@@ -1,0 +1,46 @@
+inputs:
+  case_study:
+    type: string
+    description: The case study text to analyze
+outputs:
+  final_analysis:
+    type: string
+    reference: ${synthesis.output}
+
+nodes:
+- name: requirements_analysis
+  type: llm
+  source:
+    type: code
+    path: requirements_prompt.jinja2
+  inputs:
+    deployment_name: gpt-4.1
+    temperature: 0.1
+    max_tokens: 1500
+    case_study: ${inputs.case_study}
+  connection: azureml:Default_AzureOpenAI
+  api: chat
+
+- name: architecture_design
+  type: llm
+  source:
+    type: code
+    path: architecture_prompt.jinja2
+  inputs:
+    deployment_name: gpt-4.1
+    temperature: 0.4
+    max_tokens: 3000
+    case_study: ${inputs.case_study}
+    requirements: ${requirements_analysis.output}
+  connection: azureml:Default_AzureOpenAI
+  api: chat
+
+- name: synthesis
+  type: python
+  source:
+    type: code
+    path: synthesis.py
+  inputs:
+    case_study: ${inputs.case_study}
+    requirements: ${requirements_analysis.output}
+    architecture: ${architecture_design.output}

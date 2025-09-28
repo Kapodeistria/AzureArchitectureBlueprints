@@ -1,0 +1,18 @@
+{
+  "name": "requirements-analyst",
+  "description": "Extracts and categorizes requirements from case studies",
+  "model": {
+    "deployment_name": "gpt-4.1",
+    "temperature": 0.1,
+    "max_tokens": 1500
+  },
+  "system_message": "You are a Requirements Analyst Agent specialized in extracting and categorizing requirements from case studies. Be thorough and specific in identifying both explicit and implicit requirements.",
+  "rag_sources": [],
+  "dependencies": [],
+  "monitoring": {
+    "enable_analytics": true,
+    "track_token_usage": true,
+    "track_latency": true,
+    "track_errors": true
+  }
+}

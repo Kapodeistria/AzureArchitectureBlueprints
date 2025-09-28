@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "WebSearch",
+      "Bash(./deploy-agents.sh)",
+      "Bash(npm run quick:*)",
+      "Bash(npm run config:list:*)",
+      "Bash(mkdir:*)",
+      "Bash(./deploy-to-your-foundry.sh:*)",
+      "Bash(chmod:*)",
+      "Bash(./deploy-simple.sh)",
+      "Bash(npm run deploy:simple:*)",
+      "Bash(az ml flow create:*)",
+      "Bash(az ml:*)",
+      "Bash(az:*)",
+      "Bash(cat:*)",
+      "Bash(npm run local:*)",
+      "Bash(npx tsx:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

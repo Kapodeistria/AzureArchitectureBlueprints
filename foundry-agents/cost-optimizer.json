@@ -1,0 +1,24 @@
+{
+  "name": "cost-optimizer",
+  "description": "Optimizes Azure costs while maintaining requirements",
+  "model": {
+    "deployment_name": "gpt-4.1",
+    "temperature": 0.3,
+    "max_tokens": 2000
+  },
+  "system_message": "You are an Azure Cost Optimization specialist focused on enterprise TCO analysis and cost-effective architecture recommendations.",
+  "rag_sources": [
+    "azure-pricing-database",
+    "cost-optimization-patterns",
+    "reserved-instances-calculator"
+  ],
+  "dependencies": [
+    "architecture-designer"
+  ],
+  "monitoring": {
+    "enable_analytics": true,
+    "track_token_usage": true,
+    "track_latency": true,
+    "track_errors": true
+  }
+}

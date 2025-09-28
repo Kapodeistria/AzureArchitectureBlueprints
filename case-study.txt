@@ -1,0 +1,74 @@
+Case Study: Migros Switzerland - Data Sovereignty in Azure
+Context
+Migros, Switzerland's largest retailer (CHF 32B revenue, 100K employees), operates retail stores, Migros Bank, healthcare (Medbase), and serves 3.2M Cumulus loyalty members. Currently running mixed infrastructure across 3 Swiss data centers and multi-cloud (AWS Frankfurt, Google Zürich) with 2.5PB structured and 8PB unstructured data.
+Challenge
+Switzerland's new Federal Data Protection Act (nFADP) and FINMA banking regulations require complete data sovereignty. Migros must consolidate all operations in Switzerland while enabling AI/ML analytics for their Cumulus program and maintaining 24/7 operations for retail and banking. The Swiss public demands data remains in Switzerland, especially for Migros Bank (strict FINMA) and Medbase (health data).
+Key Requirements:
+
+100% Swiss data residency for personal/financial/health data
+Real-time analytics for 3.2M Cumulus members
+Integration between retail and Migros Bank (FINMA compliant)
+<50ms latency for POS transactions
+Support 5x traffic spikes during promotions
+
+Constraints
+
+Regulatory: nFADP, FINMA Circular 2018/3, Swiss Banking Act, Health Insurance Act (KVG)
+Technical: Cannot migrate all systems at once, 300+ supplier EDI integrations
+Political: Swiss job protection, "Swissness" brand value, cooperative member trust
+Financial: CHF 5M budget, Azure Switzerland costs 30% premium
+
+Your Task (15 minutes)
+1. Architecture Design (40%)
+Design a solution using Azure Switzerland (Zürich North + Geneva West) that:
+
+Guarantees data sovereignty with clear boundaries
+Enables AI/ML without data leaving Switzerland
+Integrates Migros Bank with retail (FINMA compliant)
+Handles 10x traffic spikes while maintaining sovereignty
+
+2. Compliance Strategy (30%)
+
+Map data types to residency requirements
+Design controls for cross-border supplier data flows
+Address Migros Bank's enhanced FINMA requirements
+Create audit trail for regulatory proof
+
+3. Migration Approach (30%)
+
+Prioritize which systems migrate first (quick wins)
+Define hybrid connectivity during transition
+Ensure zero downtime for 24/7 operations
+Calculate sovereignty premium vs. functionality trade-offs
+
+Specific Scenarios
+A. Cumulus AI Analytics: Marketing wants to use AI for personalized offers using purchase history that includes health (Medbase) and financial (Bank) products. How do you enable this while ensuring data never leaves Switzerland?
+B. EU Supplier Integration: 200+ EU suppliers need real-time inventory sync. How do you enable data exchange while maintaining Swiss sovereignty?
+C. Disaster Recovery: Primary Zürich region fails during peak promotion. How do you failover to Geneva while maintaining data residency?
+Available Azure Switzerland Services
+Zürich North (Primary): Full compute, storage, networking, Azure SQL, Cosmos DB, AKS, Azure ML, Key Vault
+Geneva West (DR): Limited compute, storage focus, backup services
+Note: Some Azure services unavailable in CH regions - consider workarounds
+Deliverables
+
+Architecture diagram showing regions, data flows, and sovereignty boundaries
+Compliance matrix mapping regulations to Azure controls
+Migration roadmap with 6-month quick wins
+Trade-off analysis between sovereignty and functionality
+
+Success Metrics
+
+100% Swiss residency for classified data
+Zero sovereignty violations
+FINMA approval for Bank integration
+<50ms transaction latency
+85%+ public trust score
+
+Key Stakeholder Positions
+
+CEO: "We must be Switzerland's most trusted data handler"
+Bank CISO: "FINMA compliance is non-negotiable"
+CTO: "Need modern cloud without sacrificing sovereignty"
+Works Council: "Swiss data stays in Switzerland"
+
+Focus your solution on: Swiss-specific requirements, regulatory compliance, cultural sensitivities, and how Azure Switzerland uniquely addresses sovereignty needs while enabling innovation.RetryClaude can make mistakes. Please double-check responses.

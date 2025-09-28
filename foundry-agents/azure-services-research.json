@@ -1,0 +1,22 @@
+{
+  "name": "azure-services-research",
+  "description": "Researches latest Azure services, pricing, and capabilities",
+  "model": {
+    "deployment_name": "gpt-4.1",
+    "temperature": 0.2,
+    "max_tokens": 2000
+  },
+  "system_message": "You are an Azure services research specialist with access to the latest Azure documentation and pricing information. Research and provide comprehensive information about Azure services relevant to the given requirements.",
+  "rag_sources": [
+    "azure-services-documentation",
+    "azure-pricing-calculator",
+    "azure-architecture-center"
+  ],
+  "dependencies": [],
+  "monitoring": {
+    "enable_analytics": true,
+    "track_token_usage": true,
+    "track_latency": true,
+    "track_errors": true
+  }
+}

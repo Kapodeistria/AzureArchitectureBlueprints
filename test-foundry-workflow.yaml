@@ -1,0 +1,26 @@
+# Test workflow for deployed agents
+$schema: https://azuremlschemas.azureedge.net/promptflow/latest/Run.schema.json
+type: run
+name: "test-financeflow-analysis"
+display_name: "Test FinanceFlow Case Study Analysis"
+
+flow: "./interview-workflow.yaml"
+data:
+  case_study: |
+    FinanceFlow payment processor needs AI platform. 10M daily transactions, 50K merchants.
+    Requirements: Real-time fraud detection 90% accuracy, instant lending <30 seconds, 
+    anomaly detection, churn prediction. Constraints: 500 TPS, <100ms latency, 
+    99.99% uptime, PCI/SOX compliant, US data only, $100K/month budget, 4-month timeline.
+
+runtime: "automatic"
+resources:
+  instance_type: "Standard_E4s_v3"
+  
+environment_variables:
+  ENABLE_TRACING: "true"
+  LOG_LEVEL: "INFO"
+  
+tags:
+  test_case: "financeflow"
+  deployment_type: "production"
+  version: "v1.0"

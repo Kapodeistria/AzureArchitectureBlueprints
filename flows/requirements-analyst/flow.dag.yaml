@@ -1,0 +1,23 @@
+$schema: https://azuremlschemas.azureedge.net/promptflow/latest/Flow.schema.json
+inputs:
+  case_study:
+    type: string
+    description: The case study text to analyze
+    default: ""
+outputs:
+  analysis:
+    type: string
+    reference: ${llm_node.output}
+nodes:
+- name: llm_node
+  type: llm
+  source:
+    type: code
+    path: requirements-analyst_prompt.jinja2
+  inputs:
+    deployment_name: gpt-4.1
+    temperature: 0.3
+    max_tokens: 2000
+    case_study: ${inputs.case_study}
+  connection: azureml:Default_AzureOpenAI
+  api: chat

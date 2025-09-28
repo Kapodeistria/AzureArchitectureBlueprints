@@ -1,0 +1,26 @@
+{
+  "name": "architecture-designer",
+  "description": "Designs comprehensive Azure architecture solutions",
+  "model": {
+    "deployment_name": "gpt-4.1",
+    "temperature": 0.4,
+    "max_tokens": 3000
+  },
+  "system_message": "You are a Senior Azure Solution Architect with deep expertise in enterprise cloud architecture. Design comprehensive, production-ready Azure solutions.",
+  "rag_sources": [
+    "azure-architecture-patterns",
+    "solution-templates",
+    "reference-implementations"
+  ],
+  "dependencies": [
+    "requirements-analyst",
+    "azure-services-research",
+    "industry-patterns-research"
+  ],
+  "monitoring": {
+    "enable_analytics": true,
+    "track_token_usage": true,
+    "track_latency": true,
+    "track_errors": true
+  }
+}

@@ -11,6 +11,11 @@ import { VisualArchitectureAgent } from './visual-architecture-agent.js';
 import { CostOptimizerAgent } from './cost-optimizer-agent.js';
 import { RiskAssessorAgent } from './risk-assessor-agent.js';
 import { DocumentationAgent } from './documentation-agent.js';
+import { promises as fs } from 'fs';
+import path from 'path';
+// Phase 2: DSL functionality will be separate
+// import { StructurizrDSLValidatorAgent } from './structurizr-dsl-validator-agent.js';
+// import { SolutionArchitectReviewerAgent } from './solution-architect-reviewer-agent.js';
 
 export class SimpleOrchestrator {
   private client: OpenAI;
@@ -19,50 +24,196 @@ export class SimpleOrchestrator {
     this.client = client;
   }
 
-  async coordinate(caseStudyText: string): Promise<string> {
+  async coordinate(caseStudyText: string, caseStudyFolder?: string): Promise<string> {
     try {
-      console.log('🚀 Starting simple orchestrated analysis...');
+      console.log('🚀 Starting Phase 1: Core Architecture Analysis...');
       
-      // Initialize agents
+      // Initialize agents (Phase 1: Core workflow)
       const requirementsAgent = new RequirementsAnalystAgent(this.client);
       const architectureAgent = new ArchitectureAgent(this.client);
       const visualAgent = new VisualArchitectureAgent(this.client);
       const costAgent = new CostOptimizerAgent(this.client);
       const riskAgent = new RiskAssessorAgent(this.client);
       const docAgent = new DocumentationAgent(this.client);
+      // Phase 2: DSL agents will be separate workflow
+      // const reviewerAgent = new SolutionArchitectReviewerAgent(this.client);
+      // const dslAgent = new StructurizrDSLValidatorAgent(this.client);
 
-      // Step 1: Requirements Analysis
-      console.log('📋 Analyzing requirements...');
-      const requirements = await this.analyzeRequirements(caseStudyText);
-      
-      // Step 2: Architecture Design
-      console.log('🏗️ Designing architecture with detailed diagrams...');
-      const architecture = await this.designArchitecture(caseStudyText, requirements);
-      
-      // Step 2.5: Enhanced Visual Diagrams
-      console.log('🎨 Creating detailed ASCII architecture diagrams...');
-      const visualDiagrams = await visualAgent.generateDetailedDiagram(architecture, caseStudyText);
-      
-      // Step 3-5: Parallel Analysis (Cost, Risk, Change Management)
-      console.log('⚡ Running parallel analysis: cost, risk, and change management...');
-      const [costs, risks, changeManagement] = await Promise.all([
-        this.analyzeCosts(architecture),
-        this.assessRisks(architecture), 
-        this.developChangeStrategy(caseStudyText, architecture)
-      ]);
-      
-      // Step 6: Generate Documentation
-      console.log('📝 Generating final report...');
-      const report = await this.generateReport(caseStudyText, {
-        requirements,
-        architecture,
-        visualDiagrams, 
-        costs,
-        risks,
-        changeManagement
-      });
+      // Step 1: Requirements Analysis (with timeout fallback)
+      console.log('📋 [1/5] Analyzing business and technical requirements...');
+      let requirements = '';
+      try {
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Requirements analysis timeout')), 30000)
+        );
+        
+        requirements = await Promise.race([
+          this.analyzeRequirements(caseStudyText),
+          timeoutPromise
+        ]) as string;
+      } catch (error) {
+        console.warn('⚠️ Requirements analysis failed, using simplified fallback:', error.message);
+        requirements = `
+# Requirements Analysis (Fallback)
 
-      console.log('✅ Analysis complete!');
+## Functional Requirements
+- Core application functionality
+- User management and authentication
+- Data processing and storage
+- Integration with existing systems
+
+## Non-Functional Requirements  
+- High availability and reliability
+- Performance and scalability
+- Security and compliance
+- Cost optimization
+
+*Note: Detailed requirements analysis temporarily unavailable*
+        `;
+      }
+      
+      // Save requirements after completion
+      await this.saveIntermediateResults('Requirements Analysis', requirements, caseStudyFolder);
+      
+      // Step 2: Architecture Design (with timeout fallback)
+      console.log('🏗️ [2/5] Designing Azure architecture with service selection...');
+      let architecture = '';
+      try {
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Architecture design timeout')), 30000)
+        );
+        
+        architecture = await Promise.race([
+          this.designArchitecture(caseStudyText, requirements),
+          timeoutPromise
+        ]) as string;
+      } catch (error) {
+        console.warn('⚠️ Architecture design failed, using simplified fallback:', error.message);
+        architecture = `
+# Simplified Azure Architecture
+
+## Core Components
+- Azure App Service (Web hosting)
+- Azure SQL Database (Data storage)  
+- Azure Application Gateway (Load balancing)
+- Azure Key Vault (Security)
+- Azure Monitor (Observability)
+
+## Integration
+- Standard Azure services configuration
+- Basic security and monitoring setup
+- Scalable web application architecture
+
+*Note: Detailed architecture design temporarily unavailable*
+        `;
+      }
+      
+      // Save architecture after completion  
+      await this.saveIntermediateResults('Architecture Design', architecture, caseStudyFolder);
+      
+      // Step 2.5: Enhanced Visual Diagrams (with timeout fallback)
+      console.log('🎨 [3/5] Creating detailed ASCII architecture diagrams...');
+      let visualDiagrams = '';
+      try {
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Visual diagram generation timeout')), 30000)
+        );
+        
+        visualDiagrams = await Promise.race([
+          visualAgent.generateDetailedDiagram(architecture, caseStudyText, caseStudyFolder),
+          timeoutPromise
+        ]) as string;
+      } catch (error) {
+        console.warn('⚠️ Visual diagram generation failed, using fallback:', error.message);
+        visualDiagrams = `[Visual diagrams temporarily unavailable - proceeding with analysis]\n\nArchitecture Summary:\n${architecture}`;
+      }
+      
+      // Save visual diagrams after completion (note: already saved separately by VisualArchitectureAgent)
+      await this.saveIntermediateResults('Visual Architecture Diagrams', visualDiagrams, caseStudyFolder);
+      
+      // Phase 1: Core workflow - Skip complex review loop for now
+      console.log('✅ [3/5] Architecture and visual diagrams complete!');
+      
+      // Step 4-6: Parallel Analysis (Cost, Risk, Change Management) with timeouts  
+      console.log('⚡ [4/5] Running parallel analysis (cost, risk, change management)...');
+      let costs, risks, changeManagement;
+      
+      try {
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Parallel analysis timeout')), 45000)
+        );
+        
+        [costs, risks, changeManagement] = await Promise.race([
+          Promise.all([
+            this.analyzeCosts(architecture),
+            this.assessRisks(architecture), 
+            this.developChangeStrategy(caseStudyText, architecture)
+          ]),
+          timeoutPromise
+        ]) as [string, string, string];
+      } catch (error) {
+        console.warn('⚠️ Parallel analysis failed, using fallbacks:', error.message);
+        costs = `Cost analysis temporarily unavailable: ${error.message}`;
+        risks = `Risk assessment temporarily unavailable: ${error.message}`;
+        changeManagement = `Change management strategy temporarily unavailable: ${error.message}`;
+      }
+      
+      // Save parallel analysis results
+      await this.saveIntermediateResults('Cost Analysis', costs, caseStudyFolder);
+      await this.saveIntermediateResults('Risk Assessment', risks, caseStudyFolder);
+      await this.saveIntermediateResults('Change Management Strategy', changeManagement, caseStudyFolder);
+      
+      // Step 7: Generate Documentation (with timeout)
+      console.log('📝 [5/5] Generating comprehensive report and documentation...');
+      let report;
+      try {
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Report generation timeout')), 30000)
+        );
+        
+        report = await Promise.race([
+          this.generateReport(caseStudyText, {
+            requirements,
+            architecture,
+            visualDiagrams, 
+            costs,
+            risks,
+            changeManagement
+          }),
+          timeoutPromise
+        ]);
+      } catch (error) {
+        console.warn('⚠️ Report generation failed, using simplified fallback:', error.message);
+        report = `
+# Azure Architecture Analysis Report
+
+## Case Study
+${caseStudyText}
+
+## Requirements
+${requirements}
+
+## Architecture
+${architecture}
+
+## Visual Diagrams
+${visualDiagrams}
+
+## Cost Analysis
+${costs}
+
+## Risk Assessment
+${risks}
+
+## Change Management
+${changeManagement}
+
+---
+*Note: Detailed report generation temporarily unavailable*
+        `;
+      }
+      
+      console.log('🎉 ✅ Phase 1 Complete! Comprehensive Azure architecture analysis ready for interview!');
       return report;
       
     } catch (error) {
@@ -324,5 +475,129 @@ Create a comprehensive report that includes all visual diagrams and directly ans
       errorRate: 0,
       status: 'healthy'
     };
+  }
+
+  private async generateValidatedDSL(caseStudyText: string, architecture: any, requirements: string, caseStudyFolder?: string): Promise<any> {
+    try {
+      const dslAgent = new StructurizrDSLValidatorAgent(this.client);
+      
+      // Extract system name from case study
+      const systemNameMatch = caseStudyText.match(/(?:system|platform|application|solution)[\s\w]*:\s*([^\n]+)/i);
+      const systemName = systemNameMatch ? systemNameMatch[1].trim() : 'AzureSystem';
+      
+      // Extract Azure services from architecture
+      const azureServices = this.extractAzureServices(architecture);
+      
+      const dslTask = {
+        id: 'dsl-generation',
+        type: 'structurizr-dsl',
+        priority: 'high' as const,
+        payload: {
+          architecture: architecture,
+          requirements: requirements,
+          azureServices: azureServices,
+          systemName: systemName,
+          maxIterations: 3,
+          targetLevel: 'all' as const,
+          includeStyles: true,
+          caseStudyFolder: caseStudyFolder
+        }
+      };
+
+      const result = await dslAgent.execute(dslTask);
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DSL generation failed:', error);
+      return {
+        success: false,
+        error: error.message,
+        message: 'DSL generation encountered an error'
+      };
+    }
+  }
+
+  private extractAzureServices(architecture: any): any[] {
+    // Extract Azure services from the architecture description
+    const services: any[] = [];
+    const architectureText = typeof architecture === 'string' ? architecture : JSON.stringify(architecture);
+    
+    // Common Azure services to look for
+    const azureServicePatterns = [
+      { name: 'Azure App Service', pattern: /app\s+service|web\s+app/gi },
+      { name: 'Azure SQL Database', pattern: /sql\s+database|azure\s+sql/gi },
+      { name: 'Azure Cosmos DB', pattern: /cosmos\s+db|document\s+database/gi },
+      { name: 'Azure Storage', pattern: /blob\s+storage|azure\s+storage/gi },
+      { name: 'Azure Functions', pattern: /azure\s+functions|serverless\s+functions/gi },
+      { name: 'Azure Kubernetes Service', pattern: /aks|kubernetes\s+service/gi },
+      { name: 'Azure API Management', pattern: /api\s+management|apim/gi },
+      { name: 'Azure Key Vault', pattern: /key\s+vault|secret\s+management/gi },
+      { name: 'Azure Monitor', pattern: /azure\s+monitor|application\s+insights/gi },
+      { name: 'Azure Active Directory', pattern: /azure\s+ad|active\s+directory/gi },
+      { name: 'Azure Load Balancer', pattern: /load\s+balancer|application\s+gateway/gi },
+      { name: 'Azure Service Bus', pattern: /service\s+bus|message\s+queue/gi }
+    ];
+
+    azureServicePatterns.forEach(servicePattern => {
+      if (servicePattern.pattern.test(architectureText)) {
+        services.push({
+          name: servicePattern.name,
+          description: `${servicePattern.name} component identified in architecture`
+        });
+      }
+    });
+
+    // If no specific services found, add generic ones
+    if (services.length === 0) {
+      services.push(
+        { name: 'Azure App Service', description: 'Web application hosting platform' },
+        { name: 'Azure SQL Database', description: 'Managed relational database service' },
+        { name: 'Azure Storage', description: 'Cloud storage solution' }
+      );
+    }
+
+    return services;
+  }
+
+  // Phase 2: DSL validation methods will be moved to separate workflow
+  // reviewArchitectureWithDSLValidation() - moved to DSL orchestrator
+
+  // Phase 2: All DSL-related methods moved to separate DSL orchestrator workflow
+
+  /**
+   * Save intermediate results after each step to prevent data loss
+   */
+  private async saveIntermediateResults(
+    step: string, 
+    content: string, 
+    caseStudyFolder?: string
+  ): Promise<void> {
+    if (!caseStudyFolder) return;
+    
+    try {
+      const outputDir = path.join(process.cwd(), 'output', caseStudyFolder);
+      await fs.mkdir(outputDir, { recursive: true });
+      
+      const timestamp = new Date().toISOString();
+      const filename = `${step.toLowerCase().replace(/\s+/g, '-')}-${timestamp.slice(0, 19)}.md`;
+      const filepath = path.join(outputDir, filename);
+      
+      const formattedContent = `# ${step}
+Generated: ${timestamp}
+Status: Completed
+
+${content}
+
+---
+This is an intermediate result saved after the ${step} step.
+Part of Azure Architecture Blueprint Generator - Phase 1 Analysis
+`;
+
+      await fs.writeFile(filepath, formattedContent, 'utf-8');
+      console.log(`📁 ${step} saved: ${filename}`);
+      
+    } catch (error) {
+      console.warn(`⚠️ Failed to save ${step}:`, error.message);
+    }
   }
 }

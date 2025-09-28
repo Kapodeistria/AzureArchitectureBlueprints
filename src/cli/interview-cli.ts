@@ -134,6 +134,8 @@ class InterviewCLI {
 
     } catch (error) {
       console.error(chalk.red('❌ Analysis failed:'), error);
+    } finally {
+      this.cleanup();
     }
   }
 
@@ -220,6 +222,7 @@ class InterviewCLI {
     }
 
     console.log(chalk.green.bold('\n🎉 Analysis complete! Ready for your interview!'));
+    this.cleanup();
   }
 
   async handleQuick() {
@@ -266,20 +269,42 @@ class InterviewCLI {
       return;
     }
 
-    console.log(chalk.blue('\n🚀 Processing with Multi-Agent System...\n'));
+    // Enhanced loading animation with progress tracking
+    const mainSpinner = ora({
+      text: 'Initializing Azure Architecture Analysis...',
+      spinner: 'dots12',
+      color: 'cyan'
+    }).start();
 
-    // Quick processing
-    const result = await this.system.processCaseStudyWithContent(caseStudyText);
-    const report = result.markdownContent;
+    try {
+      // Update spinner with progress
+      mainSpinner.text = 'Starting multi-agent orchestration...';
+      
+      const result = await this.system.processCaseStudyWithContent(caseStudyText);
+      
+      mainSpinner.succeed('Analysis complete - generating final report...');
+      
+      const report = result.markdownContent;
 
-    // Auto-save and copy
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-    const filename = `quick-solution-${timestamp}.md`;
-    
-    await Promise.all([
-      this.system.saveReport(report, filename),
-      clipboardy.write(report)
-    ]);
+      // Auto-save and copy with spinner
+      const saveSpinner = ora('Saving report and copying to clipboard...').start();
+      
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      const filename = `quick-solution-${timestamp}.md`;
+      
+      await Promise.all([
+        this.system.saveReport(report, filename),
+        clipboardy.write(report)
+      ]);
+      
+      saveSpinner.succeed('Report saved and copied to clipboard!');
+      
+    } catch (error) {
+      mainSpinner.fail('Analysis failed');
+      console.error(chalk.red('❌ Error:'), error.message);
+      this.cleanup();
+      return;
+    }
 
     console.log(chalk.green.bold('\n🎉 READY FOR INTERVIEW! 🎉'));
     console.log(chalk.green(`✅ Full report saved: ${filename}`));
@@ -289,6 +314,8 @@ class InterviewCLI {
     console.log(chalk.blue.bold('\n🎯 Key Points for Presentation:'));
     const keyPoints = report.match(/## Key Talking Points\n([\s\S]*?)(?:\n##|$)/)?.[1] || '';
     console.log(chalk.white(keyPoints.trim()));
+    
+    this.cleanup();
   }
 
   async handleTest() {
@@ -347,6 +374,8 @@ GlobalRetail Corp is a mid-size retailer with $500M annual revenue operating a l
     console.log(`- Architecture Options: ${result.analysis.architectureOptions.length}`);
     console.log(`- Risk Factors: ${result.analysis.riskAssessment.length}`);
     console.log(`- Implementation Phases: ${result.analysis.implementationRoadmap.length}`);
+    
+    this.cleanup();
   }
 
   async handleStatus() {
@@ -408,6 +437,19 @@ GlobalRetail Corp is a mid-size retailer with $500M annual revenue operating a l
     console.log('  1. Copy case study to clipboard');
     console.log('  2. Run: npm run quick');
     console.log('  3. Get instant analysis for interview!');
+    
+    this.cleanup();
+  }
+
+  private cleanup() {
+    // Clean up the multi-agent system
+    this.system.cleanup();
+    
+    // Force exit after a short delay to ensure cleanup completes
+    setTimeout(() => {
+      console.log('✅ System cleanup complete');
+      process.exit(0);
+    }, 100);
   }
 
   run() {
@@ -415,6 +457,17 @@ GlobalRetail Corp is a mid-size retailer with $500M annual revenue operating a l
     if (process.argv.length === 2) {
       process.argv.push('quick');
     }
+
+    // Handle unhandled rejections and exceptions to ensure cleanup
+    process.on('unhandledRejection', (reason, promise) => {
+      console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+      this.cleanup();
+    });
+
+    process.on('uncaughtException', (error) => {
+      console.error('Uncaught Exception:', error);
+      this.cleanup();
+    });
 
     this.program.parse();
   }

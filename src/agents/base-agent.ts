@@ -45,11 +45,19 @@ export abstract class BaseAgent {
   private taskQueue: AgentTask[];
   private isProcessing: boolean;
   private healthData: AgentHealth;
+  private taskProcessorInterval?: NodeJS.Timeout;
 
-  constructor(client: OpenAI, agentName: string) {
-    this.client = client;
-    this.agentName = agentName;
-    this.config = config.getAgentConfig(agentName as any);
+  constructor(clientOrAgentName: OpenAI | string, agentName?: string) {
+    // Handle both old signature (client, agentName) and new signature (agentName)
+    if (typeof clientOrAgentName === 'string') {
+      this.agentName = clientOrAgentName;
+      this.client = null as any; // Will be set later
+    } else {
+      this.client = clientOrAgentName;
+      this.agentName = agentName!;
+    }
+    
+    this.config = config.getAgentConfig(this.agentName as any) || {};
     this.metrics = new Map();
     this.taskQueue = [];
     this.isProcessing = false;
@@ -62,8 +70,10 @@ export abstract class BaseAgent {
       averageResponseTime: 0
     };
 
-    // Start background task processing
-    this.startTaskProcessor();
+    // Start background task processing only if we have a proper client
+    if (this.client) {
+      this.startTaskProcessor();
+    }
   }
 
   // Abstract method for agent-specific processing
@@ -198,7 +208,7 @@ export abstract class BaseAgent {
 
   // Background task processor
   private async startTaskProcessor(): Promise<void> {
-    setInterval(async () => {
+    this.taskProcessorInterval = setInterval(async () => {
       if (this.isProcessing || this.taskQueue.length === 0) {
         return;
       }
@@ -216,6 +226,14 @@ export abstract class BaseAgent {
         this.isProcessing = false;
       }
     }, 100); // Check every 100ms
+  }
+
+  // Cleanup method to stop background processes
+  cleanup(): void {
+    if (this.taskProcessorInterval) {
+      clearInterval(this.taskProcessorInterval);
+      this.taskProcessorInterval = undefined;
+    }
   }
 
   // Health monitoring

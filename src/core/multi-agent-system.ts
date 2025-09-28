@@ -153,7 +153,12 @@ class MultiAgentSystem {
   }
 
   async processCaseStudy(caseStudyText: string): Promise<CaseStudyAnalysis> {
-    console.log(chalk.blue.bold('\n🚀 Starting Optimized Multi-Agent Analysis\n'));
+    // Enhanced progress display with timing
+    const progressSpinner = ora({
+      text: 'Initializing Azure Architecture Blueprint Generator...',
+      spinner: 'aesthetic',
+      color: 'blue'
+    }).start();
     
     const startTime = Date.now();
     
@@ -161,12 +166,15 @@ class MultiAgentSystem {
     const orchestrator = new SimpleOrchestrator(this.client);
 
     try {
+      // Generate case study folder name for organized output
+      const caseStudyFolder = this.generateCaseStudyFolder(caseStudyText);
+      
       // Use optimized orchestrator for parallel/sequential execution
-      console.log(chalk.yellow('📋 Orchestrating workflow with parallel optimization...'));
-      const analysisResult = await orchestrator.coordinate(caseStudyText);
+      progressSpinner.text = 'Coordinating multi-agent workflow with parallel optimization...';
+      const analysisResult = await orchestrator.coordinate(caseStudyText, caseStudyFolder);
       
       const executionTime = Date.now() - startTime;
-      console.log(chalk.green(`✅ Analysis completed in ${executionTime}ms`));
+      progressSpinner.succeed(`Analysis completed in ${Math.round(executionTime/1000)}s`);
 
       // Save results to output folder with performance metrics
       const agentMetrics = {
@@ -194,7 +202,8 @@ class MultiAgentSystem {
       
     } catch (error) {
       const executionTime = Date.now() - startTime;
-      console.error(chalk.red('❌ Analysis failed:'), error);
+      progressSpinner.fail(`Analysis failed after ${Math.round(executionTime/1000)}s`);
+      console.error(chalk.red('❌ Error details:'), error.message);
       
       // Still try to save error information
       await outputManager.saveAnalysis(
@@ -338,6 +347,43 @@ class MultiAgentSystem {
       savedPath: filePath,
       markdownContent
     };
+  }
+
+  private generateCaseStudyFolder(caseStudyText: string): string {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const title = this.extractTitle(caseStudyText);
+    const sanitizedTitle = title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '')
+      .replace(/\s+/g, '-')
+      .slice(0, 50);
+    
+    return `case-study-${timestamp}-${sanitizedTitle}`;
+  }
+
+  private extractTitle(caseStudyText: string): string {
+    const lines = caseStudyText.trim().split('\n');
+    
+    // Look for markdown headers
+    const headerLine = lines.find(line => line.trim().startsWith('#'));
+    if (headerLine) {
+      return headerLine.replace(/^#+\s*/, '').trim();
+    }
+    
+    // Look for first meaningful line
+    const firstLine = lines.find(line => line.trim().length > 0);
+    if (firstLine && firstLine.length > 5) {
+      return firstLine.trim().slice(0, 50);
+    }
+    
+    return 'case-study';
+  }
+
+  // Cleanup method to properly shut down the system
+  cleanup(): void {
+    // If using BaseAgent-derived classes, clean them up
+    // For now, we'll add a simple timer to force exit if needed
+    console.log('\n🔄 Cleaning up system...');
   }
 }
 

@@ -209,7 +209,7 @@ export class ImprovedOrchestratorAgent extends BaseAgent {
 
       // Review the architecture
       const reviewFeedback = await this.executeWithLogging(`Architecture Review V${iteration}`, () =>
-        this.reviewerAgent.review(caseStudyText, requirements, currentArchitecture, researchData)
+        this.reviewerAgent.reviewArchitecture(caseStudyText, requirements, currentArchitecture, researchData)
       );
 
       architectureEvolution.push({

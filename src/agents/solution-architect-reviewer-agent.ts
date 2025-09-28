@@ -12,14 +12,121 @@ export interface ReviewFeedback {
   improvements: string[];
   strengths: string[];
   detailedFeedback: string;
+  improvedArchitecture?: string; // For DSL integration workflow
+}
+
+export interface ReviewTask {
+  id: string;
+  type: 'architecture-review' | 'cost-review';
+  priority: 'high' | 'medium' | 'low';
+  payload: {
+    caseStudyText: string;
+    architecture: string;
+    requirements: string;
+    visualDiagrams?: string;
+    researchData?: {
+      azureServices: string;
+      industryPatterns: string;
+      compliance: string;
+    };
+  };
 }
 
 export class SolutionArchitectReviewerAgent extends BaseAgent {
-  constructor() {
+  constructor(client?: any) {
     super('solution-architect-reviewer');
+    if (client) {
+      this.client = client;
+    }
   }
 
-  async review(
+  /**
+   * Execute architecture review task - compatible with orchestrator interface
+   */
+  async execute(task: ReviewTask): Promise<ReviewFeedback & { score: number; feedback: string }> {
+    const { caseStudyText, architecture, requirements, visualDiagrams, researchData } = task.payload;
+    
+    // Use existing review method as the core logic
+    const reviewResult = await this.reviewArchitecture(
+      caseStudyText,
+      requirements, 
+      architecture,
+      researchData || {
+        azureServices: 'Standard Azure services analyzed',
+        industryPatterns: 'Industry best practices considered',
+        compliance: 'Security and compliance evaluated'
+      }
+    );
+
+    // If not approved, generate improved architecture
+    if (!reviewResult.approved && reviewResult.overallScore < 8) {
+      const improvedArchitecture = await this.generateImprovedArchitecture(
+        architecture,
+        reviewResult,
+        caseStudyText,
+        requirements
+      );
+      reviewResult.improvedArchitecture = improvedArchitecture;
+    }
+
+    // Return in format expected by orchestrator
+    return {
+      ...reviewResult,
+      score: reviewResult.overallScore,
+      feedback: reviewResult.detailedFeedback
+    };
+  }
+
+  /**
+   * Generate improved architecture based on review feedback
+   */
+  private async generateImprovedArchitecture(
+    originalArchitecture: string,
+    reviewResult: ReviewFeedback,
+    caseStudyText: string,
+    requirements: string
+  ): Promise<string> {
+    const improvementPrompt = `You are a Senior Solution Architect. Based on the review feedback, improve the architecture to address all critical issues and key improvements.
+
+ORIGINAL ARCHITECTURE:
+${originalArchitecture}
+
+REVIEW FEEDBACK:
+Score: ${reviewResult.overallScore}/10
+Critical Issues: ${reviewResult.criticalIssues.join(', ')}
+Improvements Needed: ${reviewResult.improvements.join(', ')}
+Detailed Feedback: ${reviewResult.detailedFeedback}
+
+CASE STUDY CONTEXT:
+${caseStudyText}
+
+REQUIREMENTS:
+${requirements}
+
+Please provide an improved architecture that specifically addresses all the critical issues and incorporates the key improvements while maintaining the core architectural vision. Focus on:
+
+1. Resolving all critical issues identified
+2. Implementing suggested improvements
+3. Maintaining Azure best practices
+4. Ensuring DSL compatibility with specific service names and clear relationships
+5. Providing concrete technical details and SKUs
+
+Return only the improved architecture description.`;
+
+    try {
+      const response = await this.callOpenAI([
+        { role: 'system', content: 'You are improving an Azure architecture based on expert review feedback. Focus on addressing specific issues while maintaining architectural integrity.' },
+        { role: 'user', content: improvementPrompt }
+      ]);
+
+      return response;
+    } catch (error) {
+      console.error('Failed to generate improved architecture:', error);
+      return originalArchitecture; // Fallback to original if improvement fails
+    }
+  }
+
+  async reviewArchitecture(
     caseStudyText: string, 
     requirements: string,
     architectureDesign: string,

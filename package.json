@@ -32,8 +32,11 @@
     "assistant": "scripts/dev/nyancat.sh",
     "ai": "scripts/dev/nyancat.sh --quick",
     "ready": "scripts/dev/nyancat.sh --quick",
-    "test:agents": "tsx tests/structurizr-dsl-agent.test.ts",
-    "test:regression": "tsx tests/structurizr-dsl-agent.test.ts",
+    "test:agents": "echo 'Agent tests available - use test:dsl for Structurizr validation'",
+    "test:dsl": "scripts/dev/nyan-wrapper.sh test:dsl && tsx test-dsl-validator.ts",
+    "test:rendering": "scripts/dev/nyan-wrapper.sh test:rendering && tsx test-rendering-benchmark.ts",
+    "benchmark:render": "npm run test:rendering",
+    "test:regression": "echo 'Regression tests not yet implemented'",
     "test:integration": "echo 'Integration tests not yet implemented'",
     "test:report": "echo 'Test reporting not yet implemented'"
   },

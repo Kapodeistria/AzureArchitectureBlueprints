@@ -3,9 +3,9 @@
  * Quick structural test of the integrated workflow
  */
 
-import { SimpleOrchestrator } from './src/agents/simple-orchestrator.js';
-import { SolutionArchitectReviewerAgent } from './src/agents/solution-architect-reviewer-agent.js';
-import { StructurizrDSLValidatorAgent } from './src/agents/structurizr-dsl-validator-agent.js';
+import { SimpleOrchestrator } from '../../src/agents/simple-orchestrator.js';
+import { SolutionArchitectReviewerAgent } from '../../src/agents/solution-architect-reviewer-agent.js';
+import { StructurizrDSLValidatorAgent } from '../../src/agents/structurizr-dsl-validator-agent.js';
 
 function testWorkflowStructure() {
   console.log('🔍 Testing Integrated Workflow Structure\n');

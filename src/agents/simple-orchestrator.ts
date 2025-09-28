@@ -11,6 +11,7 @@ import { VisualArchitectureAgent } from './visual-architecture-agent.js';
 import { CostOptimizerAgent } from './cost-optimizer-agent.js';
 import { RiskAssessorAgent } from './risk-assessor-agent.js';
 import { DocumentationAgent } from './documentation-agent.js';
+import { ResearchOrchestratorAgent } from './research-orchestrator-agent.js';
 import { promises as fs } from 'fs';
 import path from 'path';
 // Phase 2: DSL functionality will be separate
@@ -26,9 +27,10 @@ export class SimpleOrchestrator {
 
   async coordinate(caseStudyText: string, caseStudyFolder?: string): Promise<string> {
     try {
-      console.log('🚀 Starting Phase 1: Core Architecture Analysis...');
+      console.log('🚀 Starting Phase 1: Intelligence-Driven Architecture Analysis...');
       
       // Initialize agents (Phase 1: Core workflow)
+      const researchAgent = new ResearchOrchestratorAgent(this.client);
       const requirementsAgent = new RequirementsAnalystAgent(this.client);
       const architectureAgent = new ArchitectureAgent(this.client);
       const visualAgent = new VisualArchitectureAgent(this.client);
@@ -39,8 +41,33 @@ export class SimpleOrchestrator {
       // const reviewerAgent = new SolutionArchitectReviewerAgent(this.client);
       // const dslAgent = new StructurizrDSLValidatorAgent(this.client);
 
-      // Step 1: Requirements Analysis (with timeout fallback)
-      console.log('📋 [1/5] Analyzing business and technical requirements...');
+      // Step 0: Parallel Research Intelligence (NEW - 6 agents with time limits)
+      console.log('🔍 [0/6] Executing parallel research across 6 specialized agents...');
+      let researchResults = [];
+      let researchReport = '';
+      try {
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Research intelligence timeout')), 120000) // 2 min timeout
+        );
+        
+        researchResults = await Promise.race([
+          researchAgent.executeResearch(caseStudyText),
+          timeoutPromise
+        ]) as any[];
+        
+        researchReport = researchAgent.generateResearchReport(researchResults);
+        console.log(`✅ Research completed: ${researchResults.filter(r => r.status === 'completed').length}/${researchResults.length} agents successful`);
+        
+      } catch (error) {
+        console.warn('⚠️ Research intelligence failed, using fallback:', error.message);
+        researchReport = `# Research Intelligence (Fallback)\n\nResearch analysis temporarily unavailable: ${error.message}\n\nProceeding with standard analysis workflow.`;
+      }
+      
+      // Save research after completion
+      await this.saveIntermediateResults('Research Intelligence', researchReport, caseStudyFolder);
+
+      // Step 1: Requirements Analysis (with timeout fallback and research context)
+      console.log('📋 [1/6] Analyzing business and technical requirements...');
       let requirements = '';
       try {
         const timeoutPromise = new Promise((_, reject) => 
@@ -48,7 +75,7 @@ export class SimpleOrchestrator {
         );
         
         requirements = await Promise.race([
-          this.analyzeRequirements(caseStudyText),
+          this.analyzeRequirements(caseStudyText, researchReport),
           timeoutPromise
         ]) as string;
       } catch (error) {
@@ -75,8 +102,8 @@ export class SimpleOrchestrator {
       // Save requirements after completion
       await this.saveIntermediateResults('Requirements Analysis', requirements, caseStudyFolder);
       
-      // Step 2: Architecture Design (with timeout fallback)
-      console.log('🏗️ [2/5] Designing Azure architecture with service selection...');
+      // Step 2: Architecture Design (with timeout fallback and research context)
+      console.log('🏗️ [2/6] Designing Azure architecture with service selection...');
       let architecture = '';
       try {
         const timeoutPromise = new Promise((_, reject) => 
@@ -84,7 +111,7 @@ export class SimpleOrchestrator {
         );
         
         architecture = await Promise.race([
-          this.designArchitecture(caseStudyText, requirements),
+          this.designArchitecture(caseStudyText, requirements, researchReport),
           timeoutPromise
         ]) as string;
       } catch (error) {
@@ -112,7 +139,7 @@ export class SimpleOrchestrator {
       await this.saveIntermediateResults('Architecture Design', architecture, caseStudyFolder);
       
       // Step 2.5: Enhanced Visual Diagrams (with timeout fallback)
-      console.log('🎨 [3/5] Creating detailed ASCII architecture diagrams...');
+      console.log('🎨 [3/6] Creating detailed ASCII architecture diagrams...');
       let visualDiagrams = '';
       try {
         const timeoutPromise = new Promise((_, reject) => 
@@ -132,10 +159,10 @@ export class SimpleOrchestrator {
       await this.saveIntermediateResults('Visual Architecture Diagrams', visualDiagrams, caseStudyFolder);
       
       // Phase 1: Core workflow - Skip complex review loop for now
-      console.log('✅ [3/5] Architecture and visual diagrams complete!');
+      console.log('✅ [3/6] Architecture and visual diagrams complete!');
       
       // Step 4-6: Parallel Analysis (Cost, Risk, Change Management) with timeouts  
-      console.log('⚡ [4/5] Running parallel analysis (cost, risk, change management)...');
+      console.log('⚡ [4/6] Running parallel analysis (cost, risk, change management)...');
       let costs, risks, changeManagement;
       
       try {
@@ -163,8 +190,8 @@ export class SimpleOrchestrator {
       await this.saveIntermediateResults('Risk Assessment', risks, caseStudyFolder);
       await this.saveIntermediateResults('Change Management Strategy', changeManagement, caseStudyFolder);
       
-      // Step 7: Generate Documentation (with timeout)
-      console.log('📝 [5/5] Generating comprehensive report and documentation...');
+      // Step 7: Generate Documentation (with timeout and research context)
+      console.log('📝 [5/6] Generating comprehensive report and documentation...');
       let report;
       try {
         const timeoutPromise = new Promise((_, reject) => 
@@ -173,6 +200,7 @@ export class SimpleOrchestrator {
         
         report = await Promise.race([
           this.generateReport(caseStudyText, {
+            researchReport,
             requirements,
             architecture,
             visualDiagrams, 
@@ -213,7 +241,7 @@ ${changeManagement}
         `;
       }
       
-      console.log('🎉 ✅ Phase 1 Complete! Comprehensive Azure architecture analysis ready for interview!');
+      console.log('🎉 ✅ Phase 1 Complete! Intelligence-driven Azure architecture analysis ready for interview!');
       return report;
       
     } catch (error) {
@@ -222,7 +250,7 @@ ${changeManagement}
     }
   }
 
-  private async analyzeRequirements(caseStudyText: string): Promise<string> {
+  private async analyzeRequirements(caseStudyText: string, researchContext?: string): Promise<string> {
     const response = await this.client.chat.completions.create({
       model: config.getAzureConfig().foundry.modelDeploymentName,
       messages: [
@@ -247,7 +275,7 @@ Focus on actionable requirements that directly address the case study questions.
         },
         {
           role: 'user',
-          content: `Analyze requirements with use case prioritization for:\n\n${caseStudyText}`
+          content: `Analyze requirements with use case prioritization for:\n\n${caseStudyText}${researchContext ? `\n\nRESEARCH INTELLIGENCE CONTEXT:\n${researchContext}` : ''}`
         }
       ],
       max_tokens: 1200,
@@ -257,7 +285,7 @@ Focus on actionable requirements that directly address the case study questions.
     return response.choices[0]?.message?.content || 'Requirements analysis failed';
   }
 
-  private async designArchitecture(caseStudyText: string, requirements: string): Promise<string> {
+  private async designArchitecture(caseStudyText: string, requirements: string, researchContext?: string): Promise<string> {
     const response = await this.client.chat.completions.create({
       model: config.getAzureConfig().foundry.modelDeploymentName,
       messages: [
@@ -295,7 +323,7 @@ Focus on comprehensive visual diagrams with practical, interview-ready architect
         },
         {
           role: 'user',
-          content: `Design specific Azure architecture with AI service selection:\n\nCase Study:\n${caseStudyText}\n\nRequirements:\n${requirements}`
+          content: `Design specific Azure architecture with AI service selection:\n\nCase Study:\n${caseStudyText}\n\nRequirements:\n${requirements}${researchContext ? `\n\nRESEARCH INTELLIGENCE CONTEXT:\n${researchContext}` : ''}`
         }
       ],
       max_tokens: 3500,

@@ -4,7 +4,7 @@
  */
 
 import OpenAI from 'openai';
-import config from '../config.js';
+import config from '../config/config.js';
 import { RequirementsAnalystAgent } from './requirements-analyst-agent.js';
 import { ArchitectureAgent } from './architecture-agent.js';
 import { VisualArchitectureAgent } from './visual-architecture-agent.js';

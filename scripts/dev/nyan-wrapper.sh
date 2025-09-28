@@ -106,7 +106,7 @@ case "$1" in
         ;;
     "copilot"|"assistant"|"ai"|"ready")
         # Full animation
-        ./nyancat.sh
+        ./scripts/dev/nyancat.sh
         exit 0
         ;;
     *)

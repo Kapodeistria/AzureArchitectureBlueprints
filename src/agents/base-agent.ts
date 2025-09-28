@@ -4,7 +4,7 @@
  */
 
 import OpenAI from 'openai';
-import config from '../config.js';
+import config from '../config/config.js';
 
 export interface AgentTask {
   id: string;

@@ -12,8 +12,8 @@ import ora from 'ora';
 import clipboardy from 'clipboardy';
 import { promises as fs } from 'fs';
 import path from 'path';
-import config from './config.js';
-import { SimpleOrchestrator } from './agents/simple-orchestrator.js';
+import config from '../config/config.js';
+import { SimpleOrchestrator } from '../agents/simple-orchestrator.js';
 import { outputManager } from './output-manager.js';
 
 interface AgentConfig {

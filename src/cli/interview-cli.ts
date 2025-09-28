@@ -9,7 +9,7 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import ora from 'ora';
 import clipboardy from 'clipboardy';
-import { MultiAgentSystem } from './multi-agent-system.js';
+import { MultiAgentSystem } from '../core/multi-agent-system.js';
 import { promises as fs } from 'fs';
 
 class InterviewCLI {

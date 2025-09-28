@@ -5,7 +5,7 @@
 
 import { BaseAgent } from './base-agent.js';
 import OpenAI from 'openai';
-import config from '../config.js';
+import config from '../config/config.js';
 import { AzureServicesResearchAgent } from './azure-services-research-agent.js';
 import { IndustryPatternsResearchAgent } from './industry-patterns-research-agent.js';
 import { RequirementsAnalystAgent } from './requirements-analyst-agent.js';

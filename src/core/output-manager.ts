@@ -5,7 +5,7 @@
 
 import { promises as fs } from 'fs';
 import { join, dirname } from 'path';
-import config from './config.js';
+import config from '../config/config.js';
 
 export interface OutputMetadata {
   timestamp: number;

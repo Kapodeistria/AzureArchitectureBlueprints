@@ -65,8 +65,8 @@ export class CostAwareRefinementOrchestrator {
   private visualAgent: VisualArchitectureAgent;
 
   // Refinement parameters
-  private readonly TARGET_SATISFACTION = 8.5; // 0-10 scale
-  private readonly MAX_ITERATIONS = 3;
+  private readonly TARGET_SATISFACTION = 8.0; // 0-10 scale (minimum acceptable)
+  private readonly MAX_ITERATIONS = 5; // Maximum refinement loops
   private readonly MIN_IMPROVEMENT = 0.2; // Points per iteration
 
   // Satisfaction weights
@@ -114,12 +114,12 @@ export class CostAwareRefinementOrchestrator {
         initialRiskAssessment
       );
 
-      console.log(`📊 Initial Satisfaction Score: ${initialSatisfaction.overall.toFixed(1)}/10`);
+      console.log(`📊 Initial Satisfaction Score: ${initialSatisfaction.overall.toFixed(1)}/10 (target: ${this.TARGET_SATISFACTION}/10)`);
       console.log(`   WAF: ${initialSatisfaction.waf.toFixed(1)}/10, Cost: ${initialSatisfaction.cost.toFixed(1)}/10, Risk: ${initialSatisfaction.risk.toFixed(1)}/10`);
 
       // Check if we're already satisfied
       if (initialSatisfaction.overall >= this.TARGET_SATISFACTION) {
-        console.log(`✅ Initial architecture already meets target (${this.TARGET_SATISFACTION}/10)`);
+        console.log(`✅ Initial architecture meets target ≥${this.TARGET_SATISFACTION}/10`);
         return {
           finalArchitecture: initialArchitecture,
           finalVisualDiagrams: currentVisualDiagrams,

@@ -6,6 +6,29 @@
 import OpenAI from 'openai';
 import config from '../config/config.js';
 
+// Global agent registry for cleanup
+const agentRegistry = new Set<BaseAgent>();
+let cleanupHandlersRegistered = false;
+
+// Register global cleanup handlers once
+function registerGlobalCleanupHandlers() {
+  if (cleanupHandlersRegistered) return;
+  cleanupHandlersRegistered = true;
+
+  const cleanup = () => {
+    agentRegistry.forEach(agent => agent.cleanup());
+  };
+
+  process.once('exit', cleanup);
+  process.once('SIGINT', cleanup);
+  process.once('SIGTERM', cleanup);
+  process.once('uncaughtException', (error) => {
+    console.error('Uncaught exception:', error);
+    cleanup();
+    process.exit(1);
+  });
+}
+
 export interface AgentTask {
   id: string;
   type: string;
@@ -75,25 +98,9 @@ export abstract class BaseAgent {
       this.startTaskProcessor();
     }
 
-    // Register cleanup on process exit to prevent memory leaks
-    this.registerCleanupHandlers();
-  }
-
-  /**
-   * Register cleanup handlers for process exit
-   */
-  private registerCleanupHandlers(): void {
-    // Store bound cleanup function for proper removal
-    const boundCleanup = this.cleanup.bind(this);
-
-    // Register for different exit scenarios
-    process.once('exit', boundCleanup);
-    process.once('SIGINT', boundCleanup);
-    process.once('SIGTERM', boundCleanup);
-    process.once('uncaughtException', (error) => {
-      console.error('Uncaught exception in agent:', error);
-      boundCleanup();
-    });
+    // Register this agent in global registry for cleanup
+    agentRegistry.add(this);
+    registerGlobalCleanupHandlers();
   }
 
   // Abstract method for agent-specific processing
@@ -261,10 +268,8 @@ export abstract class BaseAgent {
     // Clear metrics map
     this.metrics.clear();
 
-    // Remove event listeners to prevent memory leaks
-    process.removeAllListeners('exit');
-    process.removeAllListeners('SIGINT');
-    process.removeAllListeners('SIGTERM');
+    // Remove from global registry
+    agentRegistry.delete(this);
 
     // Only log if agentName is defined
     if (this.agentName) {

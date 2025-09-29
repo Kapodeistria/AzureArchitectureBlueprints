@@ -1,0 +1,22 @@
+{
+  "name": "security-compliance-research",
+  "description": "Analyzes security and compliance requirements",
+  "model": {
+    "deployment_name": "gpt-4.1",
+    "temperature": 0.1,
+    "max_tokens": 1800
+  },
+  "system_message": "You are a cybersecurity and compliance expert specializing in Azure security services and regulatory frameworks.",
+  "rag_sources": [
+    "compliance-frameworks-database",
+    "azure-security-documentation",
+    "regulatory-requirements"
+  ],
+  "dependencies": [],
+  "monitoring": {
+    "enable_analytics": true,
+    "track_token_usage": true,
+    "track_latency": true,
+    "track_errors": true
+  }
+}

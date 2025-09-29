@@ -56,12 +56,12 @@ export abstract class BaseAgent {
       this.client = clientOrAgentName;
       this.agentName = agentName!;
     }
-    
+
     this.config = config.getAgentConfig(this.agentName as any) || {};
     this.metrics = new Map();
     this.taskQueue = [];
     this.isProcessing = false;
-    
+
     this.healthData = {
       status: 'healthy',
       uptime: Date.now(),
@@ -74,6 +74,26 @@ export abstract class BaseAgent {
     if (this.client) {
       this.startTaskProcessor();
     }
+
+    // Register cleanup on process exit to prevent memory leaks
+    this.registerCleanupHandlers();
+  }
+
+  /**
+   * Register cleanup handlers for process exit
+   */
+  private registerCleanupHandlers(): void {
+    // Store bound cleanup function for proper removal
+    const boundCleanup = this.cleanup.bind(this);
+
+    // Register for different exit scenarios
+    process.once('exit', boundCleanup);
+    process.once('SIGINT', boundCleanup);
+    process.once('SIGTERM', boundCleanup);
+    process.once('uncaughtException', (error) => {
+      console.error('Uncaught exception in agent:', error);
+      boundCleanup();
+    });
   }
 
   // Abstract method for agent-specific processing
@@ -228,12 +248,25 @@ export abstract class BaseAgent {
     }, 100); // Check every 100ms
   }
 
-  // Cleanup method to stop background processes
+  // Cleanup method to stop background processes and prevent memory leaks
   cleanup(): void {
     if (this.taskProcessorInterval) {
       clearInterval(this.taskProcessorInterval);
       this.taskProcessorInterval = undefined;
     }
+
+    // Clear task queue to prevent memory retention
+    this.taskQueue = [];
+
+    // Clear metrics map
+    this.metrics.clear();
+
+    // Remove event listeners to prevent memory leaks
+    process.removeAllListeners('exit');
+    process.removeAllListeners('SIGINT');
+    process.removeAllListeners('SIGTERM');
+
+    console.log(`🧹 Cleaned up agent: ${this.agentName}`);
   }
 
   // Health monitoring

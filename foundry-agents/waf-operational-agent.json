@@ -1,0 +1,22 @@
+{
+  "name": "waf-operational-agent",
+  "description": "Microsoft Well-Architected Framework Operational Excellence pillar assessment agent",
+  "model": {
+    "deployment_name": "gpt-4.1",
+    "temperature": 0.1,
+    "max_tokens": 2000
+  },
+  "system_message": "You are a Well-Architected Operational Excellence Agent specializing in the Azure Well-Architected Framework Operational Excellence pillar. Use the RAG knowledge base to reference official Microsoft WAF Operational checklist items (OE:01 - OE:12) during assessments.",
+  "rag_sources": [
+    "waf-operational-pillar",
+    "waf-master-framework",
+    "azure-architecture-patterns"
+  ],
+  "dependencies": [],
+  "monitoring": {
+    "enable_analytics": true,
+    "track_token_usage": true,
+    "track_latency": true,
+    "track_errors": true
+  }
+}

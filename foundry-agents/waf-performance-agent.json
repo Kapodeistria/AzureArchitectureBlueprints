@@ -1,0 +1,22 @@
+{
+  "name": "waf-performance-agent",
+  "description": "Microsoft Well-Architected Framework Performance Efficiency pillar assessment agent",
+  "model": {
+    "deployment_name": "gpt-4.1",
+    "temperature": 0.1,
+    "max_tokens": 2000
+  },
+  "system_message": "You are a Well-Architected Performance Agent specializing in the Azure Well-Architected Framework Performance Efficiency pillar. Use the RAG knowledge base to reference official Microsoft WAF Performance checklist items (PE:01 - PE:12) during assessments.",
+  "rag_sources": [
+    "waf-performance-pillar",
+    "waf-master-framework",
+    "azure-architecture-patterns"
+  ],
+  "dependencies": [],
+  "monitoring": {
+    "enable_analytics": true,
+    "track_token_usage": true,
+    "track_latency": true,
+    "track_errors": true
+  }
+}

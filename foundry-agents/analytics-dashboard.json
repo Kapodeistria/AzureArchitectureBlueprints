@@ -1,0 +1,42 @@
+{
+  "name": "Interview Assistant Analytics",
+  "metrics": [
+    {
+      "name": "Agent Performance",
+      "type": "time_series",
+      "queries": [
+        "avg(response_time) by agent_name",
+        "sum(token_usage) by agent_name",
+        "rate(error_count) by agent_name"
+      ]
+    },
+    {
+      "name": "Cost Analysis",
+      "type": "gauge",
+      "queries": [
+        "sum(token_cost) by date",
+        "avg(cost_per_analysis)"
+      ]
+    },
+    {
+      "name": "Quality Metrics",
+      "type": "bar_chart",
+      "queries": [
+        "avg(reviewer_score) by architecture_type",
+        "count(refinement_iterations) by case_study"
+      ]
+    }
+  ],
+  "alerts": [
+    {
+      "name": "High Error Rate",
+      "condition": "error_rate > 0.05",
+      "action": "notify_team"
+    },
+    {
+      "name": "Cost Threshold",
+      "condition": "daily_cost > 100",
+      "action": "send_email"
+    }
+  ]
+}

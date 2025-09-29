@@ -1,0 +1,38 @@
+repos:
+  # E2E Testing Hooks
+  - repo: local
+    hooks:
+      - id: smoke-test
+        name: E2E Smoke Test
+        entry: npm run test:pre-commit
+        language: system
+        stages: [pre-commit]
+        verbose: true
+        
+      - id: waf-knowledge-check
+        name: WAF Knowledge Base Check
+        entry: bash -c 'if [ ! -d "waf-knowledge-base" ] || [ $(ls waf-knowledge-base/*.json 2>/dev/null | wc -l) -lt 5 ]; then echo "❌ WAF knowledge base missing or incomplete. Run: npm run waf:download"; exit 1; fi'
+        language: system
+        stages: [pre-commit]
+        
+      - id: agent-config-validation
+        name: Agent Configuration Validation
+        entry: bash -c 'if ! grep -q "waf-.*-agent" src/utils/deploy-agents-to-foundry.ts; then echo "❌ WAF agents not properly configured"; exit 1; fi'
+        language: system
+        files: 'src/utils/deploy-agents-to-foundry.ts'
+        stages: [pre-commit]
+
+  # Optional: Code Quality Hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-json
+        files: '\.(json)$'
+      - id: check-yaml
+        files: '\.(yaml|yml)$'
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+# Configuration
+default_stages: [pre-commit]
+fail_fast: true

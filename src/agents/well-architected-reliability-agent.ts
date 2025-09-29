@@ -7,6 +7,8 @@
 import OpenAI from 'openai';
 import config from '../config/config.js';
 import { BaseAgent } from './base-agent.js';
+import { promises as fs } from 'fs';
+import { existsSync } from 'fs';
 
 interface ReliabilityTask {
   id: string;
@@ -33,8 +35,27 @@ interface ReliabilityResult {
 }
 
 export class WellArchitectedReliabilityAgent extends BaseAgent {
+  private wafKnowledge: any = null;
+
   constructor(client: OpenAI) {
     super(client);
+    this.loadWAFKnowledge();
+  }
+
+  /**
+   * Load official Microsoft WAF Reliability knowledge base
+   */
+  private async loadWAFKnowledge(): Promise<void> {
+    try {
+      const knowledgePath = 'waf-knowledge-base/reliability-knowledge.json';
+      if (existsSync(knowledgePath)) {
+        const knowledgeData = await fs.readFile(knowledgePath, 'utf8');
+        this.wafKnowledge = JSON.parse(knowledgeData);
+        console.log('🛡️ Reliability Agent: Loaded official Microsoft WAF knowledge (10 checklist items)');
+      }
+    } catch (error) {
+      console.warn('⚠️ Reliability Agent: Could not load WAF knowledge base:', error.message);
+    }
   }
 
   async execute(task: ReliabilityTask): Promise<ReliabilityResult> {

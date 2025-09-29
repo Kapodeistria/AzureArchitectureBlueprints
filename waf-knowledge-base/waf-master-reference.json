@@ -1,0 +1,25 @@
+{
+  "title": "Microsoft Azure Well-Architected Framework - Complete Reference",
+  "source": "Microsoft Learn",
+  "lastUpdated": "2025-09-29T02:36:53.870Z",
+  "pillars": {
+    "security": "12 key recommendations for confidentiality, integrity, availability",
+    "reliability": "10 key recommendations for resiliency, availability, recovery",
+    "performance": "12 key recommendations for scalability, optimization, monitoring",
+    "operational": "12 key recommendations for DevOps, automation, deployment",
+    "cost": "14 key recommendations for financial management, optimization"
+  },
+  "assessmentProcess": {
+    "overview": "Complete 5-pillar assessment following official Microsoft methodology",
+    "scoringScale": "1-10 scale with detailed pillar breakdown",
+    "implementation": "Prioritized roadmap with Azure service recommendations",
+    "compliance": "Gap analysis and improvement recommendations"
+  },
+  "agentMapping": {
+    "WellArchitectedSecurityAgent": "security-knowledge.json",
+    "WellArchitectedReliabilityAgent": "reliability-knowledge.json",
+    "WellArchitectedPerformanceAgent": "performance-efficiency-knowledge.json",
+    "WellArchitectedOperationalExcellenceAgent": "operational-excellence-knowledge.json",
+    "CostOptimizerAgent": "cost-optimization-knowledge.json"
+  }
+}

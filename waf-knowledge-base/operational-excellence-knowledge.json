@@ -1,0 +1,145 @@
+{
+  "pillar": "Operational Excellence",
+  "agent": "WellArchitectedOperationalExcellenceAgent",
+  "source": "Microsoft Azure Well-Architected Framework",
+  "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/checklist",
+  "lastUpdated": "2025-09-29T02:36:53.869Z",
+  "totalItems": 12,
+  "checklistItems": [
+    {
+      "id": "OE:01",
+      "title": "DevOps Culture",
+      "description": "Foster a blameless culture that emphasizes continuous learning and prioritizes continuous improvement",
+      "keyFocus": [
+        "blameless culture",
+        "continuous learning",
+        "improvement mindset"
+      ]
+    },
+    {
+      "id": "OE:02",
+      "title": "Operational Task Formalization",
+      "description": "Increase consistency by adopting industry-proven practices and standardizing operational processes",
+      "keyFocus": [
+        "consistency",
+        "proven practices",
+        "standardization"
+      ]
+    },
+    {
+      "id": "OE:03",
+      "title": "Software Ideation & Planning",
+      "description": "Draw from established industry standards for team communication, documentation, and development processes",
+      "keyFocus": [
+        "industry standards",
+        "communication",
+        "development processes"
+      ]
+    },
+    {
+      "id": "OE:04",
+      "title": "Software Development Enhancement",
+      "description": "Standardize tools, source control, design patterns, documentation, and style guides, ensure clear role definitions and consistent processes",
+      "keyFocus": [
+        "tool standardization",
+        "source control",
+        "role clarity"
+      ]
+    },
+    {
+      "id": "OE:05",
+      "title": "Infrastructure as Code (IaC)",
+      "description": "Use standardized IaC approach for resource and configuration preparation, prefer declarative over imperative approaches when practical",
+      "keyFocus": [
+        "IaC standardization",
+        "declarative approach",
+        "configuration management"
+      ]
+    },
+    {
+      "id": "OE:06",
+      "title": "Workload Supply Chain",
+      "description": "Drive changes through predictable, automated pipelines, incorporate comprehensive testing across environments",
+      "keyFocus": [
+        "automated pipelines",
+        "predictable changes",
+        "comprehensive testing"
+      ]
+    },
+    {
+      "id": "OE:07",
+      "title": "Observability",
+      "description": "Design monitoring systems to capture telemetry, metrics, and logs, use data to validate design choices and guide future decisions",
+      "keyFocus": [
+        "monitoring design",
+        "telemetry capture",
+        "data-driven decisions"
+      ]
+    },
+    {
+      "id": "OE:08",
+      "title": "Emergency Response",
+      "description": "Create comprehensive incident response plan, document roles, responsibilities, and emergency procedures, capture learnings through postmortems",
+      "keyFocus": [
+        "incident response",
+        "role documentation",
+        "postmortem learning"
+      ]
+    },
+    {
+      "id": "OE:09",
+      "title": "Task Automation",
+      "description": "Automate repetitive, procedural tasks with clear ROI, prefer off-the-shelf tools over custom solutions",
+      "keyFocus": [
+        "automation ROI",
+        "repetitive tasks",
+        "tool selection"
+      ]
+    },
+    {
+      "id": "OE:10",
+      "title": "Upfront Automation Design",
+      "description": "Implement automation early for lifecycle management, adopt platform-native automation capabilities",
+      "keyFocus": [
+        "early automation",
+        "lifecycle management",
+        "platform-native"
+      ]
+    },
+    {
+      "id": "OE:11",
+      "title": "Safe Deployment Practices",
+      "description": "Focus on small, incremental releases, use quality gates and progressive exposure, plan for routine and emergency deployments",
+      "keyFocus": [
+        "incremental releases",
+        "quality gates",
+        "deployment planning"
+      ]
+    },
+    {
+      "id": "OE:12",
+      "title": "Deployment Failure Mitigation",
+      "description": "Implement strategies for handling unexpected rollout issues, use rollback, feature disablement, or native deployment pattern capabilities",
+      "keyFocus": [
+        "failure mitigation",
+        "rollback strategies",
+        "deployment patterns"
+      ]
+    }
+  ],
+  "assessmentPrompt": "You are conducting a Operational Excellence assessment following the official Microsoft Well-Architected Framework methodology.\n\nOFFICIAL OPERATIONAL EXCELLENCE CHECKLIST (12 items):\n1. OE:01 - DevOps Culture: Foster a blameless culture that emphasizes continuous learning and prioritizes continuous improvement\\n2. OE:02 - Operational Task Formalization: Increase consistency by adopting industry-proven practices and standardizing operational processes\\n3. OE:03 - Software Ideation & Planning: Draw from established industry standards for team communication, documentation, and development processes\\n4. OE:04 - Software Development Enhancement: Standardize tools, source control, design patterns, documentation, and style guides, ensure clear role definitions and consistent processes\\n5. OE:05 - Infrastructure as Code (IaC): Use standardized IaC approach for resource and configuration preparation, prefer declarative over imperative approaches when practical\\n6. OE:06 - Workload Supply Chain: Drive changes through predictable, automated pipelines, incorporate comprehensive testing across environments\\n7. OE:07 - Observability: Design monitoring systems to capture telemetry, metrics, and logs, use data to validate design choices and guide future decisions\\n8. OE:08 - Emergency Response: Create comprehensive incident response plan, document roles, responsibilities, and emergency procedures, capture learnings through postmortems\\n9. OE:09 - Task Automation: Automate repetitive, procedural tasks with clear ROI, prefer off-the-shelf tools over custom solutions\\n10. OE:10 - Upfront Automation Design: Implement automation early for lifecycle management, adopt platform-native automation capabilities\\n11. OE:11 - Safe Deployment Practices: Focus on small, incremental releases, use quality gates and progressive exposure, plan for routine and emergency deployments\\n12. OE:12 - Deployment Failure Mitigation: Implement strategies for handling unexpected rollout issues, use rollback, feature disablement, or native deployment pattern capabilities\n\nASSESSMENT INSTRUCTIONS:\n- Evaluate the architecture against each checklist item\n- Provide specific recommendations using Azure services\n- Score each area on a 1-10 scale with detailed justification\n- Focus on compliance gaps and improvement opportunities\n- Reference official WAF guidance in your analysis\n\nFollow the official Microsoft WAF Operational Excellence methodology for consistent, professional assessment.",
+  "quickReference": [
+    "OE:01: DevOps Culture - Foster a blameless culture that emphasizes continuous learning and prioritizes continuous improvemen...",
+    "OE:02: Operational Task Formalization - Increase consistency by adopting industry-proven practices and standardizing operational processes...",
+    "OE:03: Software Ideation & Planning - Draw from established industry standards for team communication, documentation, and development proc...",
+    "OE:04: Software Development Enhancement - Standardize tools, source control, design patterns, documentation, and style guides, ensure clear ro...",
+    "OE:05: Infrastructure as Code (IaC) - Use standardized IaC approach for resource and configuration preparation, prefer declarative over im...",
+    "OE:06: Workload Supply Chain - Drive changes through predictable, automated pipelines, incorporate comprehensive testing across env...",
+    "OE:07: Observability - Design monitoring systems to capture telemetry, metrics, and logs, use data to validate design choic...",
+    "OE:08: Emergency Response - Create comprehensive incident response plan, document roles, responsibilities, and emergency procedu...",
+    "OE:09: Task Automation - Automate repetitive, procedural tasks with clear ROI, prefer off-the-shelf tools over custom solutio...",
+    "OE:10: Upfront Automation Design - Implement automation early for lifecycle management, adopt platform-native automation capabilities...",
+    "OE:11: Safe Deployment Practices - Focus on small, incremental releases, use quality gates and progressive exposure, plan for routine a...",
+    "OE:12: Deployment Failure Mitigation - Implement strategies for handling unexpected rollout issues, use rollback, feature disablement, or n..."
+  ]
+}

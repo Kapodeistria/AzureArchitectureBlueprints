@@ -1,0 +1,10 @@
+{
+  "name": "waf-cost-pillar",
+  "description": "Microsoft Well-Architected Framework Cost Optimization pillar with 14 official checklist items (CO:01 - CO:14)",
+  "type": "waf_knowledge",
+  "sources": [
+    "foundry-agents/rag-sources/waf-cost-pillar-content.md",
+    "foundry-agents/rag-sources/waf-cost-pillar.json"
+  ],
+  "update_frequency": "monthly"
+}

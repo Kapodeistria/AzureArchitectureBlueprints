@@ -1,0 +1,146 @@
+{
+  "pillar": "Security",
+  "agent": "WellArchitectedSecurityAgent",
+  "source": "Microsoft Azure Well-Architected Framework",
+  "url": "https://learn.microsoft.com/en-us/azure/well-architected/security/checklist",
+  "lastUpdated": "2025-09-29T02:36:53.865Z",
+  "totalItems": 12,
+  "checklistItems": [
+    {
+      "id": "SE:01",
+      "title": "Establish Security Baseline",
+      "description": "Align with compliance requirements, match industry standards, regularly measure architecture against baseline",
+      "keyFocus": [
+        "compliance",
+        "standards",
+        "baseline measurement"
+      ]
+    },
+    {
+      "id": "SE:02",
+      "title": "Secure Development Lifecycle",
+      "description": "Use hardened, automated software supply chain, implement threat modeling, safeguard against security vulnerabilities",
+      "keyFocus": [
+        "supply chain",
+        "threat modeling",
+        "vulnerability management"
+      ]
+    },
+    {
+      "id": "SE:03",
+      "title": "Data Classification",
+      "description": "Label data with sensitivity and information types, use classification to influence design and security priorities",
+      "keyFocus": [
+        "data labeling",
+        "sensitivity classification",
+        "design influence"
+      ]
+    },
+    {
+      "id": "SE:04",
+      "title": "Segmentation",
+      "description": "Create intentional architectural perimeters, segment networks, roles, identities, and resources",
+      "keyFocus": [
+        "network segmentation",
+        "role segmentation",
+        "resource isolation"
+      ]
+    },
+    {
+      "id": "SE:05",
+      "title": "Identity and Access Management",
+      "description": "Implement strict, conditional access controls, limit access to \"as necessary\", use modern authentication standards, audit non-identity-based access",
+      "keyFocus": [
+        "conditional access",
+        "zero trust",
+        "modern authentication",
+        "access auditing"
+      ]
+    },
+    {
+      "id": "SE:06",
+      "title": "Network Traffic Control",
+      "description": "Isolate and filter network traffic, apply defense-in-depth principles, control ingress and egress flows",
+      "keyFocus": [
+        "traffic isolation",
+        "defense-in-depth",
+        "flow control"
+      ]
+    },
+    {
+      "id": "SE:07",
+      "title": "Data Encryption",
+      "description": "Use industry-standard encryption methods, prioritize native platform encryption, align encryption with data classifications",
+      "keyFocus": [
+        "encryption standards",
+        "platform encryption",
+        "classification alignment"
+      ]
+    },
+    {
+      "id": "SE:08",
+      "title": "Resource Hardening",
+      "description": "Reduce attack surface, tighten configurations, increase attacker complexity",
+      "keyFocus": [
+        "attack surface reduction",
+        "configuration hardening",
+        "security complexity"
+      ]
+    },
+    {
+      "id": "SE:09",
+      "title": "Application Secrets Protection",
+      "description": "Secure secret storage, restrict access and manipulation, implement reliable rotation processes",
+      "keyFocus": [
+        "secret storage",
+        "access restriction",
+        "rotation automation"
+      ]
+    },
+    {
+      "id": "SE:10",
+      "title": "Threat Monitoring",
+      "description": "Develop holistic monitoring strategy, use modern threat detection mechanisms, integrate with SecOps processes",
+      "keyFocus": [
+        "holistic monitoring",
+        "threat detection",
+        "SecOps integration"
+      ]
+    },
+    {
+      "id": "SE:11",
+      "title": "Comprehensive Testing",
+      "description": "Prevent security issues, validate threat prevention, test detection mechanisms",
+      "keyFocus": [
+        "security testing",
+        "threat validation",
+        "detection testing"
+      ]
+    },
+    {
+      "id": "SE:12",
+      "title": "Incident Response",
+      "description": "Define procedures for various incident scenarios, clearly assign response responsibilities, test and refine response plans",
+      "keyFocus": [
+        "incident procedures",
+        "response responsibilities",
+        "plan testing"
+      ]
+    }
+  ],
+  "assessmentPrompt": "You are conducting a Security assessment following the official Microsoft Well-Architected Framework methodology.\n\nOFFICIAL SECURITY CHECKLIST (12 items):\n1. SE:01 - Establish Security Baseline: Align with compliance requirements, match industry standards, regularly measure architecture against baseline\\n2. SE:02 - Secure Development Lifecycle: Use hardened, automated software supply chain, implement threat modeling, safeguard against security vulnerabilities\\n3. SE:03 - Data Classification: Label data with sensitivity and information types, use classification to influence design and security priorities\\n4. SE:04 - Segmentation: Create intentional architectural perimeters, segment networks, roles, identities, and resources\\n5. SE:05 - Identity and Access Management: Implement strict, conditional access controls, limit access to \"as necessary\", use modern authentication standards, audit non-identity-based access\\n6. SE:06 - Network Traffic Control: Isolate and filter network traffic, apply defense-in-depth principles, control ingress and egress flows\\n7. SE:07 - Data Encryption: Use industry-standard encryption methods, prioritize native platform encryption, align encryption with data classifications\\n8. SE:08 - Resource Hardening: Reduce attack surface, tighten configurations, increase attacker complexity\\n9. SE:09 - Application Secrets Protection: Secure secret storage, restrict access and manipulation, implement reliable rotation processes\\n10. SE:10 - Threat Monitoring: Develop holistic monitoring strategy, use modern threat detection mechanisms, integrate with SecOps processes\\n11. SE:11 - Comprehensive Testing: Prevent security issues, validate threat prevention, test detection mechanisms\\n12. SE:12 - Incident Response: Define procedures for various incident scenarios, clearly assign response responsibilities, test and refine response plans\n\nASSESSMENT INSTRUCTIONS:\n- Evaluate the architecture against each checklist item\n- Provide specific recommendations using Azure services\n- Score each area on a 1-10 scale with detailed justification\n- Focus on compliance gaps and improvement opportunities\n- Reference official WAF guidance in your analysis\n\nFollow the official Microsoft WAF Security methodology for consistent, professional assessment.",
+  "quickReference": [
+    "SE:01: Establish Security Baseline - Align with compliance requirements, match industry standards, regularly measure architecture against...",
+    "SE:02: Secure Development Lifecycle - Use hardened, automated software supply chain, implement threat modeling, safeguard against security...",
+    "SE:03: Data Classification - Label data with sensitivity and information types, use classification to influence design and securi...",
+    "SE:04: Segmentation - Create intentional architectural perimeters, segment networks, roles, identities, and resources...",
+    "SE:05: Identity and Access Management - Implement strict, conditional access controls, limit access to \"as necessary\", use modern authentica...",
+    "SE:06: Network Traffic Control - Isolate and filter network traffic, apply defense-in-depth principles, control ingress and egress fl...",
+    "SE:07: Data Encryption - Use industry-standard encryption methods, prioritize native platform encryption, align encryption wi...",
+    "SE:08: Resource Hardening - Reduce attack surface, tighten configurations, increase attacker complexity...",
+    "SE:09: Application Secrets Protection - Secure secret storage, restrict access and manipulation, implement reliable rotation processes...",
+    "SE:10: Threat Monitoring - Develop holistic monitoring strategy, use modern threat detection mechanisms, integrate with SecOps ...",
+    "SE:11: Comprehensive Testing - Prevent security issues, validate threat prevention, test detection mechanisms...",
+    "SE:12: Incident Response - Define procedures for various incident scenarios, clearly assign response responsibilities, test and..."
+  ]
+}

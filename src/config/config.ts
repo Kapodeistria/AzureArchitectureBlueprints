@@ -14,6 +14,7 @@ export interface AppConfig {
       projectEndpoint: string;
       modelDeploymentName: string;
       apiVersion: string;
+      apiKey?: string;
     };
     openai: {
       endpoint: string;
@@ -143,6 +144,7 @@ const DEFAULT_CONFIG: AppConfig = {
 class ConfigManager {
   private config: AppConfig;
   private configPath: string;
+  private envCache: Map<string, Record<string, string>> = new Map();
 
   constructor() {
     this.configPath = join(process.cwd(), '.env.local');
@@ -153,16 +155,16 @@ class ConfigManager {
     // Start with defaults
     let config = JSON.parse(JSON.stringify(DEFAULT_CONFIG)) as AppConfig;
 
-    // 1. Load from .env.local (if exists)
+    // 1. Load from .env.local (if exists) - cached
     const envLocalPath = join(process.cwd(), '.env.local');
     if (existsSync(envLocalPath)) {
-      this.loadEnvFile(envLocalPath, config);
+      this.loadEnvFileOptimized(envLocalPath, config);
     }
 
-    // 2. Load from .env (if exists)
+    // 2. Load from .env (if exists) - cached
     const envPath = join(process.cwd(), '.env');
     if (existsSync(envPath)) {
-      this.loadEnvFile(envPath, config);
+      this.loadEnvFileOptimized(envPath, config);
     }
 
     // 3. Override with environment variables
@@ -174,29 +176,42 @@ class ConfigManager {
     return config;
   }
 
-  private loadEnvFile(filePath: string, config: AppConfig): void {
-    try {
-      const envContent = readFileSync(filePath, 'utf-8');
-      const envVars = this.parseEnvFile(envContent);
+  private loadEnvFileOptimized(filePath: string, config: AppConfig): void {
+    // Check cache first
+    let envVars = this.envCache.get(filePath);
 
-      // Map environment variables to config structure
-      if (envVars.PROJECT_ENDPOINT) config.azure.foundry.projectEndpoint = envVars.PROJECT_ENDPOINT;
-      if (envVars.MODEL_DEPLOYMENT_NAME) config.azure.foundry.modelDeploymentName = envVars.MODEL_DEPLOYMENT_NAME;
-      if (envVars.API_VERSION) config.azure.foundry.apiVersion = envVars.API_VERSION;
-      if (envVars.AZURE_OPENAI_ENDPOINT) config.azure.openai.endpoint = envVars.AZURE_OPENAI_ENDPOINT;
-      if (envVars.AZURE_OPENAI_API_KEY) config.azure.openai.apiKey = envVars.AZURE_OPENAI_API_KEY;
-      if (envVars.AZURE_CLIENT_ID) config.azure.authentication.clientId = envVars.AZURE_CLIENT_ID;
-      if (envVars.AZURE_CLIENT_SECRET) config.azure.authentication.clientSecret = envVars.AZURE_CLIENT_SECRET;
-      if (envVars.AZURE_TENANT_ID) config.azure.authentication.tenantId = envVars.AZURE_TENANT_ID;
-      if (envVars.NODE_ENV) config.app.environment = envVars.NODE_ENV as any;
-      if (envVars.LOG_LEVEL) config.app.logLevel = envVars.LOG_LEVEL as any;
-      if (envVars.OUTPUT_DIRECTORY) config.app.outputDirectory = envVars.OUTPUT_DIRECTORY;
-      if (envVars.MAX_TOKENS) config.app.maxTokens = parseInt(envVars.MAX_TOKENS);
-      if (envVars.TEMPERATURE) config.app.temperature = parseFloat(envVars.TEMPERATURE);
-      if (envVars.TIMEOUT) config.app.timeout = parseInt(envVars.TIMEOUT);
-    } catch (error) {
-      console.warn(`Warning: Could not load ${filePath}:`, error);
+    if (!envVars) {
+      try {
+        const envContent = readFileSync(filePath, 'utf-8');
+        envVars = this.parseEnvFile(envContent);
+        this.envCache.set(filePath, envVars);
+      } catch (error) {
+        console.warn(`Warning: Could not load ${filePath}:`, error);
+        return;
+      }
     }
+
+    // Apply environment variables to config
+    this.applyEnvVarsToConfig(envVars, config);
+  }
+
+  private applyEnvVarsToConfig(envVars: Record<string, string>, config: AppConfig): void {
+    // Map environment variables to config structure (extracted for reuse)
+    if (envVars.PROJECT_ENDPOINT) config.azure.foundry.projectEndpoint = envVars.PROJECT_ENDPOINT;
+    if (envVars.MODEL_DEPLOYMENT_NAME) config.azure.foundry.modelDeploymentName = envVars.MODEL_DEPLOYMENT_NAME;
+    if (envVars.API_VERSION) config.azure.foundry.apiVersion = envVars.API_VERSION;
+    if (envVars.FOUNDRY_API_KEY) config.azure.foundry.apiKey = envVars.FOUNDRY_API_KEY;
+    if (envVars.AZURE_OPENAI_ENDPOINT) config.azure.openai.endpoint = envVars.AZURE_OPENAI_ENDPOINT;
+    if (envVars.AZURE_OPENAI_API_KEY) config.azure.openai.apiKey = envVars.AZURE_OPENAI_API_KEY;
+    if (envVars.AZURE_CLIENT_ID) config.azure.authentication.clientId = envVars.AZURE_CLIENT_ID;
+    if (envVars.AZURE_CLIENT_SECRET) config.azure.authentication.clientSecret = envVars.AZURE_CLIENT_SECRET;
+    if (envVars.AZURE_TENANT_ID) config.azure.authentication.tenantId = envVars.AZURE_TENANT_ID;
+    if (envVars.NODE_ENV) config.app.environment = envVars.NODE_ENV as any;
+    if (envVars.LOG_LEVEL) config.app.logLevel = envVars.LOG_LEVEL as any;
+    if (envVars.OUTPUT_DIRECTORY) config.app.outputDirectory = envVars.OUTPUT_DIRECTORY;
+    if (envVars.MAX_TOKENS) config.app.maxTokens = parseInt(envVars.MAX_TOKENS);
+    if (envVars.TEMPERATURE) config.app.temperature = parseFloat(envVars.TEMPERATURE);
+    if (envVars.TIMEOUT) config.app.timeout = parseInt(envVars.TIMEOUT);
   }
 
   private parseEnvFile(content: string): Record<string, string> {
@@ -219,20 +234,8 @@ class ConfigManager {
 
   private loadEnvironmentVariables(config: AppConfig): void {
     // Override with actual environment variables (highest priority)
-    if (process.env.PROJECT_ENDPOINT) config.azure.foundry.projectEndpoint = process.env.PROJECT_ENDPOINT;
-    if (process.env.MODEL_DEPLOYMENT_NAME) config.azure.foundry.modelDeploymentName = process.env.MODEL_DEPLOYMENT_NAME;
-    if (process.env.API_VERSION) config.azure.foundry.apiVersion = process.env.API_VERSION;
-    if (process.env.AZURE_OPENAI_ENDPOINT) config.azure.openai.endpoint = process.env.AZURE_OPENAI_ENDPOINT;
-    if (process.env.AZURE_OPENAI_API_KEY) config.azure.openai.apiKey = process.env.AZURE_OPENAI_API_KEY;
-    if (process.env.AZURE_CLIENT_ID) config.azure.authentication.clientId = process.env.AZURE_CLIENT_ID;
-    if (process.env.AZURE_CLIENT_SECRET) config.azure.authentication.clientSecret = process.env.AZURE_CLIENT_SECRET;
-    if (process.env.AZURE_TENANT_ID) config.azure.authentication.tenantId = process.env.AZURE_TENANT_ID;
-    if (process.env.NODE_ENV) config.app.environment = process.env.NODE_ENV as any;
-    if (process.env.LOG_LEVEL) config.app.logLevel = process.env.LOG_LEVEL as any;
-    if (process.env.OUTPUT_DIRECTORY) config.app.outputDirectory = process.env.OUTPUT_DIRECTORY;
-    if (process.env.MAX_TOKENS) config.app.maxTokens = parseInt(process.env.MAX_TOKENS);
-    if (process.env.TEMPERATURE) config.app.temperature = parseFloat(process.env.TEMPERATURE);
-    if (process.env.TIMEOUT) config.app.timeout = parseInt(process.env.TIMEOUT);
+    // Reuse the same mapping logic
+    this.applyEnvVarsToConfig(process.env as Record<string, string>, config);
   }
 
   private validateConfiguration(config: AppConfig): void {
@@ -312,6 +315,7 @@ class ConfigManager {
 PROJECT_ENDPOINT=${this.config.azure.foundry.projectEndpoint}
 MODEL_DEPLOYMENT_NAME=${this.config.azure.foundry.modelDeploymentName}
 API_VERSION=${this.config.azure.foundry.apiVersion}
+FOUNDRY_API_KEY=your_foundry_api_key_here
 
 # Azure OpenAI Configuration  
 AZURE_OPENAI_ENDPOINT=${this.config.azure.openai.endpoint}

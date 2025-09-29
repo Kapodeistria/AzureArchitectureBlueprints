@@ -1,0 +1,123 @@
+{
+  "pillar": "Reliability",
+  "agent": "WellArchitectedReliabilityAgent",
+  "source": "Microsoft Azure Well-Architected Framework",
+  "url": "https://learn.microsoft.com/en-us/azure/well-architected/reliability/checklist",
+  "lastUpdated": "2025-09-29T02:36:53.867Z",
+  "totalItems": 10,
+  "checklistItems": [
+    {
+      "id": "RE:01",
+      "title": "Simplicity and Efficiency",
+      "description": "Focus your workload design on simplicity and efficiency to meet business goals while avoiding unnecessary complexity",
+      "keyFocus": [
+        "design simplicity",
+        "efficiency",
+        "complexity avoidance"
+      ]
+    },
+    {
+      "id": "RE:02",
+      "title": "Flow Identification",
+      "description": "Identify and rate user and system flows using a criticality scale based on business requirements",
+      "keyFocus": [
+        "flow analysis",
+        "criticality rating",
+        "business alignment"
+      ]
+    },
+    {
+      "id": "RE:03",
+      "title": "Failure Mode Analysis",
+      "description": "Use failure mode analysis (FMA) to identify potential failures by analyzing dependencies and developing mitigation strategies",
+      "keyFocus": [
+        "failure analysis",
+        "dependency mapping",
+        "mitigation strategies"
+      ]
+    },
+    {
+      "id": "RE:04",
+      "title": "Reliability Metrics",
+      "description": "Define reliability and recovery targets to inform design and establish a health model",
+      "keyFocus": [
+        "reliability targets",
+        "recovery objectives",
+        "health modeling"
+      ]
+    },
+    {
+      "id": "RE:05",
+      "title": "Redundancy",
+      "description": "Add redundancy at different levels, especially for critical flows including infrastructure components and solution instances",
+      "keyFocus": [
+        "redundancy design",
+        "critical flow protection",
+        "multi-level redundancy"
+      ]
+    },
+    {
+      "id": "RE:06",
+      "title": "Scaling Strategy",
+      "description": "Implement a timely and reliable scaling strategy across application, data, and infrastructure levels with minimal manual intervention",
+      "keyFocus": [
+        "scaling automation",
+        "multi-level scaling",
+        "timely response"
+      ]
+    },
+    {
+      "id": "RE:07",
+      "title": "Resilience Measures",
+      "description": "Strengthen resiliency through self-preservation and self-healing mechanisms using cloud patterns",
+      "keyFocus": [
+        "self-preservation",
+        "self-healing",
+        "cloud patterns"
+      ]
+    },
+    {
+      "id": "RE:08",
+      "title": "Resilience Testing",
+      "description": "Test for resiliency and availability using chaos engineering principles and simulated load testing",
+      "keyFocus": [
+        "chaos engineering",
+        "availability testing",
+        "load simulation"
+      ]
+    },
+    {
+      "id": "RE:09",
+      "title": "Disaster Recovery",
+      "description": "Implement structured, tested, and documented business continuity and disaster recovery (BCDR) plans covering all system components",
+      "keyFocus": [
+        "BCDR planning",
+        "testing procedures",
+        "documentation"
+      ]
+    },
+    {
+      "id": "RE:10",
+      "title": "Health Monitoring",
+      "description": "Measure and model solution health signals by continuously capturing uptime and reliability data across workloads",
+      "keyFocus": [
+        "health modeling",
+        "continuous monitoring",
+        "reliability metrics"
+      ]
+    }
+  ],
+  "assessmentPrompt": "You are conducting a Reliability assessment following the official Microsoft Well-Architected Framework methodology.\n\nOFFICIAL RELIABILITY CHECKLIST (10 items):\n1. RE:01 - Simplicity and Efficiency: Focus your workload design on simplicity and efficiency to meet business goals while avoiding unnecessary complexity\\n2. RE:02 - Flow Identification: Identify and rate user and system flows using a criticality scale based on business requirements\\n3. RE:03 - Failure Mode Analysis: Use failure mode analysis (FMA) to identify potential failures by analyzing dependencies and developing mitigation strategies\\n4. RE:04 - Reliability Metrics: Define reliability and recovery targets to inform design and establish a health model\\n5. RE:05 - Redundancy: Add redundancy at different levels, especially for critical flows including infrastructure components and solution instances\\n6. RE:06 - Scaling Strategy: Implement a timely and reliable scaling strategy across application, data, and infrastructure levels with minimal manual intervention\\n7. RE:07 - Resilience Measures: Strengthen resiliency through self-preservation and self-healing mechanisms using cloud patterns\\n8. RE:08 - Resilience Testing: Test for resiliency and availability using chaos engineering principles and simulated load testing\\n9. RE:09 - Disaster Recovery: Implement structured, tested, and documented business continuity and disaster recovery (BCDR) plans covering all system components\\n10. RE:10 - Health Monitoring: Measure and model solution health signals by continuously capturing uptime and reliability data across workloads\n\nASSESSMENT INSTRUCTIONS:\n- Evaluate the architecture against each checklist item\n- Provide specific recommendations using Azure services\n- Score each area on a 1-10 scale with detailed justification\n- Focus on compliance gaps and improvement opportunities\n- Reference official WAF guidance in your analysis\n\nFollow the official Microsoft WAF Reliability methodology for consistent, professional assessment.",
+  "quickReference": [
+    "RE:01: Simplicity and Efficiency - Focus your workload design on simplicity and efficiency to meet business goals while avoiding unnece...",
+    "RE:02: Flow Identification - Identify and rate user and system flows using a criticality scale based on business requirements...",
+    "RE:03: Failure Mode Analysis - Use failure mode analysis (FMA) to identify potential failures by analyzing dependencies and develop...",
+    "RE:04: Reliability Metrics - Define reliability and recovery targets to inform design and establish a health model...",
+    "RE:05: Redundancy - Add redundancy at different levels, especially for critical flows including infrastructure component...",
+    "RE:06: Scaling Strategy - Implement a timely and reliable scaling strategy across application, data, and infrastructure levels...",
+    "RE:07: Resilience Measures - Strengthen resiliency through self-preservation and self-healing mechanisms using cloud patterns...",
+    "RE:08: Resilience Testing - Test for resiliency and availability using chaos engineering principles and simulated load testing...",
+    "RE:09: Disaster Recovery - Implement structured, tested, and documented business continuity and disaster recovery (BCDR) plans ...",
+    "RE:10: Health Monitoring - Measure and model solution health signals by continuously capturing uptime and reliability data acro..."
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "waf-reliability-pillar",
+  "description": "Microsoft Well-Architected Framework Reliability pillar with 10 official checklist items (RE:01 - RE:10)",
+  "type": "waf_knowledge",
+  "sources": [
+    "foundry-agents/rag-sources/waf-reliability-pillar-content.md",
+    "foundry-agents/rag-sources/waf-reliability-pillar.json"
+  ],
+  "update_frequency": "monthly"
+}

@@ -1,0 +1,10 @@
+{
+  "name": "waf-operational-pillar",
+  "description": "Microsoft Well-Architected Framework Operational Excellence pillar with 12 official checklist items (OE:01 - OE:12)",
+  "type": "waf_knowledge",
+  "sources": [
+    "foundry-agents/rag-sources/waf-operational-pillar-content.md",
+    "foundry-agents/rag-sources/waf-operational-pillar.json"
+  ],
+  "update_frequency": "monthly"
+}

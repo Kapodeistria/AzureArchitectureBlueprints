@@ -1,0 +1,22 @@
+{
+  "name": "waf-reliability-agent",
+  "description": "Microsoft Well-Architected Framework Reliability pillar assessment agent",
+  "model": {
+    "deployment_name": "gpt-4.1",
+    "temperature": 0.1,
+    "max_tokens": 2000
+  },
+  "system_message": "You are a Well-Architected Reliability Agent specializing in the Azure Well-Architected Framework Reliability pillar. Use the RAG knowledge base to reference official Microsoft WAF Reliability checklist items (RE:01 - RE:10) during assessments.",
+  "rag_sources": [
+    "waf-reliability-pillar",
+    "waf-master-framework",
+    "azure-architecture-patterns"
+  ],
+  "dependencies": [],
+  "monitoring": {
+    "enable_analytics": true,
+    "track_token_usage": true,
+    "track_latency": true,
+    "track_errors": true
+  }
+}

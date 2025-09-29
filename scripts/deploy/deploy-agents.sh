@@ -2,6 +2,18 @@
 
 # Azure AI Foundry Agent Deployment Script
 # Deploys agents to your Azure AI Foundry project via CLI
+#
+# Authentication options (in order of preference):
+# 1. FOUNDRY_API_KEY environment variable
+# 2. FOUNDRY_API_KEY in .env.local file  
+# 3. Azure CLI (az login) - fallback method
+#
+# Usage:
+#   export FOUNDRY_API_KEY="your-api-key"
+#   ./deploy-agents.sh
+#
+# Or create .env.local file with:
+#   FOUNDRY_API_KEY=your-api-key
 
 set -e
 
@@ -34,52 +46,83 @@ echo "Project: $PROJECT_ENDPOINT"
 echo "Model: $MODEL_DEPLOYMENT_NAME"
 echo ""
 
-# Check if Azure CLI is installed
-if ! command -v az &> /dev/null; then
-    echo -e "${RED}❌ Azure CLI not found. Please install it first:${NC}"
-    echo "brew install azure-cli"
-    exit 1
+# Load environment variables from .env.local if it exists
+if [ -f ".env.local" ]; then
+    echo -e "${BLUE}📄 Loading environment from .env.local...${NC}"
+    # Source the file in a subshell to avoid polluting current environment
+    set -a
+    source .env.local
+    set +a
 fi
 
-# Check if user is logged in
-if ! az account show &> /dev/null; then
-    echo -e "${YELLOW}⚠️  Not logged into Azure. Logging in...${NC}"
-    az login
-fi
+# Function to setup authentication headers
+setup_auth() {
+    # Try API key first (from environment or .env.local)
+    if [ -n "$FOUNDRY_API_KEY" ]; then
+        echo -e "${GREEN}🔑 Using API key authentication${NC}"
+        AUTH_HEADER="api-key: $FOUNDRY_API_KEY"
+        return 0
+    fi
+    
+    # Fallback to Azure CLI authentication
+    echo -e "${YELLOW}🔐 API key not found, falling back to Azure CLI authentication...${NC}"
+    
+    # Check if Azure CLI is installed
+    if ! command -v az &> /dev/null; then
+        echo -e "${RED}❌ Azure CLI not found and no API key provided${NC}"
+        echo -e "${YELLOW}💡 Please either:${NC}"
+        echo "   1. Set FOUNDRY_API_KEY environment variable"
+        echo "   2. Add FOUNDRY_API_KEY to .env.local file"
+        echo "   3. Install Azure CLI: brew install azure-cli"
+        exit 1
+    fi
+    
+    # Check if user is logged in
+    if ! az account show &> /dev/null; then
+        echo -e "${YELLOW}⚠️  Not logged into Azure. Logging in...${NC}"
+        az login
+    fi
+    
+    # Get access token for Azure AI Foundry (try multiple resource scopes)
+    echo -e "${BLUE}🔐 Getting access token...${NC}"
+    
+    # Try different resource scopes
+    AZURE_AI_AUTH_TOKEN=$(az account get-access-token --resource https://ai.azure.com --query accessToken --output tsv 2>/dev/null)
+    
+    if [ -z "$AZURE_AI_AUTH_TOKEN" ]; then
+        echo -e "${YELLOW}Trying alternative resource scope...${NC}"
+        AZURE_AI_AUTH_TOKEN=$(az account get-access-token --resource https://cognitiveservices.azure.com --query accessToken --output tsv 2>/dev/null)
+    fi
+    
+    if [ -z "$AZURE_AI_AUTH_TOKEN" ]; then
+        echo -e "${YELLOW}Trying management API scope...${NC}"
+        AZURE_AI_AUTH_TOKEN=$(az account get-access-token --resource https://management.azure.com --query accessToken --output tsv 2>/dev/null)
+    fi
+    
+    if [ -z "$AZURE_AI_AUTH_TOKEN" ]; then
+        echo -e "${RED}❌ Failed to get access token${NC}"
+        echo -e "${YELLOW}💡 Please check your Azure CLI login or use FOUNDRY_API_KEY instead${NC}"
+        exit 1
+    fi
+    
+    AUTH_HEADER="authorization: Bearer $AZURE_AI_AUTH_TOKEN"
+    echo -e "${GREEN}✅ Access token obtained${NC}"
+    return 0
+}
 
-# Get access token for Azure AI Foundry (try multiple resource scopes)
-echo -e "${BLUE}🔐 Getting access token...${NC}"
-
-# Try different resource scopes
-AZURE_AI_AUTH_TOKEN=$(az account get-access-token --resource https://ai.azure.com --query accessToken --output tsv 2>/dev/null)
-
-if [ -z "$AZURE_AI_AUTH_TOKEN" ]; then
-    echo -e "${YELLOW}Trying alternative resource scope...${NC}"
-    AZURE_AI_AUTH_TOKEN=$(az account get-access-token --resource https://cognitiveservices.azure.com --query accessToken --output tsv 2>/dev/null)
-fi
-
-if [ -z "$AZURE_AI_AUTH_TOKEN" ]; then
-    echo -e "${YELLOW}Trying management API scope...${NC}"
-    AZURE_AI_AUTH_TOKEN=$(az account get-access-token --resource https://management.azure.com --query accessToken --output tsv 2>/dev/null)
-fi
-
-if [ -z "$AZURE_AI_AUTH_TOKEN" ]; then
-    echo -e "${RED}❌ Failed to get access token${NC}"
-    exit 1
-fi
-
-echo -e "${GREEN}✅ Access token obtained${NC}"
+# Setup authentication
+setup_auth
 
 # Agent configurations (using arrays for macOS compatibility)
-AGENT_NAMES=("OrchestratorAgent" "RequirementsAnalystAgent" "ArchitectureAgent" "CostOptimizerAgent" "RiskAssessorAgent" "DocumentationAgent" "StructurizrDSLAgent")
+AGENT_NAMES=("waf-security-agent" "waf-reliability-agent" "waf-performance-agent" "waf-operational-agent" "waf-cost-agent" "requirements-analyst" "architecture-designer")
 AGENT_INSTRUCTIONS=(
-    "Master coordinator that orchestrates the analysis workflow and coordinates between specialized agents."
-    "Analyzes and extracts technical requirements from project specifications and user stories."
-    "Designs system architecture, creates technical specifications, and defines component interactions."
-    "Analyzes and optimizes project costs, resource allocation, and budget planning."
-    "Identifies, analyzes, and provides mitigation strategies for project risks."
-    "Creates comprehensive technical documentation, user guides, and project reports."
-    "Creates professional C4 Model architecture diagrams using Structurizr DSL. Generates system landscapes, container diagrams, component diagrams with proper styling and relationships."
+    "Microsoft Well-Architected Framework Security pillar assessment agent specializing in Azure WAF Security checklist items (SE:01 - SE:12). Use the RAG knowledge base to reference official Microsoft WAF Security guidelines during assessments."
+    "Microsoft Well-Architected Framework Reliability pillar assessment agent specializing in Azure WAF Reliability checklist items (RE:01 - RE:10). Use the RAG knowledge base to reference official Microsoft WAF Reliability guidelines during assessments."
+    "Microsoft Well-Architected Framework Performance Efficiency pillar assessment agent specializing in Azure WAF Performance checklist items (PE:01 - PE:12). Use the RAG knowledge base to reference official Microsoft WAF Performance guidelines during assessments."
+    "Microsoft Well-Architected Framework Operational Excellence pillar assessment agent specializing in Azure WAF Operational checklist items (OE:01 - OE:12). Use the RAG knowledge base to reference official Microsoft WAF Operational guidelines during assessments."
+    "Microsoft Well-Architected Framework Cost Optimization pillar assessment agent specializing in Azure WAF Cost checklist items (CO:01 - CO:14). Use the RAG knowledge base to reference official Microsoft WAF Cost guidelines during assessments."
+    "Analyzes and extracts technical requirements from project specifications and user stories for Azure architecture assessments."
+    "Designs comprehensive Azure architecture solutions with deep expertise in enterprise cloud architecture and Well-Architected Framework principles."
 )
 
 # Function to create an agent
@@ -89,7 +132,8 @@ create_agent() {
     
     echo -e "${BLUE}📤 Creating agent: ${CYAN}$name${NC}"
     
-    local payload=$(cat <<EOF
+    local payload
+    payload=$(cat <<EOF
 {
   "model": "$MODEL_DEPLOYMENT_NAME",
   "name": "$name",
@@ -104,15 +148,18 @@ create_agent() {
 EOF
 )
 
-    local response=$(curl -s -w "\n%{http_code}" \
+    local response
+    response=$(curl -s -w "\n%{http_code}" \
         --request POST \
         --url "${PROJECT_ENDPOINT}/assistants?api-version=${API_VERSION}" \
-        --header "authorization: Bearer $AZURE_AI_AUTH_TOKEN" \
+        --header "$AUTH_HEADER" \
         --header "content-type: application/json" \
         --data "$payload")
     
-    local http_code=$(echo "$response" | tail -1)
-    local body=$(echo "$response" | sed '$d')
+    local http_code
+    http_code=$(echo "$response" | tail -1)
+    local body
+    body=$(echo "$response" | sed '$d')
     
     if [ "$http_code" -eq 201 ] || [ "$http_code" -eq 200 ]; then
         # Try multiple methods to extract ID from JSON response
@@ -154,13 +201,16 @@ EOF
 list_agents() {
     echo -e "${BLUE}📋 Listing existing agents...${NC}"
     
-    local response=$(curl -s -w "\n%{http_code}" \
+    local response
+    response=$(curl -s -w "\n%{http_code}" \
         --request GET \
         --url "${PROJECT_ENDPOINT}/assistants?api-version=${API_VERSION}" \
-        --header "authorization: Bearer $AZURE_AI_AUTH_TOKEN")
+        --header "$AUTH_HEADER")
     
-    local http_code=$(echo "$response" | tail -1)
-    local body=$(echo "$response" | sed '$d')
+    local http_code
+    http_code=$(echo "$response" | tail -1)
+    local body
+    body=$(echo "$response" | sed '$d')
     
     if [ "$http_code" -eq 200 ]; then
         # Try to extract agent names and IDs

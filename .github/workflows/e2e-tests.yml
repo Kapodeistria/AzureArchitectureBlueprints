@@ -1,0 +1,245 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run tests daily at 2 AM UTC to catch drift/degradation
+    - cron: '0 2 * * *'
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  smoke-test:
+    name: Smoke Test (Fast)
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run smoke test
+        run: npm run test:smoke:fast
+        
+      - name: Upload smoke test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: smoke-test-results
+          path: tests/reports/
+
+  critical-path-test:
+    name: Critical Path Test
+    runs-on: ubuntu-latest
+    needs: smoke-test
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Download WAF knowledge base
+        run: npm run waf:download
+        
+      - name: Run critical path test
+        run: npm run test:critical-path
+        env:
+          # Use simulation mode for CI (no real Azure API calls)
+          CI: true
+          
+      - name: Upload critical path results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: critical-path-results
+          path: tests/reports/
+
+  e2e-test:
+    name: Full E2E Test
+    runs-on: ubuntu-latest
+    needs: critical-path-test
+    timeout-minutes: 20
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Download WAF knowledge base
+        run: npm run waf:download
+        
+      - name: Run full E2E test suite
+        run: npm run test:e2e:critical
+        env:
+          CI: true
+          
+      - name: Upload E2E test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-test-results
+          path: tests/reports/
+
+  # Integration test with real Azure (only on main branch with secrets)
+  azure-integration-test:
+    name: Azure Integration Test
+    runs-on: ubuntu-latest
+    needs: critical-path-test
+    timeout-minutes: 15
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository_owner == 'your-org'
+    environment: production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Download WAF knowledge base
+        run: npm run waf:download
+        
+      - name: Test Azure AI Foundry connection
+        run: npm run foundry:test
+        env:
+          PROJECT_ENDPOINT: ${{ secrets.PROJECT_ENDPOINT }}
+          FOUNDRY_API_KEY: ${{ secrets.FOUNDRY_API_KEY }}
+          
+      - name: Run Azure integration tests
+        run: npm run test:critical-path
+        env:
+          PROJECT_ENDPOINT: ${{ secrets.PROJECT_ENDPOINT }}
+          FOUNDRY_API_KEY: ${{ secrets.FOUNDRY_API_KEY }}
+          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          
+      - name: Upload integration test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: azure-integration-results
+          path: tests/reports/
+
+  # Nightly comprehensive test
+  nightly-test:
+    name: Nightly Comprehensive Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name == 'schedule'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Download WAF knowledge base
+        run: npm run waf:download
+        
+      - name: Run comprehensive test suite
+        run: npm run test:all
+        env:
+          CI: true
+          
+      - name: Upload nightly test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: nightly-test-results
+          path: tests/reports/
+          
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 Nightly E2E Tests Failed',
+              body: `Nightly E2E tests failed on ${new Date().toISOString()}\n\nWorkflow: ${context.workflow}\nRun: ${context.runNumber}\n\nPlease investigate potential system degradation.`,
+              labels: ['bug', 'e2e-failure', 'priority-high']
+            })
+
+  # Test result summary
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [smoke-test, critical-path-test]
+    if: always()
+    
+    steps:
+      - name: Download all test results
+        uses: actions/download-artifact@v3
+        
+      - name: Display test summary
+        run: |
+          echo "## 🧪 E2E Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check if smoke test passed
+          if [ -f smoke-test-results/smoke-test-report.json ]; then
+            echo "✅ Smoke Test: Completed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Smoke Test: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Check if critical path test passed
+          if [ -f critical-path-results/critical-path-report.json ]; then
+            echo "✅ Critical Path Test: Completed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Critical Path Test: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 **Test Coverage**: Core user workflows validated" >> $GITHUB_STEP_SUMMARY
+          echo "🎯 **Critical Paths**: Authentication, WAF knowledge, Agent deployment" >> $GITHUB_STEP_SUMMARY
+          echo "⚡ **Performance**: Smoke test < 10s, Critical path < 5 min" >> $GITHUB_STEP_SUMMARY

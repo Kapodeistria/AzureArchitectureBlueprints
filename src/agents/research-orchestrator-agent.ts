@@ -1,6 +1,6 @@
 /**
- * Research Orchestrator Agent
- * Coordinates 6 specialized research agents for comprehensive Azure project intelligence
+ * WAF Research Orchestrator Agent
+ * Coordinates 6 specialized WAF research agents for comprehensive Microsoft Well-Architected Framework intelligence
  */
 
 import OpenAI from 'openai';
@@ -34,45 +34,45 @@ export class ResearchOrchestratorAgent {
 
   private initializeResearchAgents() {
     this.researchAgents = new Map([
-      ['infrastructure-regional', {
-        id: 'infra-001',
-        agentName: 'Azure Infrastructure & Regional Expansion Agent',
-        prompt: this.getInfrastructureResearchPrompt(),
+      ['waf-infrastructure-regional', {
+        id: 'waf-infra-001',
+        agentName: 'Infrastructure & Regional WAF Compliance Agent',
+        prompt: this.getWAFInfrastructureResearchPrompt(),
         timeLimit: 45000, // 45 seconds
         priority: 'high'
       }],
-      ['ai-ml-innovation', {
-        id: 'ai-002',
-        agentName: 'Azure AI/ML & Technical Innovation Agent', 
-        prompt: this.getAIMLResearchPrompt(),
+      ['waf-ai-ml-innovation', {
+        id: 'waf-ai-002',
+        agentName: 'AI/ML Well-Architected Patterns Agent', 
+        prompt: this.getWAFAIMLResearchPrompt(),
         timeLimit: 45000, // 45 seconds
         priority: 'high'
       }],
-      ['enterprise-cases', {
-        id: 'ent-003',
-        agentName: 'Enterprise Case Studies & Customer Success Agent',
-        prompt: this.getEnterpriseResearchPrompt(),
+      ['waf-enterprise-cases', {
+        id: 'waf-ent-003',
+        agentName: 'Enterprise WAF Case Studies Agent',
+        prompt: this.getWAFEnterpriseResearchPrompt(),
         timeLimit: 50000, // 50 seconds
         priority: 'high'
       }],
-      ['compliance-sovereignty', {
-        id: 'comp-004',
-        agentName: 'Compliance & Data Sovereignty Agent',
-        prompt: this.getComplianceResearchPrompt(),
+      ['waf-compliance-sovereignty', {
+        id: 'waf-comp-004',
+        agentName: 'Compliance & Data Sovereignty WAF Agent',
+        prompt: this.getWAFComplianceResearchPrompt(),
         timeLimit: 40000, // 40 seconds
         priority: 'medium'
       }],
-      ['industry-verticals', {
-        id: 'ind-005',
-        agentName: 'Industry Verticals & Sector-Specific Agent',
-        prompt: this.getIndustryResearchPrompt(),
+      ['waf-industry-verticals', {
+        id: 'waf-ind-005',
+        agentName: 'Industry Vertical WAF Solutions Agent',
+        prompt: this.getWAFIndustryResearchPrompt(),
         timeLimit: 40000, // 40 seconds
         priority: 'medium'
       }],
-      ['architecture-migration', {
-        id: 'arch-006',
-        agentName: 'Architecture & Migration Patterns Agent',
-        prompt: this.getArchitectureResearchPrompt(),
+      ['waf-architecture-migration', {
+        id: 'waf-arch-006',
+        agentName: 'Architecture & Migration WAF Patterns Agent',
+        prompt: this.getWAFArchitectureResearchPrompt(),
         timeLimit: 45000, // 45 seconds
         priority: 'high'
       }]
@@ -210,144 +210,144 @@ export class ResearchOrchestratorAgent {
     return caseStudies.slice(0, 3); // Limit to top 3 case studies
   }
 
-  // Research prompt generators for each specialized agent
-  private getInfrastructureResearchPrompt(): string {
-    return `Research Azure infrastructure and regional expansion projects from 2024-2025:
+  // WAF Research prompt generators for each specialized agent
+  private getWAFInfrastructureResearchPrompt(): string {
+    return `Research Azure infrastructure and regional expansion with Well-Architected Framework compliance from 2024-2025:
 
-FOCUS AREAS:
-1. New Azure regions launched or announced in 2024-2025
-2. Major datacenter expansions and infrastructure investments
-3. Edge computing and Azure Arc deployments
-4. Availability zone expansions and disaster recovery capabilities
-5. Network infrastructure improvements (ExpressRoute, global connectivity)
+WAF INFRASTRUCTURE FOCUS AREAS:
+1. New Azure regions with WAF Reliability pillar compliance (availability zones, disaster recovery)
+2. Infrastructure investments supporting WAF Performance Efficiency (network latency, bandwidth)
+3. Edge computing and Azure Arc deployments for WAF Operational Excellence
+4. Regional expansion supporting WAF Security requirements (data sovereignty, compliance)
+5. Cost optimization through WAF-aligned infrastructure planning
 
-DELIVERABLES:
-- Specific region names, locations, and launch dates
-- Infrastructure specifications and capabilities
-- Business impact and customer benefits
-- Technical architecture details
-- Investment amounts and scale metrics
+WAF-ALIGNED DELIVERABLES:
+- Region names with WAF Reliability capabilities (availability zones, SLA improvements)
+- Infrastructure specifications supporting WAF Performance Efficiency targets
+- Security and compliance features aligned with WAF Security pillar
+- Cost optimization opportunities through regional WAF planning
+- Operational excellence improvements through infrastructure automation
 
-FORMAT: Provide concrete examples with specific details, technical specifications, and measurable outcomes suitable for enterprise case studies.`;
+FORMAT: Focus on how infrastructure developments support Microsoft Well-Architected Framework principles and compliance.`;
   }
 
-  private getAIMLResearchPrompt(): string {
-    return `Research Azure AI/ML and technical innovation projects from 2024-2025:
+  private getWAFAIMLResearchPrompt(): string {
+    return `Research Azure AI/ML Well-Architected patterns and implementations from 2024-2025:
 
-FOCUS AREAS:
-1. Azure OpenAI Service expansions and new model deployments
-2. Azure AI/ML platform enhancements and new services
-3. Microsoft Copilot enterprise implementations
-4. Azure Cognitive Services updates and capabilities
-5. AI infrastructure projects (GPU clusters, specialized hardware)
-6. Industry-specific AI solutions and partnerships
+WAF AI/ML FOCUS AREAS:
+1. Azure OpenAI Service WAF compliance patterns (Security, Performance, Cost optimization)
+2. Microsoft Copilot enterprise implementations following WAF principles
+3. AI infrastructure projects with WAF Reliability and Performance Efficiency
+4. Azure AI/ML services supporting WAF Operational Excellence (monitoring, automation)
+5. Industry-specific AI solutions demonstrating WAF Security and Compliance
+6. AI cost optimization strategies aligned with WAF Cost Optimization pillar
 
-DELIVERABLES:
-- Specific AI/ML service launches with technical specs
-- Large-scale enterprise AI implementations
-- Performance metrics and scalability achievements
-- Integration patterns and architectural decisions
-- Cost optimization and ROI examples
+WAF-ALIGNED AI/ML DELIVERABLES:
+- AI/ML service implementations with WAF pillar compliance analysis
+- Performance and scalability patterns supporting WAF Performance Efficiency
+- Security and governance patterns for AI/ML following WAF Security pillar
+- Cost optimization strategies for AI workloads aligned with WAF principles
+- Operational excellence patterns for AI/ML monitoring and automation
 
-FORMAT: Focus on enterprise-grade implementations with technical depth, specific Azure SKUs, and quantifiable business outcomes.`;
+FORMAT: Focus on how AI/ML implementations demonstrate Microsoft Well-Architected Framework compliance across all 5 pillars.`;
   }
 
-  private getEnterpriseResearchPrompt(): string {
-    return `Research major enterprise Azure implementations and customer success stories from 2024-2025:
+  private getWAFEnterpriseResearchPrompt(): string {
+    return `Research major enterprise WAF implementations and Well-Architected success stories from 2024-2025:
 
-FOCUS AREAS:
-1. Large-scale cloud migration projects (Fortune 500 companies)
-2. Multi-billion dollar Azure contracts and partnerships
-3. Complex hybrid and multi-cloud implementations
-4. Digital transformation case studies with specific outcomes
-5. Mission-critical workload migrations
-6. Industry-leading performance and scale achievements
+WAF ENTERPRISE FOCUS AREAS:
+1. Fortune 500 companies implementing complete WAF assessments and compliance
+2. Multi-billion dollar Azure contracts with WAF methodology requirements
+3. Complex enterprise WAF transformations across all 5 pillars
+4. Mission-critical workload migrations following WAF principles
+5. Industry-leading WAF compliance achievements and case studies
+6. Enterprise WAF maturity improvements with measurable outcomes
 
-DELIVERABLES:
-- Company names, project scope, and implementation details
-- Technical challenges overcome and solutions implemented
-- Specific Azure services used and architecture patterns
-- Quantifiable business outcomes (cost savings, performance gains)
-- Timeline and implementation methodology
+WAF-ALIGNED DELIVERABLES:
+- Company WAF assessment scores and pillar improvements over time
+- Technical WAF compliance implementations and architecture decisions
+- Specific Azure services chosen for WAF pillar compliance
+- Quantifiable WAF business outcomes (reliability, security, performance, cost)
+- WAF implementation timelines and methodology adoption
 
-FORMAT: Provide detailed case studies suitable for technical interviews, including architecture decisions, stakeholder management, and measurable results.`;
+FORMAT: Focus on how enterprises achieved WAF compliance across all 5 pillars with specific Azure services and measurable improvements.`;
   }
 
-  private getComplianceResearchPrompt(): string {
-    return `Research Azure compliance, data sovereignty, and regulatory projects from 2024-2025:
+  private getWAFComplianceResearchPrompt(): string {
+    return `Research Azure compliance and data sovereignty through WAF Security pillar from 2024-2025:
 
-FOCUS AREAS:
-1. Data residency and sovereignty implementations (EU, UK, Asia-Pacific)
-2. Industry-specific compliance certifications and solutions
-3. Financial services regulatory compliance (FINRA, PCI, SOX)
-4. Healthcare compliance implementations (HIPAA, GDPR)
-5. Government and public sector compliance projects
-6. Cross-border data transfer solutions and regulatory approvals
+WAF COMPLIANCE FOCUS AREAS:
+1. Data residency implementations supporting WAF Security pillar compliance
+2. Industry-specific WAF Security patterns (FINRA, PCI, SOX, HIPAA, GDPR)
+3. Financial services WAF Security and Compliance implementations
+4. Healthcare WAF Security and regulatory compliance patterns
+5. Government WAF Security implementations and public sector compliance
+6. Cross-border data transfer solutions following WAF Security principles
 
-DELIVERABLES:
-- Specific compliance frameworks and certifications achieved
-- Data sovereignty architecture patterns and controls
-- Regulatory approval processes and outcomes
-- Technical implementation details for compliance requirements
-- Multi-jurisdictional compliance strategies
+WAF SECURITY DELIVERABLES:
+- Compliance frameworks aligned with WAF Security pillar requirements
+- Data sovereignty architecture patterns supporting WAF principles
+- WAF Security pillar implementation details for regulatory compliance
+- Technical WAF Security controls and audit requirements
+- Multi-jurisdictional WAF compliance strategies and patterns
 
-FORMAT: Focus on regulatory complexity, technical controls, audit requirements, and compliance architecture patterns.`;
+FORMAT: Focus on how WAF Security pillar principles address regulatory requirements with specific Azure security services.`;
   }
 
-  private getIndustryResearchPrompt(): string {
-    return `Research Azure industry-specific and vertical solutions from 2024-2025:
+  private getWAFIndustryResearchPrompt(): string {
+    return `Research Azure industry-specific WAF implementations and vertical solutions from 2024-2025:
 
-FOCUS AREAS:
-1. Financial services: Banking, insurance, capital markets implementations
-2. Healthcare: Hospital systems, pharmaceutical, medical device companies
-3. Retail: E-commerce platforms, supply chain, customer analytics
-4. Manufacturing: IoT, predictive maintenance, digital twin implementations
-5. Government: Public cloud, citizen services, digital government initiatives
-6. Energy: Smart grid, renewable energy, oil & gas digital transformation
+WAF INDUSTRY FOCUS AREAS:
+1. Financial services WAF implementations (banking, insurance, capital markets)
+2. Healthcare WAF compliance patterns (hospitals, pharmaceutical, medical devices)
+3. Retail WAF optimization (e-commerce, supply chain, customer analytics)
+4. Manufacturing WAF excellence (IoT, predictive maintenance, digital twins)
+5. Government WAF standards (public cloud, citizen services, digital government)
+6. Energy WAF transformations (smart grid, renewable energy, oil & gas)
 
-DELIVERABLES:
-- Industry-specific Azure solutions and reference architectures
-- Vertical-focused case studies with technical specifications
-- Regulatory and compliance considerations by industry
-- Performance metrics and business outcomes
-- Integration patterns with industry-standard systems
+WAF INDUSTRY DELIVERABLES:
+- Industry-specific WAF compliance patterns and reference architectures
+- Vertical-focused WAF case studies with pillar-specific implementations
+- Regulatory WAF requirements and compliance considerations by industry
+- WAF performance metrics and business outcomes by vertical
+- Industry-standard system integration following WAF principles
 
-FORMAT: Provide industry-specific technical depth, regulatory context, and measurable business impact suitable for sector-focused case studies.`;
+FORMAT: Focus on how each industry vertical implements WAF compliance with specific Azure services and pillar-focused outcomes.`;
   }
 
-  private getArchitectureResearchPrompt(): string {
-    return `Research complex Azure architecture patterns and migration strategies from 2024-2025:
+  private getWAFArchitectureResearchPrompt(): string {
+    return `Research complex Azure architecture patterns following WAF methodology from 2024-2025:
 
-FOCUS AREAS:
-1. Large-scale cloud migration methodologies and frameworks
-2. Hybrid and multi-cloud architecture patterns
-3. Microservices and container orchestration implementations
-4. Event-driven and serverless architecture examples
-5. Data architecture and analytics platform implementations
-6. Security architecture and zero-trust implementations
+WAF ARCHITECTURE FOCUS AREAS:
+1. Large-scale WAF-compliant migration methodologies and frameworks
+2. Hybrid and multi-cloud WAF architecture patterns across all 5 pillars
+3. Microservices and container orchestration with WAF Operational Excellence
+4. Event-driven and serverless WAF Performance Efficiency patterns
+5. Data architecture and analytics platforms following WAF principles
+6. Zero-trust security architectures aligned with WAF Security pillar
 
-DELIVERABLES:
-- Detailed architecture patterns with technical specifications
-- Migration strategies for complex enterprise environments
-- Performance optimization techniques and results
-- Cost optimization patterns and savings achieved
-- Integration patterns and API management strategies
-- Scalability and resilience architecture decisions
+WAF ARCHITECTURE DELIVERABLES:
+- Detailed WAF-compliant architecture patterns with pillar analysis
+- Migration strategies incorporating WAF assessment and compliance
+- WAF Performance Efficiency optimization techniques and results
+- WAF Cost Optimization patterns and savings achieved through compliance
+- Integration patterns following WAF Operational Excellence principles
+- Scalability and resilience decisions based on WAF Reliability pillar
 
-FORMAT: Focus on technical architecture depth, decision rationale, trade-offs considered, and quantifiable outcomes suitable for solution architect interviews.`;
+FORMAT: Focus on technical architecture depth with WAF pillar alignment, decision rationale based on WAF principles, and quantifiable WAF compliance outcomes.`;
   }
 
   /**
    * Combine research results into comprehensive intelligence report
    */
   generateResearchReport(results: ResearchResult[]): string {
-    const report = `# Azure Research Intelligence Report
+    const report = `# Microsoft Well-Architected Framework Intelligence Report
 Generated: ${new Date().toISOString()}
 
 ## Executive Summary
-${this.generateExecutiveSummary(results)}
+${this.generateWAFExecutiveSummary(results)}
 
-## Research Findings by Specialization
+## WAF Research Findings by Specialization
 
 ${results.map(result => `
 ### ${result.agentName}
@@ -365,36 +365,36 @@ ${result.findings}
 ---
 `).join('')}
 
-## Research Methodology
-- **Parallel Execution:** 6 specialized agents running simultaneously
-- **Time Limits:** 40-50 second focused research per agent
-- **Total Research Time:** ${Math.round(results.reduce((sum, r) => Math.max(sum, r.executionTime), 0) / 1000)}s
-- **Success Rate:** ${results.filter(r => r.status === 'completed').length}/${results.length} agents completed successfully
+## WAF Research Methodology
+- **Parallel WAF Intelligence:** 6 specialized WAF research agents running simultaneously
+- **Time Limits:** 40-50 second focused WAF research per agent
+- **Total WAF Research Time:** ${Math.round(results.reduce((sum, r) => Math.max(sum, r.executionTime), 0) / 1000)}s
+- **Success Rate:** ${results.filter(r => r.status === 'completed').length}/${results.length} WAF agents completed successfully
 
-## Recommendations for Case Study Development
-${this.generateCaseStudyRecommendations(results)}
+## WAF-Aligned Recommendations for Architecture Development
+${this.generateWAFCaseStudyRecommendations(results)}
 `;
 
     return report;
   }
 
-  private generateExecutiveSummary(results: ResearchResult[]): string {
+  private generateWAFExecutiveSummary(results: ResearchResult[]): string {
     const completedResults = results.filter(r => r.status === 'completed');
     const totalInsights = completedResults.reduce((sum, r) => sum + r.keyInsights.length, 0);
     const totalCaseStudies = completedResults.reduce((sum, r) => sum + r.caseStudies.length, 0);
 
-    return `Research completed across ${completedResults.length} specialized domains, identifying ${totalInsights} key insights and ${totalCaseStudies} potential case studies. Focus areas covered include infrastructure expansion, AI/ML innovation, enterprise implementations, compliance frameworks, industry verticals, and architecture patterns.`;
+    return `WAF research completed across ${completedResults.length} specialized domains, identifying ${totalInsights} key insights and ${totalCaseStudies} potential WAF case studies. Focus areas covered include WAF infrastructure compliance, AI/ML innovation with WAF principles, enterprise WAF implementations, compliance frameworks, industry-specific WAF solutions, and WAF architecture patterns.`;
   }
 
-  private generateCaseStudyRecommendations(results: ResearchResult[]): string {
-    return `Based on research findings, recommended case study focus areas:
+  private generateWAFCaseStudyRecommendations(results: ResearchResult[]): string {
+    return `Based on WAF research findings, recommended case study focus areas:
 
-1. **High-Impact Implementations:** Focus on large-scale enterprise migrations with measurable ROI
-2. **Compliance-First Architectures:** Leverage data sovereignty and regulatory compliance examples  
-3. **Industry-Specific Solutions:** Develop vertical-focused case studies for target sectors
-4. **Technical Innovation:** Highlight cutting-edge AI/ML and architecture pattern implementations
-5. **Multi-Stakeholder Scenarios:** Include complex organizational change and stakeholder management elements
+1. **High-Impact WAF Implementations:** Focus on large-scale enterprise WAF assessments with measurable compliance improvements
+2. **WAF Security-First Architectures:** Leverage data sovereignty and regulatory compliance through WAF Security pillar
+3. **Industry-Specific WAF Solutions:** Develop vertical-focused WAF case studies for target sectors
+4. **WAF Technical Innovation:** Highlight cutting-edge AI/ML implementations following WAF Performance and Operational Excellence pillars
+5. **Multi-Pillar WAF Scenarios:** Include complex WAF assessments spanning all 5 pillars with stakeholder alignment
 
-These findings provide foundation for developing realistic, interview-ready case studies with technical depth and business context.`;
+These WAF findings provide foundation for developing realistic, interview-ready case studies with technical depth, business context, and Well-Architected Framework compliance methodology.`;
   }
 }

@@ -1,0 +1,64 @@
+{
+  "waf_sources": {
+    "description": "Microsoft Well-Architected Framework RAG Sources",
+    "total_pillars": 5,
+    "total_items": 60,
+    "sources": [
+      {
+        "name": "waf-security-pillar",
+        "file": "waf-security-pillar.json",
+        "content": "waf-security-pillar-content.md",
+        "pillar": "Security",
+        "items": 12
+      },
+      {
+        "name": "waf-reliability-pillar",
+        "file": "waf-reliability-pillar.json",
+        "content": "waf-reliability-pillar-content.md",
+        "pillar": "Reliability",
+        "items": 10
+      },
+      {
+        "name": "waf-performance-pillar",
+        "file": "waf-performance-pillar.json",
+        "content": "waf-performance-pillar-content.md",
+        "pillar": "Performance Efficiency",
+        "items": 12
+      },
+      {
+        "name": "waf-operational-pillar",
+        "file": "waf-operational-pillar.json",
+        "content": "waf-operational-pillar-content.md",
+        "pillar": "Operational Excellence",
+        "items": 12
+      },
+      {
+        "name": "waf-cost-pillar",
+        "file": "waf-cost-pillar.json",
+        "content": "waf-cost-pillar-content.md",
+        "pillar": "Cost Optimization",
+        "items": 14
+      }
+    ]
+  },
+  "deployment_integration": {
+    "note": "These RAG sources should be deployed with their respective WAF agents",
+    "agent_mapping": {
+      "WellArchitectedSecurityAgent": [
+        "waf-security-pillar"
+      ],
+      "WellArchitectedReliabilityAgent": [
+        "waf-reliability-pillar"
+      ],
+      "WellArchitectedPerformanceAgent": [
+        "waf-performance-pillar"
+      ],
+      "WellArchitectedOperationalExcellenceAgent": [
+        "waf-operational-pillar"
+      ],
+      "CostOptimizerAgent": [
+        "waf-cost-pillar"
+      ]
+    }
+  }
+}

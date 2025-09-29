@@ -1,0 +1,10 @@
+{
+  "name": "waf-master-framework",
+  "description": "Complete Microsoft Well-Architected Framework knowledge base with all 5 pillars (60 total checklist items)",
+  "type": "waf_master",
+  "sources": [
+    "foundry-agents/rag-sources/waf-master-framework-content.md",
+    "foundry-agents/rag-sources/waf-master-framework.json"
+  ],
+  "update_frequency": "monthly"
+}

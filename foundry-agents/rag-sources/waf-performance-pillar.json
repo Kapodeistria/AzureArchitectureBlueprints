@@ -1,0 +1,10 @@
+{
+  "name": "waf-performance-pillar",
+  "description": "Microsoft Well-Architected Framework Performance Efficiency pillar with 12 official checklist items (PE:01 - PE:12)",
+  "type": "waf_knowledge",
+  "sources": [
+    "foundry-agents/rag-sources/waf-performance-pillar-content.md",
+    "foundry-agents/rag-sources/waf-performance-pillar.json"
+  ],
+  "update_frequency": "monthly"
+}

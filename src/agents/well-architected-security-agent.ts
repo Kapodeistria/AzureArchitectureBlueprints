@@ -7,6 +7,9 @@
 import OpenAI from 'openai';
 import config from '../config/config.js';
 import { BaseAgent } from './base-agent.js';
+import { promises as fs } from 'fs';
+import { join } from 'path';
+import { existsSync } from 'fs';
 
 interface SecurityTask {
   id: string;
@@ -22,7 +25,7 @@ interface SecurityTask {
 }
 
 interface SecurityResult {
-  securityScore: number; // 1-10 scale
+  securityScore: number; // 0-100 scale for granular optimization
   threatProtection: string[];
   identityManagement: string;
   dataProtection: string[];
@@ -31,11 +34,34 @@ interface SecurityResult {
   securityRecommendations: string[];
   azureSecurityServices: string[];
   wellArchitectedCompliance: string;
+  criticalIssues: string[];
+  improvementPotential: number; // How much score could improve
 }
 
 export class WellArchitectedSecurityAgent extends BaseAgent {
+  private wafKnowledge: any = null;
+
   constructor(client: OpenAI) {
     super(client);
+    this.loadWAFKnowledge();
+  }
+
+  /**
+   * Load official Microsoft WAF Security knowledge base
+   */
+  private async loadWAFKnowledge(): Promise<void> {
+    try {
+      const knowledgePath = 'waf-knowledge-base/security-knowledge.json';
+      if (existsSync(knowledgePath)) {
+        const knowledgeData = await fs.readFile(knowledgePath, 'utf8');
+        this.wafKnowledge = JSON.parse(knowledgeData);
+        console.log('🔒 Security Agent: Loaded official Microsoft WAF knowledge (12 checklist items)');
+      } else {
+        console.warn('⚠️ Security Agent: WAF knowledge base not found - using built-in knowledge');
+      }
+    } catch (error) {
+      console.warn('⚠️ Security Agent: Could not load WAF knowledge base:', error.message);
+    }
   }
 
   async execute(task: SecurityTask): Promise<SecurityResult> {
@@ -76,39 +102,32 @@ export class WellArchitectedSecurityAgent extends BaseAgent {
           role: 'system',
           content: `You are a Well-Architected Security Agent specializing in the Azure Well-Architected Framework Security pillar.
 
-**AZURE WELL-ARCHITECTED SECURITY PRINCIPLES:**
-1. **Plan security readiness** - Establish security requirements and governance
-2. **Protect confidentiality, integrity, availability** - Comprehensive data protection
-3. **Sustain and evolve security posture** - Continuous security improvement
+**ASSESSMENT INSTRUCTIONS:**
+1. Use the RAG knowledge base to reference official Microsoft WAF Security checklist items (SE:01 - SE:12)
+2. Evaluate the architecture against each of the 12 official WAF Security requirements
+3. Provide specific Azure service recommendations aligned with WAF principles
+4. Score overall security posture (0-100) with detailed justification based on WAF compliance
+5. Focus on Zero Trust principles and defense-in-depth strategies
+6. Identify critical security issues that must be addressed
+7. Calculate improvement potential and specific remediation steps
 
-**SECURITY FOUNDATION AREAS:**
-- **Identity & Access Management**: Zero Trust, least privilege, MFA
-- **Data Protection**: Encryption at rest/transit, classification, DLP
-- **Network Security**: Segmentation, firewalls, private endpoints
-- **Threat Protection**: Detection, monitoring, incident response
-- **Governance & Compliance**: Policies, standards, regulatory alignment
-- **Application Security**: Secure development, secrets management
+**SCORING GUIDANCE:**
+- 90-100: Excellent WAF compliance, industry-leading security
+- 80-89: Good security with minor gaps
+- 70-79: Adequate security with notable improvements needed
+- 60-69: Below average, significant security concerns
+- 50-59: Poor security, major vulnerabilities present
+- 0-49: Critical security failures, immediate action required
 
-**AZURE SECURITY SERVICES TO EVALUATE:**
-- **Identity**: Entra ID (Azure AD), Privileged Identity Management
-- **Network**: Network Security Groups, Application Gateway WAF, Firewall
-- **Data**: Azure Key Vault, Disk Encryption, SQL TDE
-- **Monitoring**: Microsoft Defender for Cloud, Sentinel, Monitor
-- **Governance**: Policy, Blueprints, Resource Graph
-- **Application**: App Service authentication, API Management
-- **Storage**: Private endpoints, access keys, managed identities
+**OUTPUT REQUIREMENTS:**
+- Reference specific WAF Security checklist items (SE:01, SE:02, etc.) in your analysis
+- Provide concrete Azure security service recommendations
+- Include compliance gap analysis and improvement roadmap
+- Score each security area and provide overall WAF Security pillar score (0-100)
+- List critical issues requiring immediate attention
+- Calculate improvement potential with specific actions
 
-**SECURITY ASSESSMENT STRUCTURE:**
-1. **Security Score (1-10)**: Overall security posture rating
-2. **Threat Protection**: Specific threat mitigation strategies
-3. **Identity Management**: Authentication and authorization approach
-4. **Data Protection**: Encryption and data governance measures
-5. **Network Security**: Segmentation and access controls
-6. **Compliance Alignment**: Regulatory and industry standards
-7. **Security Recommendations**: Prioritized improvement actions
-8. **WAF Compliance**: Security pillar alignment assessment
-
-Focus on Zero Trust principles and defense-in-depth strategies with specific Azure configurations.`
+Use the RAG knowledge base for detailed WAF Security methodology and checklist items.`
         },
         {
           role: 'user',
@@ -125,7 +144,7 @@ ${complianceRequirements ? `**Compliance Requirements:**\n${complianceRequiremen
 ${industryType ? `**Industry Type:**\n${industryType}\n` : ''}
 
 **SECURITY DELIVERABLES:**
-1. Security score (1-10) with detailed justification
+1. Security score (0-100) with detailed justification per WAF checklist item
 2. Threat protection mechanisms and detection capabilities
 3. Identity and access management strategy (Zero Trust alignment)
 4. Data protection and encryption recommendations
@@ -134,6 +153,15 @@ ${industryType ? `**Industry Type:**\n${industryType}\n` : ''}
 7. Prioritized security recommendations with Azure services
 8. Well-Architected Framework security compliance
 9. Security governance and monitoring strategy
+10. Critical security issues requiring immediate remediation
+11. Improvement potential calculation with specific action items
+
+**SCORING FORMAT:**
+Provide a granular 0-100 score based on:
+- SE:01-SE:12 checklist item compliance (8 points each)
+- Architecture quality and Azure service alignment (4 points)
+- Critical issue penalties (-5 points per critical issue)
+- Innovation bonus for advanced security features (+1-5 points)
 
 Focus on defense-in-depth strategy and Zero Trust principles with specific Azure security services.`
         }
@@ -146,9 +174,9 @@ Focus on defense-in-depth strategy and Zero Trust principles with specific Azure
   }
 
   private parseSecurityAnalysis(analysis: string): SecurityResult {
-    // Extract security score
+    // Extract security score (0-100 scale)
     const scoreMatch = analysis.match(/security score[:\s]*(\d+(?:\.\d+)?)/i);
-    const securityScore = scoreMatch ? parseFloat(scoreMatch[1]) : 7;
+    const securityScore = scoreMatch ? parseFloat(scoreMatch[1]) : 70;
 
     // Extract compliance alignment
     const complianceMatch = analysis.match(/compliance[:\s]*([^\n]+)/i);
@@ -165,8 +193,14 @@ Focus on defense-in-depth strategy and Zero Trust principles with specific Azure
     const recommendations = this.extractSecurityItems(analysis, ['recommend', 'should', 'implement']);
     const azureServices = this.extractAzureSecurityServices(analysis);
 
+    // Extract critical issues
+    const criticalIssues = this.extractCriticalIssues(analysis);
+
+    // Calculate improvement potential
+    const improvementPotential = this.calculateImprovementPotential(securityScore, criticalIssues.length);
+
     return {
-      securityScore: Math.min(Math.max(securityScore, 1), 10),
+      securityScore: Math.min(Math.max(securityScore, 0), 100),
       threatProtection: threatProtection.slice(0, 5),
       identityManagement,
       dataProtection: dataProtection.slice(0, 5),
@@ -174,7 +208,9 @@ Focus on defense-in-depth strategy and Zero Trust principles with specific Azure
       complianceAlignment,
       securityRecommendations: recommendations.slice(0, 6),
       azureSecurityServices: azureServices.slice(0, 8),
-      wellArchitectedCompliance: this.extractWAFSecurityCompliance(analysis)
+      wellArchitectedCompliance: this.extractWAFSecurityCompliance(analysis),
+      criticalIssues: criticalIssues.slice(0, 8),
+      improvementPotential
     };
   }
 
@@ -254,9 +290,64 @@ Focus on defense-in-depth strategy and Zero Trust principles with specific Azure
     return 'Aligned with Well-Architected security principles with enhancement opportunities';
   }
 
+  private extractCriticalIssues(analysis: string): string[] {
+    const issues: string[] = [];
+    const criticalPatterns = [
+      /critical[^.]*issue[:\s]*([^.]+)/gi,
+      /immediate[^.]*attention[:\s]*([^.]+)/gi,
+      /security[^.]*vulnerability[:\s]*([^.]+)/gi,
+      /urgent[^.]*fix[:\s]*([^.]+)/gi,
+      /high[^.]*risk[:\s]*([^.]+)/gi
+    ];
+
+    for (const pattern of criticalPatterns) {
+      const matches = analysis.match(pattern);
+      if (matches) {
+        for (const match of matches) {
+          const cleanIssue = match.replace(/^(critical|immediate|security|urgent|high)[^:]*:\s*/i, '').trim();
+          if (cleanIssue.length > 10 && cleanIssue.length < 200) {
+            issues.push(cleanIssue);
+          }
+        }
+      }
+    }
+
+    // Fallback: look for bullet points with critical keywords
+    const lines = analysis.split('\n');
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if ((trimmed.startsWith('•') || trimmed.startsWith('-') || trimmed.startsWith('*')) &&
+          /critical|urgent|immediate|vulnerability|risk|expose|breach/i.test(trimmed)) {
+        const issue = trimmed.substring(1).trim();
+        if (issue.length > 10) {
+          issues.push(issue);
+        }
+      }
+    }
+
+    return [...new Set(issues)]; // Remove duplicates
+  }
+
+  private calculateImprovementPotential(currentScore: number, criticalIssueCount: number): number {
+    // Base improvement potential
+    let potential = 100 - currentScore;
+
+    // Add bonus potential for addressing critical issues
+    const criticalBonus = Math.min(criticalIssueCount * 8, 30); // Max 30 points from critical fixes
+
+    // Diminishing returns for high scores
+    if (currentScore > 80) {
+      potential *= 0.7; // Harder to improve when already good
+    } else if (currentScore > 60) {
+      potential *= 0.9; // Some diminishing returns
+    }
+
+    return Math.min(Math.round(potential + criticalBonus), 100 - currentScore);
+  }
+
   private getSecurityFallback(): SecurityResult {
     return {
-      securityScore: 7,
+      securityScore: 70, // Updated to 0-100 scale
       threatProtection: [
         'Microsoft Defender for Cloud threat detection',
         'Azure Monitor security alerting',
@@ -287,7 +378,12 @@ Focus on defense-in-depth strategy and Zero Trust principles with specific Azure
         'Entra ID', 'Azure Key Vault', 'Microsoft Defender for Cloud', 
         'Azure Firewall', 'Azure Monitor', 'Azure Policy'
       ],
-      wellArchitectedCompliance: 'Security assessment temporarily unavailable - manual review recommended'
+      wellArchitectedCompliance: 'Security assessment temporarily unavailable - manual review recommended',
+      criticalIssues: [
+        'Security assessment failed - manual review required',
+        'Unable to validate current security posture'
+      ],
+      improvementPotential: 30 // Potential improvement if assessment can be completed
     };
   }
 }

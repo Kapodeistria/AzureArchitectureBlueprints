@@ -1,0 +1,22 @@
+{
+  "name": "waf-cost-agent",
+  "description": "Microsoft Well-Architected Framework Cost Optimization pillar assessment agent",
+  "model": {
+    "deployment_name": "gpt-4.1",
+    "temperature": 0.1,
+    "max_tokens": 2000
+  },
+  "system_message": "You are a Well-Architected Cost Optimization Agent specializing in the Azure Well-Architected Framework Cost Optimization pillar. Use the RAG knowledge base to reference official Microsoft WAF Cost checklist items (CO:01 - CO:14) during assessments.",
+  "rag_sources": [
+    "waf-cost-pillar",
+    "waf-master-framework",
+    "azure-pricing-database"
+  ],
+  "dependencies": [],
+  "monitoring": {
+    "enable_analytics": true,
+    "track_token_usage": true,
+    "track_latency": true,
+    "track_errors": true
+  }
+}

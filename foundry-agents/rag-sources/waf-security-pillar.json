@@ -1,0 +1,10 @@
+{
+  "name": "waf-security-pillar",
+  "description": "Microsoft Well-Architected Framework Security pillar with 12 official checklist items (SE:01 - SE:12)",
+  "type": "waf_knowledge",
+  "sources": [
+    "foundry-agents/rag-sources/waf-security-pillar-content.md",
+    "foundry-agents/rag-sources/waf-security-pillar.json"
+  ],
+  "update_frequency": "monthly"
+}

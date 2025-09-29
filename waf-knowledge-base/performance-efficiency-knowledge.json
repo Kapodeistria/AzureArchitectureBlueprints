@@ -1,0 +1,145 @@
+{
+  "pillar": "Performance Efficiency",
+  "agent": "WellArchitectedPerformanceAgent",
+  "source": "Microsoft Azure Well-Architected Framework",
+  "url": "https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/checklist",
+  "lastUpdated": "2025-09-29T02:36:53.868Z",
+  "totalItems": 12,
+  "checklistItems": [
+    {
+      "id": "PE:01",
+      "title": "Define Performance Targets",
+      "description": "Set numerical values tied to workload requirements, implement targets for all workload flows",
+      "keyFocus": [
+        "numerical targets",
+        "requirement alignment",
+        "flow coverage"
+      ]
+    },
+    {
+      "id": "PE:02",
+      "title": "Conduct Capacity Planning",
+      "description": "Plan before predicted usage pattern changes, consider seasonal variations, product updates, marketing campaigns",
+      "keyFocus": [
+        "capacity planning",
+        "usage patterns",
+        "change anticipation"
+      ]
+    },
+    {
+      "id": "PE:03",
+      "title": "Select Right Services",
+      "description": "Choose services/infrastructure supporting performance targets, weigh platform features vs. custom implementation",
+      "keyFocus": [
+        "service selection",
+        "platform features",
+        "custom vs platform"
+      ]
+    },
+    {
+      "id": "PE:04",
+      "title": "Collect Performance Data",
+      "description": "Provide automatic, continuous metrics and logs, collect data across application, platform, data, and OS levels",
+      "keyFocus": [
+        "continuous monitoring",
+        "multi-level data",
+        "automation"
+      ]
+    },
+    {
+      "id": "PE:05",
+      "title": "Optimize Scaling and Partitioning",
+      "description": "Design reliable, controlled scaling strategies, base approach on workload's scale unit design",
+      "keyFocus": [
+        "scaling design",
+        "partitioning strategy",
+        "scale units"
+      ]
+    },
+    {
+      "id": "PE:06",
+      "title": "Performance Testing",
+      "description": "Test in production-like environment, compare results against performance targets/benchmarks",
+      "keyFocus": [
+        "production testing",
+        "benchmark comparison",
+        "target validation"
+      ]
+    },
+    {
+      "id": "PE:07",
+      "title": "Optimize Code and Infrastructure",
+      "description": "Use performant code, offload responsibilities to platform, use resources only when necessary",
+      "keyFocus": [
+        "code optimization",
+        "platform offloading",
+        "resource efficiency"
+      ]
+    },
+    {
+      "id": "PE:08",
+      "title": "Optimize Data Usage",
+      "description": "Optimize data stores, partitions, indexes, align with workload's intended and actual use",
+      "keyFocus": [
+        "data optimization",
+        "indexing strategy",
+        "usage alignment"
+      ]
+    },
+    {
+      "id": "PE:09",
+      "title": "Prioritize Critical Flows",
+      "description": "Allocate resources to most important business processes, focus optimization on key user and operational flows",
+      "keyFocus": [
+        "resource allocation",
+        "business prioritization",
+        "critical flows"
+      ]
+    },
+    {
+      "id": "PE:10",
+      "title": "Optimize Operational Tasks",
+      "description": "Minimize software lifecycle impact on performance, manage tasks like virus scans, secret rotations, backups",
+      "keyFocus": [
+        "lifecycle optimization",
+        "operational impact",
+        "task management"
+      ]
+    },
+    {
+      "id": "PE:11",
+      "title": "Respond to Live Performance Issues",
+      "description": "Establish clear communication and responsibilities, learn and implement preventive measures",
+      "keyFocus": [
+        "incident response",
+        "communication",
+        "preventive measures"
+      ]
+    },
+    {
+      "id": "PE:12",
+      "title": "Continuous Performance Optimization",
+      "description": "Focus on components with deteriorating performance, regularly review databases, networking features",
+      "keyFocus": [
+        "continuous improvement",
+        "performance monitoring",
+        "regular reviews"
+      ]
+    }
+  ],
+  "assessmentPrompt": "You are conducting a Performance Efficiency assessment following the official Microsoft Well-Architected Framework methodology.\n\nOFFICIAL PERFORMANCE EFFICIENCY CHECKLIST (12 items):\n1. PE:01 - Define Performance Targets: Set numerical values tied to workload requirements, implement targets for all workload flows\\n2. PE:02 - Conduct Capacity Planning: Plan before predicted usage pattern changes, consider seasonal variations, product updates, marketing campaigns\\n3. PE:03 - Select Right Services: Choose services/infrastructure supporting performance targets, weigh platform features vs. custom implementation\\n4. PE:04 - Collect Performance Data: Provide automatic, continuous metrics and logs, collect data across application, platform, data, and OS levels\\n5. PE:05 - Optimize Scaling and Partitioning: Design reliable, controlled scaling strategies, base approach on workload's scale unit design\\n6. PE:06 - Performance Testing: Test in production-like environment, compare results against performance targets/benchmarks\\n7. PE:07 - Optimize Code and Infrastructure: Use performant code, offload responsibilities to platform, use resources only when necessary\\n8. PE:08 - Optimize Data Usage: Optimize data stores, partitions, indexes, align with workload's intended and actual use\\n9. PE:09 - Prioritize Critical Flows: Allocate resources to most important business processes, focus optimization on key user and operational flows\\n10. PE:10 - Optimize Operational Tasks: Minimize software lifecycle impact on performance, manage tasks like virus scans, secret rotations, backups\\n11. PE:11 - Respond to Live Performance Issues: Establish clear communication and responsibilities, learn and implement preventive measures\\n12. PE:12 - Continuous Performance Optimization: Focus on components with deteriorating performance, regularly review databases, networking features\n\nASSESSMENT INSTRUCTIONS:\n- Evaluate the architecture against each checklist item\n- Provide specific recommendations using Azure services\n- Score each area on a 1-10 scale with detailed justification\n- Focus on compliance gaps and improvement opportunities\n- Reference official WAF guidance in your analysis\n\nFollow the official Microsoft WAF Performance Efficiency methodology for consistent, professional assessment.",
+  "quickReference": [
+    "PE:01: Define Performance Targets - Set numerical values tied to workload requirements, implement targets for all workload flows...",
+    "PE:02: Conduct Capacity Planning - Plan before predicted usage pattern changes, consider seasonal variations, product updates, marketin...",
+    "PE:03: Select Right Services - Choose services/infrastructure supporting performance targets, weigh platform features vs. custom im...",
+    "PE:04: Collect Performance Data - Provide automatic, continuous metrics and logs, collect data across application, platform, data, and...",
+    "PE:05: Optimize Scaling and Partitioning - Design reliable, controlled scaling strategies, base approach on workload's scale unit design...",
+    "PE:06: Performance Testing - Test in production-like environment, compare results against performance targets/benchmarks...",
+    "PE:07: Optimize Code and Infrastructure - Use performant code, offload responsibilities to platform, use resources only when necessary...",
+    "PE:08: Optimize Data Usage - Optimize data stores, partitions, indexes, align with workload's intended and actual use...",
+    "PE:09: Prioritize Critical Flows - Allocate resources to most important business processes, focus optimization on key user and operatio...",
+    "PE:10: Optimize Operational Tasks - Minimize software lifecycle impact on performance, manage tasks like virus scans, secret rotations, ...",
+    "PE:11: Respond to Live Performance Issues - Establish clear communication and responsibilities, learn and implement preventive measures...",
+    "PE:12: Continuous Performance Optimization - Focus on components with deteriorating performance, regularly review databases, networking features..."
+  ]
+}

@@ -13,6 +13,8 @@ import { RiskAssessorAgent } from './risk-assessor-agent.js';
 import { DocumentationAgent } from './documentation-agent.js';
 import { ResearchOrchestratorAgent } from './research-orchestrator-agent.js';
 import { WellArchitectedOrchestrator } from './well-architected-orchestrator.js';
+import { ArchitectureRefinementOrchestrator } from './architecture-refinement-orchestrator.js';
+import { getAgentRegistry, isAgentDeployed } from '../utils/deploy-agents-to-foundry.js';
 import { promises as fs } from 'fs';
 import path from 'path';
 // Phase 2: DSL functionality will be separate
@@ -21,156 +23,151 @@ import path from 'path';
 
 export class SimpleOrchestrator {
   private client: OpenAI;
+  private agentRegistry: { [key: string]: string } = {};
   
   constructor(client: OpenAI) {
     this.client = client;
   }
 
+  /**
+   * Initialize agent registry for local execution
+   */
+  private initializeAgentRegistry(): void {
+    try {
+      this.agentRegistry = getAgentRegistry();
+      const deployedAgents = Object.keys(this.agentRegistry);
+      if (deployedAgents.length > 0) {
+        console.log(`🔗 Using deployed agents: ${deployedAgents.join(', ')}`);
+      } else {
+        console.log('⚠️  No deployed agents found in registry - using local execution only');
+      }
+    } catch (error) {
+      console.log('⚠️  Could not load agent registry - using local execution only');
+      this.agentRegistry = {};
+    }
+  }
+
   async coordinate(caseStudyText: string, caseStudyFolder?: string): Promise<string> {
     try {
-      console.log('🚀 Starting Phase 1: Intelligence-Driven Architecture Analysis...');
-      
-      // Initialize agents (Phase 1: Core workflow + WAF)
-      const researchAgent = new ResearchOrchestratorAgent(this.client);
-      const requirementsAgent = new RequirementsAnalystAgent(this.client);
-      const architectureAgent = new ArchitectureAgent(this.client);
-      const visualAgent = new VisualArchitectureAgent(this.client);
-      const costAgent = new CostOptimizerAgent(this.client);
-      const riskAgent = new RiskAssessorAgent(this.client);
-      const docAgent = new DocumentationAgent(this.client);
-      const wafOrchestrator = new WellArchitectedOrchestrator(this.client);
-      // Phase 2: DSL agents will be separate workflow
-      // const reviewerAgent = new SolutionArchitectReviewerAgent(this.client);
-      // const dslAgent = new StructurizrDSLValidatorAgent(this.client);
+      console.log('🚀 Starting WAF-compliant architecture analysis\n');
 
-      // Step 0: Parallel Research Intelligence (NEW - 6 agents with time limits)
-      console.log('🔍 [0/6] Executing parallel research across 6 specialized agents...');
+      // Initialize agent registry
+      this.initializeAgentRegistry();
+
+      // Initialize agents
+      const researchAgent = new ResearchOrchestratorAgent(this.client);
+      const visualAgent = new VisualArchitectureAgent(this.client);
+      const wafOrchestrator = new WellArchitectedOrchestrator(this.client);
+
+      // Step 0: Research Intelligence (6 parallel agents)
+      console.log('🔍 Research Intelligence');
       let researchResults = [];
       let researchReport = '';
       try {
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Research intelligence timeout')), 120000) // 2 min timeout
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Research intelligence timeout')), 120000)
         );
-        
+
         researchResults = await Promise.race([
           researchAgent.executeResearch(caseStudyText),
           timeoutPromise
         ]) as any[];
-        
+
         researchReport = researchAgent.generateResearchReport(researchResults);
-        console.log(`✅ Research completed: ${researchResults.filter(r => r.status === 'completed').length}/${researchResults.length} agents successful`);
-        
+        const successful = researchResults.filter(r => r.status === 'completed').length;
+        console.log(`   ✓ ${successful}/${researchResults.length} agents completed\n`);
+
       } catch (error) {
-        console.warn('⚠️ Research intelligence failed, using fallback:', error.message);
-        researchReport = `# Research Intelligence (Fallback)\n\nResearch analysis temporarily unavailable: ${error.message}\n\nProceeding with standard analysis workflow.`;
+        console.log(`   ⚠ Using fallback (${error.message})\n`);
+        researchReport = `# Research Intelligence (Fallback)\n\nProceeding with standard analysis workflow.`;
       }
-      
-      // Save research after completion
+
       await this.saveIntermediateResults('Research Intelligence', researchReport, caseStudyFolder);
 
-      // Step 1: Requirements Analysis (with timeout fallback and research context)
-      console.log('📋 [1/6] Analyzing business and technical requirements...');
+      // Step 1: Requirements Analysis
+      console.log('📋 Requirements Analysis');
       let requirements = '';
       try {
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Requirements analysis timeout')), 30000)
-        );
-        
         requirements = await Promise.race([
           this.analyzeRequirements(caseStudyText, researchReport),
-          timeoutPromise
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 30000))
         ]) as string;
+        console.log('   ✓ Complete\n');
       } catch (error) {
-        console.warn('⚠️ Requirements analysis failed, using simplified fallback:', error.message);
-        requirements = `
-# Requirements Analysis (Fallback)
-
-## Functional Requirements
-- Core application functionality
-- User management and authentication
-- Data processing and storage
-- Integration with existing systems
-
-## Non-Functional Requirements  
-- High availability and reliability
-- Performance and scalability
-- Security and compliance
-- Cost optimization
-
-*Note: Detailed requirements analysis temporarily unavailable*
-        `;
+        console.log('   ⚠ Using fallback\n');
+        requirements = `# Requirements Analysis (Fallback)\n\n## Functional Requirements\n- Core functionality\n- Authentication\n- Data processing\n\n## Non-Functional Requirements\n- High availability\n- Performance & scalability\n- Security & compliance`;
       }
-      
-      // Save requirements after completion
+
       await this.saveIntermediateResults('Requirements Analysis', requirements, caseStudyFolder);
-      
-      // Step 2: Architecture Design (with timeout fallback and research context)
-      console.log('🏗️ [2/6] Designing Azure architecture with service selection...');
+
+      // Step 2: Architecture Design
+      console.log('🏗️  Architecture Design');
       let architecture = '';
       try {
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Architecture design timeout')), 30000)
-        );
-        
         architecture = await Promise.race([
           this.designArchitecture(caseStudyText, requirements, researchReport),
-          timeoutPromise
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 30000))
         ]) as string;
+        console.log('   ✓ Complete\n');
       } catch (error) {
-        console.warn('⚠️ Architecture design failed, using simplified fallback:', error.message);
-        architecture = `
-# Simplified Azure Architecture
-
-## Core Components
-- Azure App Service (Web hosting)
-- Azure SQL Database (Data storage)  
-- Azure Application Gateway (Load balancing)
-- Azure Key Vault (Security)
-- Azure Monitor (Observability)
-
-## Integration
-- Standard Azure services configuration
-- Basic security and monitoring setup
-- Scalable web application architecture
-
-*Note: Detailed architecture design temporarily unavailable*
-        `;
+        console.log('   ⚠ Using fallback\n');
+        architecture = `# Azure Architecture\n\n## Core Components\n- Azure App Service\n- Azure SQL Database\n- Azure Application Gateway\n- Azure Key Vault\n- Azure Monitor`;
       }
-      
-      // Save architecture after completion  
+
       await this.saveIntermediateResults('Architecture Design', architecture, caseStudyFolder);
-      
-      // Step 2.5: Enhanced Visual Diagrams (with timeout fallback)
-      console.log('🎨 [3/6] Creating detailed ASCII architecture diagrams...');
+
+      // Step 2.1: Architecture Refinement
+      console.log('🔄 Architecture Optimization');
+      let refinedArchitecture = architecture;
+      try {
+        const refinementOrchestrator = new ArchitectureRefinementOrchestrator(this.client);
+
+        const refinementTask = {
+          id: 'architecture-optimization',
+          type: 'architecture-refinement' as const,
+          priority: 'high' as const,
+          payload: {
+            caseStudy: caseStudyText,
+            requirements,
+            businessContext: caseStudyText,
+            targetWAFScore: 85,
+            maxIterations: 3,
+            caseStudyFolder
+          }
+        };
+
+        const refinementResult = await refinementOrchestrator.execute(refinementTask);
+        refinedArchitecture = refinementResult.finalArchitecture;
+        architecture = refinedArchitecture;
+
+        console.log(`   ✓ WAF Score: ${refinementResult.finalWAFScore}/100 (${refinementResult.totalIterations} iterations)\n`);
+
+        await this.saveIntermediateResults('Optimized Architecture', refinedArchitecture, caseStudyFolder);
+
+      } catch (error) {
+        console.log('   ⚠ Using initial design\n');
+      }
+
+      // Step 2.5: Visual Diagrams
+      console.log('🎨 Architecture Diagrams');
       let visualDiagrams = '';
       try {
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Visual diagram generation timeout')), 30000)
-        );
-        
         visualDiagrams = await Promise.race([
           visualAgent.generateDetailedDiagram(architecture, caseStudyText, caseStudyFolder),
-          timeoutPromise
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 30000))
         ]) as string;
+        console.log('   ✓ Complete\n');
       } catch (error) {
-        console.warn('⚠️ Visual diagram generation failed, using fallback:', error.message);
-        visualDiagrams = `[Visual diagrams temporarily unavailable - proceeding with analysis]\n\nArchitecture Summary:\n${architecture}`;
+        console.log('   ⚠ Using fallback\n');
+        visualDiagrams = `[Visual diagrams unavailable]\n\n${architecture}`;
       }
-      
-      // Save visual diagrams after completion (note: already saved separately by VisualArchitectureAgent)
+
       await this.saveIntermediateResults('Visual Architecture Diagrams', visualDiagrams, caseStudyFolder);
-      
-      // Phase 1: Core workflow - Skip complex review loop for now
-      console.log('✅ [3/6] Architecture and visual diagrams complete!');
-      
-      // Step 4: Well-Architected Framework Assessment (NEW)
-      console.log('🏗️ [4/7] Conducting Azure Well-Architected Framework assessment...');
+
+      // Step 4: Well-Architected Framework Assessment
+      console.log('🏗️  WAF Assessment');
       let wafAssessment;
       try {
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('WAF assessment timeout')), 180000) // 3 min timeout
-        );
-        
         const wafTask = {
           id: 'waf-assessment',
           type: 'waf-comprehensive-assessment' as const,
@@ -182,108 +179,87 @@ export class SimpleOrchestrator {
             caseStudyFolder
           }
         };
-        
+
         wafAssessment = await Promise.race([
           wafOrchestrator.executeWAFAssessment(wafTask),
-          timeoutPromise
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 180000))
         ]);
-        
-        console.log(`✅ WAF Assessment complete - Overall Score: ${wafAssessment.overallScore}/10`);
-        
+
+        console.log(`   ✓ Score: ${wafAssessment.overallScore}/100\n`);
+
       } catch (error) {
-        console.warn('⚠️ WAF assessment failed, using fallback:', error.message);
+        console.log('   ⚠ Using fallback\n');
         wafAssessment = {
-          overallScore: 7.0,
-          assessmentSummary: 'Well-Architected assessment temporarily unavailable',
-          wafReport: 'WAF assessment will be conducted in final report generation'
+          overallScore: 70.0,
+          assessmentSummary: 'Assessment unavailable',
+          wafReport: 'WAF assessment in final report'
         };
       }
-      
-      // Save WAF assessment after completion
       await this.saveIntermediateResults('Well-Architected Framework Assessment', wafAssessment.wafReport || wafAssessment.assessmentSummary, caseStudyFolder);
 
-      // Step 5-6: Parallel Analysis (Cost, Risk, Change Management) with timeouts  
-      console.log('⚡ [5/7] Running parallel analysis (cost, risk, change management)...');
+      // Step 5: Parallel Analysis with individual timeouts
+      console.log('⚡ Cost, Risk & Change Analysis');
       let costs, risks, changeManagement;
-      
+
       try {
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Parallel analysis timeout')), 45000)
+        const timeout = (ms: number) => new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), ms)
         );
-        
-        [costs, risks, changeManagement] = await Promise.race([
-          Promise.all([
-            this.analyzeCosts(architecture),
-            this.assessRisks(architecture), 
-            this.developChangeStrategy(caseStudyText, architecture)
-          ]),
-          timeoutPromise
+
+        [costs, risks, changeManagement] = await Promise.all([
+          Promise.race([this.analyzeCosts(architecture), timeout(30000)])
+            .catch(err => {
+              console.log('   ⚠ Cost analysis timeout');
+              return '# Cost Analysis\n\n*Analysis unavailable - timeout exceeded*';
+            }),
+          Promise.race([this.assessRisks(architecture), timeout(30000)])
+            .catch(err => {
+              console.log('   ⚠ Risk assessment timeout');
+              return '# Risk Assessment\n\n*Assessment unavailable - timeout exceeded*';
+            }),
+          Promise.race([this.developChangeStrategy(caseStudyText, architecture), timeout(30000)])
+            .catch(err => {
+              console.log('   ⚠ Change strategy timeout');
+              return '# Change Management\n\n*Strategy unavailable - timeout exceeded*';
+            })
         ]) as [string, string, string];
+
+        console.log('   ✓ Complete\n');
       } catch (error) {
-        console.warn('⚠️ Parallel analysis failed, using fallbacks:', error.message);
-        costs = `Cost analysis temporarily unavailable: ${error.message}`;
-        risks = `Risk assessment temporarily unavailable: ${error.message}`;
-        changeManagement = `Change management strategy temporarily unavailable: ${error.message}`;
+        console.log('   ✗ Failed\n');
+        costs = `# Cost Analysis\n\n*Unavailable*`;
+        risks = `# Risk Assessment\n\n*Unavailable*`;
+        changeManagement = `# Change Management\n\n*Unavailable*`;
       }
-      
-      // Save parallel analysis results
+
       await this.saveIntermediateResults('Cost Analysis', costs, caseStudyFolder);
       await this.saveIntermediateResults('Risk Assessment', risks, caseStudyFolder);
       await this.saveIntermediateResults('Change Management Strategy', changeManagement, caseStudyFolder);
-      
-      // Step 7: Generate Documentation (with timeout, research context, and WAF assessment)
-      console.log('📝 [6/7] Generating comprehensive report and documentation...');
+
+      // Step 6: Generate Documentation
+      console.log('📝 Documentation');
       let report;
       try {
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Report generation timeout')), 30000)
-        );
-        
         report = await Promise.race([
           this.generateReport(caseStudyText, {
             researchReport,
             requirements,
             architecture,
-            visualDiagrams, 
+            visualDiagrams,
             wafAssessment,
             costs,
             risks,
             changeManagement
           }),
-          timeoutPromise
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 30000))
         ]);
+        console.log('   ✓ Complete\n');
       } catch (error) {
-        console.warn('⚠️ Report generation failed, using simplified fallback:', error.message);
-        report = `
-# Azure Architecture Analysis Report
-
-## Case Study
-${caseStudyText}
-
-## Requirements
-${requirements}
-
-## Architecture
-${architecture}
-
-## Visual Diagrams
-${visualDiagrams}
-
-## Cost Analysis
-${costs}
-
-## Risk Assessment
-${risks}
-
-## Change Management
-${changeManagement}
-
----
-*Note: Detailed report generation temporarily unavailable*
-        `;
+        console.log('   ⚠ Using fallback\n');
+        report = `# Azure Architecture Analysis\n\n${caseStudyText}\n\n## Requirements\n${requirements}\n\n## Architecture\n${architecture}\n\n## Diagrams\n${visualDiagrams}\n\n## Cost\n${costs}\n\n## Risk\n${risks}\n\n## Change\n${changeManagement}`;
       }
-      
-      console.log('🎉 ✅ Phase 1 Complete! Well-Architected intelligence-driven Azure architecture analysis ready for interview!');
+
+      console.log('✅ Analysis complete\n');
       return report;
       
     } catch (error) {
@@ -381,30 +357,23 @@ Focus on comprehensive visual diagrams with practical, interview-ready architect
       messages: [
         {
           role: 'system',
-          content: `You are a Cost Optimization Agent specializing in ROI analysis and business value.
+          content: `You are an Azure Cost Optimization specialist.
 
-CRITICAL DELIVERABLES:
-1. **ROI Calculations**: Quantify value of reducing 20% diagnostic miss rate
-2. **POC vs Full Implementation Costs**: Separate 8-week vs 6-month costs  
-3. **Competitive Advantage Value**: Cost of losing to AI-enhanced competitors
-4. **Business Impact Metrics**: Cost per life saved, market share protection
-5. **Quick Win Financial Analysis**: Immediate cost savings and revenue protection
+Provide concise cost analysis:
+1. Monthly/annual cost estimates for each major service
+2. Reserved instance savings opportunities (up to 72%)
+3. 3-year TCO projection
+4. ROI based on business value
+5. Quick wins for cost reduction
 
-COST STRUCTURE:
-- POC Phase Costs (8 weeks, 2-5 hospitals)
-- Full Rollout Costs (6 months, 200 hospitals)  
-- ROI Analysis (diagnostic accuracy improvement value)
-- Competitive Risk Analysis (market share loss prevention)
-- Total Cost of Ownership (3-year projection)
-
-Focus on business value storytelling for CEO/CTO presentations.`
+Format: Service name, SKU, monthly cost, optimization tip.`
         },
         {
           role: 'user',
-          content: `Analyze costs with ROI and business value focus:\n\n${architecture}`
+          content: `Analyze costs:\n\n${architecture}`
         }
       ],
-      max_tokens: 1000,
+      max_tokens: 800,
       temperature: 0.1
     });
 
@@ -417,23 +386,23 @@ Focus on business value storytelling for CEO/CTO presentations.`
       messages: [
         {
           role: 'system',
-          content: `You are a Risk Assessment Agent. Identify and assess risks in Azure solutions.
+          content: `You are a Risk Assessment specialist for Azure solutions.
 
-Focus on:
-- Technical risks and mitigation strategies
-- Security vulnerabilities 
-- Operational challenges
-- Compliance gaps
-- Performance bottlenecks
+Identify top 5 risks:
+1. Technical risks (scalability, performance)
+2. Security vulnerabilities
+3. Operational challenges
+4. Compliance gaps
+5. Business continuity risks
 
-Categorize risks as High/Medium/Low with specific mitigation plans.`
+Format: Risk name, Impact (H/M/L), Probability (H/M/L), Mitigation.`
         },
         {
           role: 'user',
-          content: `Assess risks for this architecture:\n\n${architecture}`
+          content: `Assess risks:\n\n${architecture}`
         }
       ],
-      max_tokens: 800,
+      max_tokens: 600,
       temperature: 0.1
     });
 
@@ -446,31 +415,23 @@ Categorize risks as High/Medium/Low with specific mitigation plans.`
       messages: [
         {
           role: 'system',
-          content: `You are a Change Management Strategy Agent specializing in AI adoption in healthcare.
+          content: `You are a Change Management specialist for cloud migrations.
 
-CRITICAL FOCUS:
-1. **Doctor Resistance to "Black Box" AI**: Specific strategies to build trust
-2. **Workflow Integration**: Minimize disruption to existing radiologist workflows  
-3. **Training and Adoption**: Phased approach for 200 hospitals
-4. **Success Metrics**: Measurable adoption KPIs
-5. **Cultural Change**: Build AI-augmented culture vs AI-replacement fear
+Provide concise strategy:
+1. Stakeholder analysis (identify key groups)
+2. Communication plan (addressing concerns)
+3. Training approach (by role)
+4. Phased rollout (pilot → production)
+5. Success metrics (adoption KPIs)
 
-CHANGE STRATEGY STRUCTURE:
-- Stakeholder Analysis (Radiologists, IT, Management)
-- Communication Strategy (addressing "black box" concerns)
-- Training Program (technical and workflow)
-- Adoption Phases (pilot, rollout, optimization)
-- Success Metrics and Feedback Loops
-- Risk Mitigation (resistance, workflow disruption)
-
-Focus on practical, healthcare-specific change management for AI adoption.`
+Keep it practical and actionable.`
         },
         {
           role: 'user',
-          content: `Develop change management strategy for AI adoption:\n\nCase Study:\n${caseStudyText}\n\nArchitecture:\n${architecture}`
+          content: `Change strategy for:\n\n${caseStudyText.slice(0, 500)}\n\nArchitecture: ${architecture.slice(0, 300)}`
         }
       ],
-      max_tokens: 1000,
+      max_tokens: 600,
       temperature: 0.1
     });
 
@@ -637,37 +598,48 @@ Create a comprehensive report that includes all visual diagrams, Well-Architecte
   // Phase 2: All DSL-related methods moved to separate DSL orchestrator workflow
 
   /**
-   * Save intermediate results after each step to prevent data loss
+   * Save intermediate results with streaming for large content
    */
   private async saveIntermediateResults(
-    step: string, 
-    content: string, 
+    step: string,
+    content: string,
     caseStudyFolder?: string
   ): Promise<void> {
     if (!caseStudyFolder) return;
-    
+
     try {
       const outputDir = path.join(process.cwd(), 'output', caseStudyFolder);
       await fs.mkdir(outputDir, { recursive: true });
-      
+
       const timestamp = new Date().toISOString();
       const filename = `${step.toLowerCase().replace(/\s+/g, '-')}-${timestamp.slice(0, 19)}.md`;
       const filepath = path.join(outputDir, filename);
-      
-      const formattedContent = `# ${step}
-Generated: ${timestamp}
-Status: Completed
 
-${content}
+      // Use streaming for large content (>100KB)
+      if (content.length > 100000) {
+        const { createWriteStream } = await import('fs');
+        const stream = createWriteStream(filepath, { encoding: 'utf-8' });
 
----
-This is an intermediate result saved after the ${step} step.
-Part of Azure Architecture Blueprint Generator - Phase 1 Analysis
-`;
+        stream.write(`# ${step}\nGenerated: ${timestamp}\nStatus: Completed\n\n`);
 
-      await fs.writeFile(filepath, formattedContent, 'utf-8');
-      console.log(`📁 ${step} saved: ${filename}`);
-      
+        // Stream content in chunks
+        const chunkSize = 50000;
+        for (let i = 0; i < content.length; i += chunkSize) {
+          stream.write(content.slice(i, i + chunkSize));
+        }
+
+        stream.write(`\n\n---\nIntermediate result: ${step}\n`);
+        stream.end();
+
+        await new Promise((resolve, reject) => {
+          stream.on('finish', resolve);
+          stream.on('error', reject);
+        });
+      } else {
+        // Regular write for smaller content
+        const formattedContent = `# ${step}\nGenerated: ${timestamp}\nStatus: Completed\n\n${content}\n\n---\nIntermediate result: ${step}\n`;
+        await fs.writeFile(filepath, formattedContent, 'utf-8');
+      }
     } catch (error) {
       console.warn(`⚠️ Failed to save ${step}:`, error.message);
     }

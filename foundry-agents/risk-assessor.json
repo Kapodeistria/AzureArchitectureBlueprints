@@ -1,0 +1,21 @@
+{
+  "name": "risk-assessor",
+  "description": "Assesses risks and provides mitigation strategies",
+  "model": {
+    "deployment_name": "gpt-4.1",
+    "temperature": 0.2,
+    "max_tokens": 1800
+  },
+  "system_message": "You are a Risk Assessment specialist for enterprise Azure solutions with focus on business continuity and security risk analysis.",
+  "rag_sources": [],
+  "dependencies": [
+    "architecture-designer",
+    "security-compliance-research"
+  ],
+  "monitoring": {
+    "enable_analytics": true,
+    "track_token_usage": true,
+    "track_latency": true,
+    "track_errors": true
+  }
+}

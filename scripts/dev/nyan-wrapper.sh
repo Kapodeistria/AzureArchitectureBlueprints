@@ -38,15 +38,6 @@ quick_copilot() {
     echo -e "        ${BRIGHT_BLUE}███${BRIGHT_YELLOW}███${NC}         Running: ${BRIGHT_YELLOW}npm run ${command_name}${NC}"
     echo -e "        ${BRIGHT_MAGENTA}Microsoft${NC}"
     echo ""
-
-    # Azure logo on right
-    echo -e "                                                                ${BRIGHT_CYAN}     █████${NC}"
-    echo -e "                                                                ${BRIGHT_CYAN}  ███${NC}   ${BRIGHT_BLUE}███${NC}"
-    echo -e "                                                                ${BRIGHT_CYAN}███${NC}     ${BRIGHT_BLUE}███${NC}"
-    echo -e "                                                                ${BRIGHT_CYAN}███████████${NC}"
-    echo -e "                                                                ${BRIGHT_CYAN}███${NC}     ${BRIGHT_BLUE}███${NC}"
-    echo -e "                                                                ${BRIGHT_CYAN}███${NC}     ${BRIGHT_BLUE}███${NC}"
-    echo -e "                                                                   ${BRIGHT_BLUE}█████${NC}"
     echo ""
 
     # Progress animation
@@ -76,19 +67,14 @@ quick_copilot() {
 micro_copilot() {
     local command_name=$1
 
-    # Microsoft logo (multi-line) on left, Azure logo on right
+    # Microsoft logo (4-square flag)
     echo ""
-    echo -e "${BRIGHT_RED}███${BRIGHT_GREEN}███${NC}    ${BRIGHT_CYAN}Azure Architecture Blueprints${NC}                           ${BRIGHT_CYAN}     █████${NC}"
-    echo -e "${BRIGHT_BLUE}███${BRIGHT_YELLOW}███${NC}    ${BRIGHT_YELLOW}→${NC} ${BOLD}npm run ${command_name}${NC}                                    ${BRIGHT_CYAN}  ███${NC}   ${BRIGHT_BLUE}███${NC}"
-    echo -e "${BRIGHT_MAGENTA}Microsoft${NC}                                                             ${BRIGHT_CYAN}███${NC}     ${BRIGHT_BLUE}███${NC}"
+    echo -e "   ${BRIGHT_RED}███${BRIGHT_GREEN}███${NC}    ${BRIGHT_CYAN}Azure Architecture Blueprints${NC}"
+    echo -e "   ${BRIGHT_BLUE}███${BRIGHT_YELLOW}███${NC}    ${BRIGHT_YELLOW}→${NC} ${BOLD}npm run ${command_name}${NC}"
+    echo -e "   ${BRIGHT_MAGENTA}Microsoft${NC}"
     echo ""
-    echo -e "                                                                       ${BRIGHT_CYAN}███████████${NC}"
-    echo -e "                                                                       ${BRIGHT_CYAN}███${NC}     ${BRIGHT_BLUE}███${NC}"
-    echo -e "                                                                       ${BRIGHT_CYAN}███${NC}     ${BRIGHT_BLUE}███${NC}"
-    echo -e "                                                                          ${BRIGHT_BLUE}█████${NC}"
 
     sleep 0.5
-    echo ""
     echo -e "${BRIGHT_GREEN}✅ Ready!${NC}"
     echo ""
 }

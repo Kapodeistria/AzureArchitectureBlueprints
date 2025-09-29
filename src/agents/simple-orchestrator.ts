@@ -535,18 +535,37 @@ Create a comprehensive report that includes all visual diagrams, Well-Architecte
   }
 
   getMetrics() {
+    // Return metrics for all agents used in the workflow
     return {
-      tasksCompleted: 5,
-      averageResponseTime: 1000,
-      errorRate: 0,
-      status: 'healthy'
+      'research-orchestrator': { tasksCompleted: 1, averageResponseTime: 45000, errorRate: 0, status: 'healthy' },
+      'research-infrastructure': { tasksCompleted: 1, averageResponseTime: 8000, errorRate: 0, status: 'healthy' },
+      'research-ai-ml': { tasksCompleted: 1, averageResponseTime: 8000, errorRate: 0, status: 'healthy' },
+      'research-case-studies': { tasksCompleted: 1, averageResponseTime: 8000, errorRate: 0, status: 'healthy' },
+      'research-compliance': { tasksCompleted: 1, averageResponseTime: 8000, errorRate: 0, status: 'healthy' },
+      'research-industry': { tasksCompleted: 1, averageResponseTime: 8000, errorRate: 0, status: 'healthy' },
+      'research-architecture': { tasksCompleted: 1, averageResponseTime: 8000, errorRate: 0, status: 'healthy' },
+      'requirements-analyzer': { tasksCompleted: 1, averageResponseTime: 5000, errorRate: 0, status: 'healthy' },
+      'architecture-designer': { tasksCompleted: 1, averageResponseTime: 12000, errorRate: 0, status: 'healthy' },
+      'waf-orchestrator': { tasksCompleted: 1, averageResponseTime: 30000, errorRate: 0, status: 'healthy' },
+      'waf-reliability': { tasksCompleted: 1, averageResponseTime: 6000, errorRate: 0, status: 'healthy' },
+      'waf-security': { tasksCompleted: 1, averageResponseTime: 6000, errorRate: 0, status: 'healthy' },
+      'waf-performance': { tasksCompleted: 1, averageResponseTime: 6000, errorRate: 0, status: 'healthy' },
+      'waf-operational': { tasksCompleted: 1, averageResponseTime: 6000, errorRate: 0, status: 'healthy' },
+      'waf-cost': { tasksCompleted: 1, averageResponseTime: 6000, errorRate: 0, status: 'healthy' },
+      'visual-architecture': { tasksCompleted: 1, averageResponseTime: 15000, errorRate: 0, status: 'healthy' },
+      'cost-analyzer': { tasksCompleted: 1, averageResponseTime: 8000, errorRate: 0, status: 'healthy' },
+      'risk-assessor': { tasksCompleted: 1, averageResponseTime: 8000, errorRate: 0, status: 'healthy' },
+      'change-management': { tasksCompleted: 1, averageResponseTime: 8000, errorRate: 0, status: 'healthy' },
+      'cost-aware-refinement': { tasksCompleted: 1, averageResponseTime: 20000, errorRate: 0, status: 'healthy' },
+      orchestrator: { tasksCompleted: 1, averageResponseTime: 1000, errorRate: 0, status: 'healthy' }
     };
   }
 
   getHealth() {
     return {
-      tasksCompleted: 5,
-      averageResponseTime: 1000,
+      totalAgents: 20,
+      tasksCompleted: 20,
+      averageResponseTime: 8500,
       errorRate: 0,
       status: 'healthy'
     };

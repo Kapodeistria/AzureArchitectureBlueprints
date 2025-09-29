@@ -360,25 +360,27 @@ ${metadata.wafChecklist ? `- WAF Framework Coverage: ${metadata.wafChecklist.cov
                     this.extractSection(analysis, 'Change Management') ||
                     this.extractRiskInfo(analysis);
 
-    const wafSummary = metadata.wafChecklist ? this.formatWAFSummaryForQuickRef(metadata.wafChecklist) : '';
+    const wafSummary = metadata.wafChecklist ?
+      this.formatWAFSummaryForQuickRef(metadata.wafChecklist) :
+      '## 📋 Well-Architected Framework Coverage\n**Generating WAF assessment...** Run `npm run local` for full WAF coverage analysis.\n';
 
     const summaryContent = `# Quick Interview Reference
-Generated: ${new Date().toLocaleString()}
+Generated: ${getLocalTimestamp()}
 Workflow: ${metadata.workflowId}
 
 ## 🎯 Executive Summary & Recommendation
-${executiveSummary}
+${executiveSummary || '*Generating executive summary...*'}
 
 ---
 
 ## 🏗️ Architecture Overview
-${architectureInfo}
+${architectureInfo || '*Generating architecture overview...*'}
 
-## 💰 Cost Highlights  
-${costInfo}
+## 💰 Cost Highlights
+${this.stripLLMConversational(costInfo) || '*Generating cost analysis...*'}
 
 ## ⚠️ Key Risks & Mitigations
-${riskInfo}
+${this.stripLLMConversational(riskInfo) || '*Generating risk assessment...*'}
 
 ${wafSummary}
 
@@ -428,13 +430,41 @@ ${this.generateTalkingPoints(analysis)}
     return 75; // Placeholder - would be calculated from actual timing data
   }
 
+  // Strip conversational LLM preambles and conclusions
+  private stripLLMConversational(text: string): string {
+    if (!text) return text;
+
+    // Remove common conversational preambles
+    const preamblePatterns = [
+      /^(Certainly!?|Sure!?|Of course!?|Here's|Here is|Let me|I'll|I can|I've)\s+/i,
+      /^(Below is|The following|Based on)\s+/i,
+      /^(Here's a|Here is a)\s+.*?(analysis|summary|breakdown|overview):?\s*/i
+    ];
+
+    let cleaned = text.trim();
+    for (const pattern of preamblePatterns) {
+      cleaned = cleaned.replace(pattern, '');
+    }
+
+    // Remove conversational conclusions
+    const conclusionPatterns = [
+      /\n\s*(Let me know if.*|Feel free to.*|Please let me know.*|Hope this helps.*|Is there anything else.*)$/i
+    ];
+
+    for (const pattern of conclusionPatterns) {
+      cleaned = cleaned.replace(pattern, '');
+    }
+
+    return cleaned.trim();
+  }
+
   // Content extraction helpers
   private extractSection(content: string, sectionName: string): string {
     // Try multiple patterns to extract sections
     const patterns = [
       // Pattern 1: ## Section Name
       new RegExp(`## ${sectionName}[\\s\\S]*?(?=## |$)`, 'i'),
-      // Pattern 2: ## [NUMBER]. Section Name  
+      // Pattern 2: ## [NUMBER]. Section Name
       new RegExp(`## \\d+\\.\\s*${sectionName}[\\s\\S]*?(?=## |$)`, 'i'),
       // Pattern 3: # Section Name
       new RegExp(`# ${sectionName}[\\s\\S]*?(?=# |$)`, 'i'),
@@ -453,10 +483,18 @@ ${this.generateTalkingPoints(analysis)}
         extracted = extracted.replace(new RegExp(`^##?\\s*\\d*\\.?\\s*${sectionName}`, 'i'), '').trim();
         extracted = extracted.replace(new RegExp(`^\\*\\*${sectionName}\\*\\*`, 'i'), '').trim();
         extracted = extracted.replace(new RegExp(`^${sectionName}:?`, 'i'), '').trim();
-        
+
+        // Strip LLM conversational text
+        extracted = this.stripLLMConversational(extracted);
+
+        // If empty after cleaning, skip
+        if (!extracted || extracted.length < 10) {
+          continue;
+        }
+
         // Take first few lines for summary
-        const lines = extracted.split('\n').filter(line => line.trim().length > 0).slice(0, 5);
-        return lines.length > 0 ? lines.join('\n') : 'Content extracted but empty';
+        const lines = extracted.split('\n').filter(line => line.trim().length > 0).slice(0, 10);
+        return lines.length > 0 ? lines.join('\n') : '';
       }
     }
     

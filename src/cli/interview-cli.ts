@@ -10,6 +10,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import clipboardy from 'clipboardy';
 import { MultiAgentSystem } from '../core/multi-agent-system.js';
+import { getLocalTimestampForFilename } from '../utils/local-timestamp.js';
 import { promises as fs } from 'fs';
 
 class InterviewCLI {
@@ -204,7 +205,7 @@ class InterviewCLI {
 
     // Handle outputs
     if (options.includes('file')) {
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      const timestamp = getLocalTimestampForFilename();
       const filename = `interview-solution-${timestamp}.md`;
       await this.system.saveReport(report, filename);
       console.log(chalk.green(`✅ Saved to ${filename}`));
@@ -288,15 +289,15 @@ class InterviewCLI {
 
       // Auto-save and copy with spinner
       const saveSpinner = ora('Saving report and copying to clipboard...').start();
-      
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+
+      const timestamp = getLocalTimestampForFilename();
       const filename = `quick-solution-${timestamp}.md`;
-      
+
       await Promise.all([
         this.system.saveReport(report, filename),
         clipboardy.write(report)
       ]);
-      
+
       saveSpinner.succeed('Report saved and copied to clipboard!');
       
     } catch (error) {

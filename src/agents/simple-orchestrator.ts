@@ -16,6 +16,7 @@ import { WellArchitectedOrchestrator } from './well-architected-orchestrator.js'
 import { ArchitectureRefinementOrchestrator } from './architecture-refinement-orchestrator.js';
 import { CostAwareRefinementOrchestrator } from './cost-aware-refinement-orchestrator.js';
 import { getAgentRegistry, isAgentDeployed } from '../utils/deploy-agents-to-foundry.js';
+import { getLocalTimestamp } from '../utils/local-timestamp.js';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -567,8 +568,8 @@ Create a comprehensive report that includes all visual diagrams, Well-Architecte
       const outputDir = path.join(process.cwd(), 'output', caseStudyFolder);
       await fs.mkdir(outputDir, { recursive: true });
 
-      const timestamp = new Date().toISOString();
-      const filename = `${step.toLowerCase().replace(/\s+/g, '-')}-${timestamp.slice(0, 19)}.md`;
+      const timestamp = getLocalTimestamp();
+      const filename = `${step.toLowerCase().replace(/\s+/g, '-')}-${timestamp.replace(/[:.+]/g, '-').slice(0, 19)}.md`;
       const filepath = path.join(outputDir, filename);
 
       // Use streaming for large content (>100KB)

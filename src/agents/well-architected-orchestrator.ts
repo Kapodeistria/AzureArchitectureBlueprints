@@ -11,6 +11,7 @@ import { WellArchitectedSecurityAgent } from './well-architected-security-agent.
 import { WellArchitectedPerformanceAgent } from './well-architected-performance-agent.js';
 import { WellArchitectedOperationalExcellenceAgent } from './well-architected-operational-excellence-agent.js';
 import { CostOptimizerAgent } from './cost-optimizer-agent.js'; // Reuse existing cost agent
+import { getLocalTimestamp } from '../utils/local-timestamp.js';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -310,8 +311,8 @@ export class WellArchitectedOrchestrator {
   }
 
   private async generateComprehensiveWAFReport(pillarResults: WAFPillarResult[], overallScore: number, payload: any): Promise<string> {
-    const timestamp = new Date().toISOString();
-    
+    const timestamp = getLocalTimestamp();
+
     return `# Azure Well-Architected Framework Assessment Report
 
 Generated: ${timestamp}
@@ -428,7 +429,7 @@ ${this.generateImplementationRoadmap(pillarResults).map((phase, index) => `${ind
       const outputDir = path.join(process.cwd(), 'output', caseStudyFolder);
       await fs.mkdir(outputDir, { recursive: true });
       
-      const timestamp = new Date().toISOString();
+      const timestamp = getLocalTimestamp();
       const filename = `well-architected-assessment-${timestamp.slice(0, 19)}.md`;
       const filepath = path.join(outputDir, filename);
       

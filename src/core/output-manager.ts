@@ -7,6 +7,7 @@ import { promises as fs } from 'fs';
 import { join, dirname } from 'path';
 import config from '../config/config.js';
 import { wafChecklistExtractor, WAFChecklistSummary } from '../utils/waf-checklist-extractor.js';
+import { getLocalTimestamp, getLocalTimestampForFilename } from '../utils/local-timestamp.js';
 
 export interface OutputMetadata {
   timestamp: number;
@@ -49,22 +50,22 @@ export class OutputManager {
     }
   }
 
-  // Generate unique filename with timestamp
+  // Generate unique filename with timestamp (local timezone)
   private generateFilename(prefix: string, extension: string = 'md'): string {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+    const timestamp = getLocalTimestampForFilename();
     return `${prefix}-${timestamp}.${extension}`;
   }
 
-  // Generate unique folder name for case study
+  // Generate unique folder name for case study (local timezone)
   private generateCaseStudyFolder(caseStudyText: string): string {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const timestamp = getLocalTimestampForFilename();
     const title = this.extractTitle(caseStudyText);
     const sanitizedTitle = title
       .toLowerCase()
       .replace(/[^a-z0-9\s]/g, '')
       .replace(/\s+/g, '-')
       .slice(0, 50);
-    
+
     return `case-study-${timestamp}-${sanitizedTitle}`;
   }
 
@@ -159,7 +160,7 @@ export class OutputManager {
     const wafSection = metadata.wafChecklist ? this.formatWAFChecklist(metadata.wafChecklist) : '';
 
     return `# Architecture Solution Analysis
-Generated: ${new Date(metadata.timestamp).toISOString()}
+Generated: ${getLocalTimestamp()}
 Workflow ID: ${metadata.workflowId}
 Execution Time: ${metadata.executionTime}ms
 

@@ -15,6 +15,7 @@ import { ArchitectureAgent } from './architecture-agent.js';
 import { CostOptimizerAgent } from './cost-optimizer-agent.js';
 import { RiskAssessorAgent } from './risk-assessor-agent.js';
 import { VisualArchitectureAgent } from './visual-architecture-agent.js';
+import { getLocalTimestamp, getLocalTimestampForFilename } from '../utils/local-timestamp.js';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 
@@ -550,12 +551,12 @@ Use the same markdown format as the original architecture.
   }
 
   private async saveIterationResults(iteration: CostAwareIterationResult, caseStudyFolder: string): Promise<void> {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const timestamp = getLocalTimestampForFilename();
     const filename = `cost-aware-refinement-iteration-${iteration.iteration}-${timestamp}.md`;
     const filepath = join(caseStudyFolder, filename);
 
     const content = `# Cost-Aware Refinement - Iteration ${iteration.iteration}
-Generated: ${new Date().toISOString()}
+Generated: ${getLocalTimestamp()}
 
 ## Satisfaction Score: ${iteration.satisfactionScore.overall.toFixed(1)}/10
 
@@ -603,12 +604,12 @@ ${iteration.visualDiagrams || '*Visual diagrams unavailable*'}
   }
 
   private async saveRefinementReport(result: CostAwareRefinementResult, caseStudyFolder: string): Promise<void> {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const timestamp = getLocalTimestampForFilename();
     const filename = `cost-aware-refinement-final-report-${timestamp}.md`;
     const filepath = join(caseStudyFolder, filename);
 
     const content = `# Cost-Aware Architecture Refinement - Final Report
-Generated: ${new Date().toISOString()}
+Generated: ${getLocalTimestamp()}
 
 ## Executive Summary
 

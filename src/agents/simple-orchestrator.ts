@@ -17,9 +17,6 @@ import { ArchitectureRefinementOrchestrator } from './architecture-refinement-or
 import { getAgentRegistry, isAgentDeployed } from '../utils/deploy-agents-to-foundry.js';
 import { promises as fs } from 'fs';
 import path from 'path';
-// Phase 2: DSL functionality will be separate
-// import { StructurizrDSLValidatorAgent } from './structurizr-dsl-validator-agent.js';
-// import { SolutionArchitectReviewerAgent } from './solution-architect-reviewer-agent.js';
 
 export class SimpleOrchestrator {
   private client: OpenAI;
@@ -510,92 +507,7 @@ Create a comprehensive report that includes all visual diagrams, Well-Architecte
     };
   }
 
-  private async generateValidatedDSL(caseStudyText: string, architecture: any, requirements: string, caseStudyFolder?: string): Promise<any> {
-    try {
-      const dslAgent = new StructurizrDSLValidatorAgent(this.client);
-      
-      // Extract system name from case study
-      const systemNameMatch = caseStudyText.match(/(?:system|platform|application|solution)[\s\w]*:\s*([^\n]+)/i);
-      const systemName = systemNameMatch ? systemNameMatch[1].trim() : 'AzureSystem';
-      
-      // Extract Azure services from architecture
-      const azureServices = this.extractAzureServices(architecture);
-      
-      const dslTask = {
-        id: 'dsl-generation',
-        type: 'structurizr-dsl',
-        priority: 'high' as const,
-        payload: {
-          architecture: architecture,
-          requirements: requirements,
-          azureServices: azureServices,
-          systemName: systemName,
-          maxIterations: 3,
-          targetLevel: 'all' as const,
-          includeStyles: true,
-          caseStudyFolder: caseStudyFolder
-        }
-      };
-
-      const result = await dslAgent.execute(dslTask);
-      return result;
-      
-    } catch (error) {
-      console.error('❌ DSL generation failed:', error);
-      return {
-        success: false,
-        error: error.message,
-        message: 'DSL generation encountered an error'
-      };
-    }
-  }
-
-  private extractAzureServices(architecture: any): any[] {
-    // Extract Azure services from the architecture description
-    const services: any[] = [];
-    const architectureText = typeof architecture === 'string' ? architecture : JSON.stringify(architecture);
-    
-    // Common Azure services to look for
-    const azureServicePatterns = [
-      { name: 'Azure App Service', pattern: /app\s+service|web\s+app/gi },
-      { name: 'Azure SQL Database', pattern: /sql\s+database|azure\s+sql/gi },
-      { name: 'Azure Cosmos DB', pattern: /cosmos\s+db|document\s+database/gi },
-      { name: 'Azure Storage', pattern: /blob\s+storage|azure\s+storage/gi },
-      { name: 'Azure Functions', pattern: /azure\s+functions|serverless\s+functions/gi },
-      { name: 'Azure Kubernetes Service', pattern: /aks|kubernetes\s+service/gi },
-      { name: 'Azure API Management', pattern: /api\s+management|apim/gi },
-      { name: 'Azure Key Vault', pattern: /key\s+vault|secret\s+management/gi },
-      { name: 'Azure Monitor', pattern: /azure\s+monitor|application\s+insights/gi },
-      { name: 'Azure Active Directory', pattern: /azure\s+ad|active\s+directory/gi },
-      { name: 'Azure Load Balancer', pattern: /load\s+balancer|application\s+gateway/gi },
-      { name: 'Azure Service Bus', pattern: /service\s+bus|message\s+queue/gi }
-    ];
-
-    azureServicePatterns.forEach(servicePattern => {
-      if (servicePattern.pattern.test(architectureText)) {
-        services.push({
-          name: servicePattern.name,
-          description: `${servicePattern.name} component identified in architecture`
-        });
-      }
-    });
-
-    // If no specific services found, add generic ones
-    if (services.length === 0) {
-      services.push(
-        { name: 'Azure App Service', description: 'Web application hosting platform' },
-        { name: 'Azure SQL Database', description: 'Managed relational database service' },
-        { name: 'Azure Storage', description: 'Cloud storage solution' }
-      );
-    }
-
-    return services;
-  }
-
-  // Phase 2: DSL validation methods will be moved to separate workflow
-  // reviewArchitectureWithDSLValidation() - moved to DSL orchestrator
-
-  // Phase 2: All DSL-related methods moved to separate DSL orchestrator workflow
+  // Phase 2 Structurizr DSL functionality removed - using ASCII diagrams only
 
   /**
    * Save intermediate results with streaming for large content

@@ -97,9 +97,9 @@ const DEFAULT_CONFIG: AppConfig = {
     environment: 'development',
     logLevel: 'info',
     outputDirectory: './output',
-    maxTokens: 1500,
+    maxTokens: 2500, // Increased for comprehensive responses
     temperature: 0.3,
-    timeout: 30000, // 30 seconds
+    timeout: 60000, // Increased to 60 seconds per agent
   },
   agents: {
     orchestrator: {
@@ -109,27 +109,27 @@ const DEFAULT_CONFIG: AppConfig = {
     },
     requirementsAnalyst: {
       enabled: true,
-      maxTokens: 1000,
+      maxTokens: 2000, // Increased for detailed analysis
       temperature: 0.1,
     },
     architecture: {
       enabled: true,
-      maxTokens: 1500,
+      maxTokens: 2500, // Increased for comprehensive designs
       temperature: 0.2,
     },
     costOptimizer: {
       enabled: true,
-      maxTokens: 1000,
+      maxTokens: 2000, // Increased for detailed cost analysis
       temperature: 0.1,
     },
     riskAssessor: {
       enabled: true,
-      maxTokens: 1000,
+      maxTokens: 2000, // Increased for thorough risk assessment
       temperature: 0.2,
     },
     documentation: {
       enabled: true,
-      maxTokens: 1500,
+      maxTokens: 2500, // Increased for complete documentation
       temperature: 0.1,
     },
   },

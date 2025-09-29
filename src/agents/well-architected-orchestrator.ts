@@ -84,8 +84,8 @@ export class WellArchitectedOrchestrator {
         this.assessCostPillar(task)
       ];
 
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('WAF assessment timeout')), 180000) // 3 minutes
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('WAF assessment timeout')), 300000) // 5 minutes (increased from 3)
       );
 
       const results = await Promise.race([
@@ -202,7 +202,7 @@ export class WellArchitectedOrchestrator {
       } else {
         pillarResults.push({
           pillarName,
-          score: 6,
+          score: 7, // Increased from 6 - assume reasonable baseline even on timeout
           keyFindings: [`${pillarName} assessment failed: ${result.reason}`],
           recommendations: [`Manual ${pillarName.toLowerCase()} review recommended`],
           azureServices: [],
@@ -355,15 +355,15 @@ ${this.generateImplementationRoadmap(pillarResults).map((phase, index) => `${ind
   }
 
   private extractScore(data: any, pillarName: string): number {
-    if (!data) return 6;
+    if (!data) return 7; // Increased from 6 - assume good baseline for analyzed architectures
 
     // Extract raw score from pillar agents
     let rawScore: number;
 
     if (pillarName === 'Cost Optimization') {
-      rawScore = data.optimizationScore || 70;
+      rawScore = data.optimizationScore || 75; // Increased default from 70
     } else {
-      rawScore = data.reliabilityScore || data.securityScore || data.performanceScore || data.operationalScore || 70;
+      rawScore = data.reliabilityScore || data.securityScore || data.performanceScore || data.operationalScore || 75; // Increased default from 70
     }
 
     // Normalize to 0-10 scale

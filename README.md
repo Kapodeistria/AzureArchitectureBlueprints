@@ -1,8 +1,8 @@
-# 🏗️ Azure Architecture Blueprints v2.3 🤖
+# 🏗️ Azure Architecture Blueprints v2.4 🤖
 
 **Intelligence-Driven Azure Architecture Blueprint Generator**
 
-Advanced AI-powered system with **6 specialized research agents** that creates comprehensive Azure architecture blueprints enhanced with real-world market intelligence, current Azure developments, and enterprise case studies.
+Advanced AI-powered system with **6 specialized research agents** and **Azure Well-Architected Framework assessment** that creates comprehensive architecture blueprints enhanced with real-world market intelligence, WAF compliance analysis, and enterprise case studies.
 
 ---
 
@@ -24,7 +24,7 @@ npm run quick
 ```
 
 ### 3. Generate Your Blueprint ✨
-**Intelligence-Driven** architecture blueprint generated with:
+**Intelligence-Driven + Well-Architected** architecture blueprint generated with:
 - **🔍 Research Intelligence** (6 specialized agents execute in parallel, 45-120 seconds)
   - 🏗️ Infrastructure & Regional Expansion Intelligence
   - 🤖 AI/ML & Technical Innovation Research  
@@ -32,11 +32,17 @@ npm run quick
   - 🔒 Compliance & Data Sovereignty Analysis
   - 🏭 Industry Verticals & Sector Solutions
   - 🏛️ Architecture Patterns & Migration Strategies
+- **🏗️ Well-Architected Framework Assessment** (5 pillars, 120-180 seconds)
+  - 🛡️ Reliability: Resiliency, availability, recovery (RTO/RPO)
+  - 🔒 Security: Confidentiality, integrity, threat protection
+  - ⚡ Performance Efficiency: Scalability, optimization, monitoring
+  - 🔧 Operational Excellence: DevOps, automation, safe deployment
+  - 💰 Cost Optimization: Financial management, usage optimization
 - **Enhanced Architecture Design** informed by current Azure 2024-2025 developments
 - **Professional ASCII Diagrams** with borders, proper alignment, and visual clarity
 - **Detailed C4 Model Diagrams** with exact Azure SKUs and costs
-- **Market-Informed Analysis** with real-world case studies and best practices
-- **Interview-Ready Documentation** demonstrating current Azure expertise
+- **WAF Compliance Analysis** with pillar scores and improvement recommendations
+- **Interview-Ready Documentation** demonstrating WAF expertise and current Azure knowledge
 
 ---
 
@@ -205,26 +211,55 @@ npm run quick
 
 ---
 
-## ⭐ **What's New in v2.3**
+## ⭐ **What's New in v2.4**
 
 ```
-🔍 RESEARCH INTELLIGENCE    🎨 ENHANCED VISUALS    🚀 BETTER PERFORMANCE
-────────────────────────    ──────────────────    ─────────────────────
-• 6 specialized agents      • Professional ASCII   • 45-120s research
-• Parallel execution        • Clean diagram borders • Graceful fallbacks  
-• Real-world case studies   • Proper alignment     • Minimal overhead
-• Current Azure insights    • Interview-ready      • Enhanced quality
+🏗️ WELL-ARCHITECTED FRAMEWORK  🔍 RESEARCH INTELLIGENCE    🎨 ENHANCED VISUALS
+──────────────────────────────  ────────────────────────    ──────────────────
+• 5 pillar assessment (NEW)     • 6 specialized agents      • Professional ASCII
+• Reliability, Security, Perf   • Parallel execution        • Clean diagram borders
+• Operational, Cost analysis    • Real-world case studies   • Proper alignment
+• WAF compliance scoring        • Current Azure insights    • Interview-ready
 ```
 
 ### **🔥 Key Advantages**
+- **Well-Architected Expertise**: Demonstrate deep understanding of Microsoft's 5-pillar framework with automated assessment
 - **Current Azure Knowledge**: Stay ahead with 2024-2025 developments and real enterprise implementations
 - **Professional Presentation**: Enhanced ASCII diagrams with proper borders and alignment for interview success
-- **Intelligence-Driven**: Architecture decisions based on proven patterns and latest Azure service capabilities
-- **Market Awareness**: Demonstrate knowledge of recent Azure investments, new regions, and enterprise case studies
+- **Intelligence-Driven**: Architecture decisions based on proven patterns, WAF principles, and latest Azure capabilities
+- **Interview Confidence**: WAF compliance scores and recommendations showcase architectural best practices knowledge
 
 ---
 
-## 🔍 **Research Intelligence System (NEW in v2.3)**
+## 🏗️ **Azure Well-Architected Framework Integration (NEW in v2.4)**
+
+### **5 Pillar Automated Assessment**
+Our enhanced workflow now includes comprehensive Azure Well-Architected Framework assessment to ensure your architecture solutions follow Microsoft's proven best practices.
+
+| Pillar | Focus Area | Assessment Time | Key Analysis |
+|--------|------------|-----------------|--------------|
+| 🛡️ **Reliability** | Resiliency, availability, recovery | 45s | RTO/RPO, fault tolerance, disaster recovery strategies |
+| 🔒 **Security** | Confidentiality, integrity, availability | 45s | Zero Trust, encryption, threat protection, compliance |
+| ⚡ **Performance Efficiency** | Scalability, optimization, monitoring | 45s | Capacity planning, scaling patterns, performance targets |
+| 🔧 **Operational Excellence** | DevOps, automation, safe deployment | 45s | CI/CD maturity, monitoring, incident response |
+| 💰 **Cost Optimization** | Financial management, usage optimization | 45s | Cost modeling, waste reduction, efficiency improvements |
+
+### **WAF Assessment Features**
+- **Overall Score**: 1-10 scale with pillar breakdown and compliance status
+- **Prioritized Recommendations**: Critical improvements ranked by impact and effort
+- **Azure Service Optimization**: Specific service recommendations aligned with WAF principles
+- **Implementation Roadmap**: Phased approach for WAF compliance improvements
+- **Interview Advantage**: Demonstrates current Microsoft architectural best practices knowledge
+
+### **Integration Benefits**
+- **Step 4**: WAF assessment integrated into main workflow (120-180 seconds total)
+- **Comprehensive Analysis**: Each pillar assessed with specific Azure service recommendations
+- **Professional Reporting**: WAF scores and compliance status included in final documentation
+- **Methodology Alignment**: Follows official Microsoft Well-Architected Review process
+
+---
+
+## 🔍 **Research Intelligence System (v2.3)**
 
 ### **6 Specialized Research Agents**
 Our enhanced workflow now begins with parallel research intelligence to ensure your architecture solutions are informed by the latest Azure developments and real-world implementations.

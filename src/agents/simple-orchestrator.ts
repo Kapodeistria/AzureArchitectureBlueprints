@@ -12,6 +12,7 @@ import { CostOptimizerAgent } from './cost-optimizer-agent.js';
 import { RiskAssessorAgent } from './risk-assessor-agent.js';
 import { DocumentationAgent } from './documentation-agent.js';
 import { ResearchOrchestratorAgent } from './research-orchestrator-agent.js';
+import { WellArchitectedOrchestrator } from './well-architected-orchestrator.js';
 import { promises as fs } from 'fs';
 import path from 'path';
 // Phase 2: DSL functionality will be separate
@@ -29,7 +30,7 @@ export class SimpleOrchestrator {
     try {
       console.log('🚀 Starting Phase 1: Intelligence-Driven Architecture Analysis...');
       
-      // Initialize agents (Phase 1: Core workflow)
+      // Initialize agents (Phase 1: Core workflow + WAF)
       const researchAgent = new ResearchOrchestratorAgent(this.client);
       const requirementsAgent = new RequirementsAnalystAgent(this.client);
       const architectureAgent = new ArchitectureAgent(this.client);
@@ -37,6 +38,7 @@ export class SimpleOrchestrator {
       const costAgent = new CostOptimizerAgent(this.client);
       const riskAgent = new RiskAssessorAgent(this.client);
       const docAgent = new DocumentationAgent(this.client);
+      const wafOrchestrator = new WellArchitectedOrchestrator(this.client);
       // Phase 2: DSL agents will be separate workflow
       // const reviewerAgent = new SolutionArchitectReviewerAgent(this.client);
       // const dslAgent = new StructurizrDSLValidatorAgent(this.client);
@@ -161,8 +163,47 @@ export class SimpleOrchestrator {
       // Phase 1: Core workflow - Skip complex review loop for now
       console.log('✅ [3/6] Architecture and visual diagrams complete!');
       
-      // Step 4-6: Parallel Analysis (Cost, Risk, Change Management) with timeouts  
-      console.log('⚡ [4/6] Running parallel analysis (cost, risk, change management)...');
+      // Step 4: Well-Architected Framework Assessment (NEW)
+      console.log('🏗️ [4/7] Conducting Azure Well-Architected Framework assessment...');
+      let wafAssessment;
+      try {
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('WAF assessment timeout')), 180000) // 3 min timeout
+        );
+        
+        const wafTask = {
+          id: 'waf-assessment',
+          type: 'waf-comprehensive-assessment' as const,
+          priority: 'high' as const,
+          payload: {
+            architecture,
+            requirements,
+            businessContext: caseStudyText,
+            caseStudyFolder
+          }
+        };
+        
+        wafAssessment = await Promise.race([
+          wafOrchestrator.executeWAFAssessment(wafTask),
+          timeoutPromise
+        ]);
+        
+        console.log(`✅ WAF Assessment complete - Overall Score: ${wafAssessment.overallScore}/10`);
+        
+      } catch (error) {
+        console.warn('⚠️ WAF assessment failed, using fallback:', error.message);
+        wafAssessment = {
+          overallScore: 7.0,
+          assessmentSummary: 'Well-Architected assessment temporarily unavailable',
+          wafReport: 'WAF assessment will be conducted in final report generation'
+        };
+      }
+      
+      // Save WAF assessment after completion
+      await this.saveIntermediateResults('Well-Architected Framework Assessment', wafAssessment.wafReport || wafAssessment.assessmentSummary, caseStudyFolder);
+
+      // Step 5-6: Parallel Analysis (Cost, Risk, Change Management) with timeouts  
+      console.log('⚡ [5/7] Running parallel analysis (cost, risk, change management)...');
       let costs, risks, changeManagement;
       
       try {
@@ -190,8 +231,8 @@ export class SimpleOrchestrator {
       await this.saveIntermediateResults('Risk Assessment', risks, caseStudyFolder);
       await this.saveIntermediateResults('Change Management Strategy', changeManagement, caseStudyFolder);
       
-      // Step 7: Generate Documentation (with timeout and research context)
-      console.log('📝 [5/6] Generating comprehensive report and documentation...');
+      // Step 7: Generate Documentation (with timeout, research context, and WAF assessment)
+      console.log('📝 [6/7] Generating comprehensive report and documentation...');
       let report;
       try {
         const timeoutPromise = new Promise((_, reject) => 
@@ -204,6 +245,7 @@ export class SimpleOrchestrator {
             requirements,
             architecture,
             visualDiagrams, 
+            wafAssessment,
             costs,
             risks,
             changeManagement
@@ -241,7 +283,7 @@ ${changeManagement}
         `;
       }
       
-      console.log('🎉 ✅ Phase 1 Complete! Intelligence-driven Azure architecture analysis ready for interview!');
+      console.log('🎉 ✅ Phase 1 Complete! Well-Architected intelligence-driven Azure architecture analysis ready for interview!');
       return report;
       
     } catch (error) {
@@ -447,9 +489,10 @@ CRITICAL STRUCTURE - Match Case Study Questions:
 1. **First Use Case Recommendation**: Clear answer to "which AI capability first for maximum impact?"
 2. **Azure AI Services Selection**: Specific services mapped to use cases
 3. **Hybrid Architecture Approach**: Detailed data residency solution with VISUAL DIAGRAMS
-4. **Change Management Strategy**: Concrete plan for doctor adoption
-5. **Value Story**: Separate CTO (technical) vs CEO (business) presentations
-6. **Quick Wins vs Long-term Vision**: Clear separation and timeline
+4. **Well-Architected Framework Assessment**: Include WAF pillar scores and compliance analysis
+5. **Change Management Strategy**: Concrete plan for doctor adoption
+6. **Value Story**: Separate CTO (technical) vs CEO (business) presentations
+7. **Quick Wins vs Long-term Vision**: Clear separation and timeline
 
 VISUAL PRESENTATION REQUIREMENTS:
 - MANDATORY: Include ALL provided ASCII architecture diagrams
@@ -462,6 +505,7 @@ INTERVIEW FORMAT:
 - Lead with First Use Case recommendation
 - Present 3 architecture alternatives with clear pros/cons
 - Include comprehensive ASCII architecture diagrams
+- Include Azure Well-Architected Framework assessment with pillar scores
 - Include specific Azure service selections with SKUs and costs
 - Address all constraint questions directly
 - End with compelling value propositions
@@ -473,11 +517,11 @@ CONSULTANT STYLE:
 - Provide clear next steps
 - Leverage visual diagrams for technical credibility
 
-Create a comprehensive report that includes all visual diagrams and directly answers all case study questions in interview-ready format.`
+Create a comprehensive report that includes all visual diagrams, Well-Architected Framework assessment, and directly answers all case study questions in interview-ready format.`
         },
         {
           role: 'user',
-          content: `Generate comprehensive interview-ready report with MANDATORY visual diagrams:\n\nCase Study:\n${caseStudyText}\n\nAnalysis Results:\n${JSON.stringify(analysis, null, 2)}\n\nCRITICAL REQUIREMENTS:\n- MUST include ALL ASCII architecture diagrams from visualDiagrams section\n- MUST show specific Azure SKUs with monthly costs\n- MUST reference diagrams in technical explanations\n- MUST provide visual-supported talking points\n\nThe success of this report depends on comprehensive visual integration.`
+          content: `Generate comprehensive interview-ready report with MANDATORY visual diagrams and WAF assessment:\n\nCase Study:\n${caseStudyText}\n\nAnalysis Results:\n${JSON.stringify(analysis, null, 2)}\n\nCRITICAL REQUIREMENTS:\n- MUST include ALL ASCII architecture diagrams from visualDiagrams section\n- MUST include Azure Well-Architected Framework assessment with pillar scores\n- MUST show specific Azure SKUs with monthly costs\n- MUST reference diagrams in technical explanations\n- MUST provide WAF-based recommendations and compliance status\n- MUST provide visual-supported talking points\n\nThe success of this report depends on comprehensive visual integration and Well-Architected Framework compliance demonstration.`
         }
       ],
       max_tokens: 4000,

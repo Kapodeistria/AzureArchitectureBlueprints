@@ -266,7 +266,10 @@ export abstract class BaseAgent {
     process.removeAllListeners('SIGINT');
     process.removeAllListeners('SIGTERM');
 
-    console.log(`🧹 Cleaned up agent: ${this.agentName}`);
+    // Only log if agentName is defined
+    if (this.agentName) {
+      console.log(`🧹 Cleaned up agent: ${this.agentName}`);
+    }
   }
 
   // Health monitoring

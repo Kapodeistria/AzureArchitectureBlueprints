@@ -148,18 +148,18 @@ export class SimpleOrchestrator {
         console.log('   ⚠ Using initial design\n');
       }
 
-      // Step 2.5: Visual Diagrams
+      // Step 2.5: Visual Diagrams (increased timeout for diagram generation)
       console.log('🎨 Architecture Diagrams');
       let visualDiagrams = '';
       try {
         visualDiagrams = await Promise.race([
           visualAgent.generateDetailedDiagram(architecture, caseStudyText, caseStudyFolder),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 30000))
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 60000)) // 60s for diagrams
         ]) as string;
-        console.log('   ✓ Complete\n');
+        console.log('   ✓ Complete (includes ASCII diagrams)\n');
       } catch (error) {
-        console.log('   ⚠ Using fallback\n');
-        visualDiagrams = `[Visual diagrams unavailable]\n\n${architecture}`;
+        console.log(`   ⚠ Using fallback (${error.message})\n`);
+        visualDiagrams = `[Visual diagrams unavailable - timeout or error]\n\n${architecture}`;
       }
 
       await this.saveIntermediateResults('Visual Architecture Diagrams', visualDiagrams, caseStudyFolder);
@@ -640,8 +640,9 @@ Create a comprehensive report that includes all visual diagrams, Well-Architecte
         const formattedContent = `# ${step}\nGenerated: ${timestamp}\nStatus: Completed\n\n${content}\n\n---\nIntermediate result: ${step}\n`;
         await fs.writeFile(filepath, formattedContent, 'utf-8');
       }
+      console.log(`   📁 Saved: ${filename}`);
     } catch (error) {
-      console.warn(`⚠️ Failed to save ${step}:`, error.message);
+      console.warn(`   ⚠️ Failed to save ${step}: ${error.message}`);
     }
   }
 }

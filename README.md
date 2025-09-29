@@ -1,4 +1,4 @@
-# 🏗️ AgenticWellArchitectedBlueprint v3.1
+# 🏗️ AgenticWellArchitectedBlueprint v3.2
 
 ```
  █████╗  ██████╗ ███████╗███╗   ██╗████████╗██╗ ██████╗    ██╗    ██╗ █████╗ ███████╗
@@ -350,6 +350,39 @@ npm run agents:redeploy
 ✅ **Implementation Guidance**: Prioritized roadmaps and improvement plans  
 ✅ **Cost Intelligence**: WAF-aligned cost optimization strategies  
 ✅ **Real-World Insights**: Latest Azure capabilities and proven patterns  
+
+---
+
+## 🔄 **Cost-Aware Refinement & Satisfaction Scoring (v3.2)**
+
+### **Intelligent Architecture Refinement Loop**
+- **Post-Cost-Analysis Feedback**: Automatically refines architecture based on WAF, cost, and risk insights
+- **Satisfaction Scoring**: Combined 0-10 metric (WAF 40%, Cost 30%, Risk 30%)
+- **Target-Driven Iteration**: Refines until satisfaction ≥ 8.5/10 or max 3 iterations
+- **Visual Diagram Updates**: Regenerates diagrams after each refinement iteration
+- **Comprehensive Tracking**: Detailed iteration reports showing improvement progression
+
+### **Satisfaction Score Formula**
+```
+Satisfaction = (WAF/10 × 0.40) + (Cost × 0.30) + (Risk × 0.30)
+
+Scoring Criteria:
+- WAF: Normalized from 0-100 to 0-10 (from official WAF assessment)
+- Cost: Reserved instances, optimization opportunities, ROI analysis
+- Risk: Critical/high risk count, mitigation strategies present
+- Target: ≥ 8.5/10 for production-ready architectures
+```
+
+### **Workflow Enhancement**
+- **Step 2.1**: Initial WAF-based architecture optimization
+- **Step 5**: Parallel cost, risk, and change management analysis
+- **Step 5.5**: **NEW** Cost-aware refinement loop with satisfaction scoring
+- **Step 6**: Final documentation with refined architecture
+
+### **Fixed WAF Scoring Issues**
+- ✅ Corrected score normalization (fixed 22.6/10 bug)
+- ✅ Consistent scales: Overall WAF 0-100, pillars 0-10
+- ✅ Accurate executive summaries and reports
 
 ---
 

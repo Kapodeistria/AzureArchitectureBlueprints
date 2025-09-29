@@ -14,6 +14,7 @@ import { DocumentationAgent } from './documentation-agent.js';
 import { ResearchOrchestratorAgent } from './research-orchestrator-agent.js';
 import { WellArchitectedOrchestrator } from './well-architected-orchestrator.js';
 import { ArchitectureRefinementOrchestrator } from './architecture-refinement-orchestrator.js';
+import { CostAwareRefinementOrchestrator } from './cost-aware-refinement-orchestrator.js';
 import { getAgentRegistry, isAgentDeployed } from '../utils/deploy-agents-to-foundry.js';
 import { promises as fs } from 'fs';
 import path from 'path';
@@ -233,6 +234,48 @@ export class SimpleOrchestrator {
       await this.saveIntermediateResults('Risk Assessment', risks, caseStudyFolder);
       await this.saveIntermediateResults('Change Management Strategy', changeManagement, caseStudyFolder);
 
+      // Step 5.5: Cost-Aware Refinement Loop (NEW)
+      console.log('🔄 Cost-Aware Refinement');
+      let finalArchitecture = architecture;
+      let finalVisualDiagrams = visualDiagrams;
+      let refinementReport = '';
+
+      try {
+        const costAwareOrchestrator = new CostAwareRefinementOrchestrator(this.client);
+
+        const refinementResult = await costAwareOrchestrator.execute(
+          architecture,
+          wafAssessment,
+          costs,
+          risks,
+          caseStudyText,
+          requirements,
+          caseStudyFolder
+        );
+
+        // Use refined architecture and diagrams if improvement achieved
+        if (refinementResult.totalIterations > 0 &&
+            refinementResult.finalSatisfactionScore.overall > 7.0) {
+          finalArchitecture = refinementResult.finalArchitecture;
+          finalVisualDiagrams = refinementResult.finalVisualDiagrams || visualDiagrams;
+
+          console.log(`   ✓ Satisfaction: ${refinementResult.finalSatisfactionScore.overall.toFixed(1)}/10 (${refinementResult.totalIterations} iterations)`);
+          console.log(`      WAF: ${refinementResult.finalSatisfactionScore.waf.toFixed(1)}/10, Cost: ${refinementResult.finalSatisfactionScore.cost.toFixed(1)}/10, Risk: ${refinementResult.finalSatisfactionScore.risk.toFixed(1)}/10\n`);
+
+          refinementReport = `\n## Cost-Aware Refinement Results\n${refinementResult.optimizationSummary}\n\nFinal Satisfaction Score: ${refinementResult.finalSatisfactionScore.overall.toFixed(1)}/10`;
+        } else {
+          console.log(`   ✓ Initial architecture satisfactory (no refinement needed)\n`);
+        }
+
+      } catch (error) {
+        console.log(`   ⚠ Refinement loop skipped (${error instanceof Error ? error.message : 'error'})\n`);
+        refinementReport = '\n## Cost-Aware Refinement\n*Refinement loop skipped - using initial architecture*';
+      }
+
+      // Update architecture and diagrams with refined versions
+      architecture = finalArchitecture;
+      visualDiagrams = finalVisualDiagrams;
+
       // Step 6: Generate Documentation
       console.log('📝 Documentation');
       let report;
@@ -246,14 +289,15 @@ export class SimpleOrchestrator {
             wafAssessment,
             costs,
             risks,
-            changeManagement
+            changeManagement,
+            refinementReport
           }),
           new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 30000))
         ]);
         console.log('   ✓ Complete\n');
       } catch (error) {
         console.log('   ⚠ Using fallback\n');
-        report = `# Azure Architecture Analysis\n\n${caseStudyText}\n\n## Requirements\n${requirements}\n\n## Architecture\n${architecture}\n\n## Diagrams\n${visualDiagrams}\n\n## Cost\n${costs}\n\n## Risk\n${risks}\n\n## Change\n${changeManagement}`;
+        report = `# Azure Architecture Analysis\n\n${caseStudyText}\n\n## Requirements\n${requirements}\n\n## Architecture\n${architecture}\n\n${refinementReport}\n\n## Diagrams\n${visualDiagrams}\n\n## Cost\n${costs}\n\n## Risk\n${risks}\n\n## Change\n${changeManagement}`;
       }
 
       console.log('✅ Analysis complete\n');

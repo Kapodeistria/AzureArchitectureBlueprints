@@ -23,6 +23,60 @@
 
 ---
 
+## 🔄 [3.2.0] - 2025-09-29 - **Cost-Aware Refinement & Satisfaction Scoring**
+
+### 🎯 **NEW: Post-Cost-Analysis Refinement Loop**
+- **Cost-Aware Refinement Orchestrator**: Iterative architecture refinement incorporating WAF, cost, and risk feedback
+- **Satisfaction Scoring System**: Combined metric (0-10) with weighted scoring (WAF 40%, Cost 30%, Risk 30%)
+- **Target-Driven Iteration**: Automatically refines architecture until satisfaction ≥ 8.5/10 or max 3 iterations
+- **Visual Diagram Regeneration**: Regenerates diagrams after each refinement to reflect optimizations
+- **Comprehensive Iteration Tracking**: Saves detailed iteration reports showing improvement progression
+
+### 📊 **Satisfaction Score Components**
+- **WAF Compliance** (40% weight): Normalized from 0-100 to 0-10 scale
+- **Cost Efficiency** (30% weight): Evaluates reserved instance usage, optimization opportunities, ROI
+- **Risk Posture** (30% weight): Assesses critical/high risk count and mitigation strategies
+- **Overall Target**: 8.5/10 minimum for production-ready architectures
+
+### 🔧 **WAF Scoring Fixes**
+- **Fixed Score Normalization**: Corrected 22.6/10 bug - all pillar scores now properly normalized to 0-10
+- **Consistent Scale**: Overall WAF score on 0-100 scale, pillar scores on 0-10 scale
+- **Accurate Reporting**: Executive summaries and reports now display correct score ranges
+
+### 🔄 **Enhanced Workflow**
+- **Step 2.1**: Initial WAF-only architecture refinement (existing)
+- **Step 5**: Cost, risk, and change management analysis
+- **Step 5.5**: **NEW** Cost-aware refinement loop with satisfaction scoring
+- **Step 6**: Final documentation with refined architecture and diagrams
+
+### 📁 **New Iteration Output Files**
+- `cost-aware-refinement-iteration-N-*.md`: Detailed iteration reports with satisfaction breakdown
+- `cost-aware-refinement-final-report-*.md`: Final refinement summary with convergence analysis
+- **Preserved Diagrams**: Visual diagrams updated with each iteration for comparison
+
+### 🎨 **Improved User Experience**
+- **Real-Time Satisfaction Tracking**: Console shows WAF/Cost/Risk breakdown during refinement
+- **Convergence Feedback**: Clear messaging when target achieved or minimal improvement detected
+- **Iteration Transparency**: Detailed logging of improvements and refinement reasoning
+
+### 🚀 **Expected Outcomes**
+- Architectures consistently achieve 8.5+/10 satisfaction scores
+- Cost optimization insights automatically incorporated into final designs
+- Risk mitigation strategies baked into architecture rather than afterthoughts
+- Visual diagrams accurately reflect cost-optimized and risk-mitigated architectures
+
+### 📊 **Scoring Formula**
+```
+Satisfaction = (WAF/10 × 0.40) + (Cost × 0.30) + (Risk × 0.30)
+
+Where:
+- WAF: Normalized from 0-100 to 0-10
+- Cost: Extracted from cost analysis (reserved instances +1.5, optimizations +2, ROI +0.5, quick wins +1)
+- Risk: Based on critical/high risk count (no critical = 8-10, critical present = 2-3)
+```
+
+---
+
 ## ⚡ [3.1.0] - 2025-09-29 - **Performance & Reliability Optimization**
 
 ### 🚀 **Major Performance Optimizations**

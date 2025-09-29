@@ -237,7 +237,7 @@ export class WellArchitectedOrchestrator {
   }
 
   private calculateOverallScore(pillarResults: WAFPillarResult[]): number {
-    const scores = pillarResults.map(result => result.score);
+    const scores = pillarResults.map(result => result.score); // Already normalized to 0-10
     const weightedScore = (
       scores[0] * 0.25 + // Reliability: 25%
       scores[1] * 0.25 + // Security: 25%
@@ -245,7 +245,8 @@ export class WellArchitectedOrchestrator {
       scores[3] * 0.15 + // Operational: 15%
       scores[4] * 0.15   // Cost: 15%
     );
-    return Math.round(weightedScore * 10) / 10;
+    // Return on 0-100 scale for consistency with WAF methodology
+    return Math.round(weightedScore * 10 * 10) / 10; // 0-10 → 0-100, rounded to 1 decimal
   }
 
   private prioritizeRecommendations(pillarResults: WAFPillarResult[]): string[] {
@@ -305,7 +306,7 @@ export class WellArchitectedOrchestrator {
     const criticalCount = pillarResults.filter(p => p.score < 6).length;
     const excellentCount = pillarResults.filter(p => p.score >= 8).length;
     
-    return `Azure Well-Architected Assessment: Overall Score ${overallScore}/10. ${excellentCount} pillars excellent, ${criticalCount} need immediate attention. Key focus areas: ${pillarResults.sort((a, b) => a.score - b.score).slice(0, 2).map(p => p.pillarName).join(', ')}.`;
+    return `Azure Well-Architected Assessment: Overall Score ${overallScore.toFixed(1)}/100. ${excellentCount} pillars excellent, ${criticalCount} need immediate attention. Key focus areas: ${pillarResults.sort((a, b) => a.score - b.score).slice(0, 2).map(p => p.pillarName).join(', ')}.`;
   }
 
   private async generateComprehensiveWAFReport(pillarResults: WAFPillarResult[], overallScore: number, payload: any): Promise<string> {
@@ -314,7 +315,7 @@ export class WellArchitectedOrchestrator {
     return `# Azure Well-Architected Framework Assessment Report
 
 Generated: ${timestamp}
-Overall Score: ${overallScore}/10
+Overall Score: ${overallScore.toFixed(1)}/100
 
 ## Executive Summary
 ${await this.generateAssessmentSummary(pillarResults, overallScore, payload)}
@@ -322,7 +323,7 @@ ${await this.generateAssessmentSummary(pillarResults, overallScore, payload)}
 ## Pillar Assessment Results
 
 ${pillarResults.map(pillar => `
-### ${pillar.pillarName} - Score: ${pillar.score}/10
+### ${pillar.pillarName} - Score: ${pillar.score.toFixed(1)}/10
 
 **Compliance:** ${pillar.compliance}
 
@@ -354,12 +355,23 @@ ${this.generateImplementationRoadmap(pillarResults).map((phase, index) => `${ind
 
   private extractScore(data: any, pillarName: string): number {
     if (!data) return 6;
-    
+
+    // Extract raw score from pillar agents
+    let rawScore: number;
+
     if (pillarName === 'Cost Optimization') {
-      return data.optimizationScore || 7;
+      rawScore = data.optimizationScore || 70;
+    } else {
+      rawScore = data.reliabilityScore || data.securityScore || data.performanceScore || data.operationalScore || 70;
     }
-    
-    return data.reliabilityScore || data.securityScore || data.performanceScore || data.operationalScore || 7;
+
+    // Normalize to 0-10 scale
+    // If score > 10, assume it's on 0-100 scale and convert
+    // If score <= 10, assume it's already on 0-10 scale
+    const normalizedScore = rawScore > 10 ? rawScore / 10 : rawScore;
+
+    // Clamp to 0-10 range
+    return Math.min(10, Math.max(0, normalizedScore));
   }
 
   private extractKeyFindings(data: any, pillarName: string): string[] {

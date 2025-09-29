@@ -1,4 +1,4 @@
-Summary
+Agentic Azure SOlution Architecture Software Solution
 Developed an Azure-native solution pattern that combines a Next.js experience layer with Azure Functions-based APIs, event-driven integration, and managed data/AI services to meet the user’s request for a web-accessible workload on Azure.
 Authored a detailed case study tailored for the multi-agent Azure Architecture Blueprints workflow so architecture agents can rapidly ideate and validate the design within the system’s intelligence-driven process.
 

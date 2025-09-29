@@ -1,0 +1,18 @@
+{
+  "bindings": [
+    {
+      "name": "jobMessage",
+      "type": "serviceBusTrigger",
+      "direction": "in",
+      "queueName": "casestudy-jobs",
+      "connection": "ServiceBusConnection"
+    },
+    {
+      "name": "statusMessage",
+      "type": "serviceBus",
+      "direction": "out",
+      "queueName": "casestudy-status",
+      "connection": "ServiceBusConnection"
+    }
+  ]
+}

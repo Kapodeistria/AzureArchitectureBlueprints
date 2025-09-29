@@ -23,6 +23,49 @@
 
 ---
 
+## 🎨 [4.0.0] - 2025-09-30 - **Major UI/UX & Infrastructure Overhaul**
+
+### 🚀 **Modern Azure-Inspired WebApp Design**
+- **Gradient Background**: Beautiful purple-to-violet gradient matching Azure's modern aesthetic
+- **Glassmorphism UI**: Cards with backdrop blur and transparency effects
+- **Custom Azure Logo**: SVG logo with gradient coloring
+- **Enhanced Animations**: Smooth transitions, hover effects, and shimmer progress bars
+- **Improved Layout**: Two-column responsive design with stats cards
+- **Feature Badges**: AI-Powered, Multi-Agent System, Real-Time Updates badges
+- **Quick Mode Default**: Enabled by default for faster testing experience
+
+### 🔧 **Infrastructure Security & Best Practices**
+- **Managed Identities**: System-assigned identities for Function App and Web App
+- **RBAC Integration**: Service Bus Data Receiver/Sender role assignments
+- **Parameterized Deployments**: Removed all hard-coded resource groups and ACR references
+- **Static Website Support**: Enabled $web container for blob storage hosting
+- **Environment Flexibility**: Deploy scripts now use environment variables
+
+### 🔍 **Service Bus Diagnostics**
+- **sb-health.sh**: Queue health monitoring with message counts (active/dead-letter/scheduled)
+- **sb-send.ts**: Test message sender with sessionId tracking
+- **sb-drain.ts**: Message reader and queue drainer for debugging
+
+### 📋 **Configuration Updates**
+- `SERVICE_BUS_CONNECTION` added to webapp environment variables
+- `SERVICE_BUS_NAMESPACE` configured for managed identity auth
+- Queue names (`casestudy-jobs`, `casestudy-status`) properly wired
+- Function App configured with Service Bus triggers
+
+### 🐛 **Bug Fixes**
+- Fixed Container App module references (not needed - Function App handles queues)
+- Resolved Bicep validation errors for role assignments
+- Fixed hard-coded paths in deploy scripts (`infra/bicep/main.bicep`)
+- Cleaned up storage.bicep unused parameters
+
+### 📦 **Deployment Improvements**
+- `webapp/deploy.sh` & `webapp/redeploy.sh` now use `AZURE_RESOURCE_GROUP` env var
+- `infra/deploy.sh` validates required environment variables
+- Bicep templates compile without errors (warnings only)
+- Deployment tested and verified on Azure
+
+---
+
 ## 📁 [3.2.4] - 2025-09-29 - **Organized Output Structure**
 
 ### 🗂️ **Restructured Output Folders**

@@ -34,9 +34,10 @@ The command prints the output values, including:
 ## Key Improvements Over Original PoC
 
 ### Performance & Capacity
-- **Model**: Upgraded from `gpt-4o-mini` → **`gpt-4o`** (production-grade quality)
-- **Capacity**: Increased from 60 TPM → **240 TPM** (supports 20 agents + 2500 tokens each)
+- **Model**: Upgraded from `gpt-4o-mini` → **`gpt-4.1`** (latest GPT-4 model, April 2025)
+- **Capacity**: Increased from 60 TPM → **240 TPM** (supports 20 agents @ 2500 tokens each)
 - **API Version**: Updated to `2024-04-01-preview` (latest features)
+- **Version**: `2025-04-14` (matches production CLI deployment)
 
 ### Reliability & Security
 - **Storage Redundancy**: Upgraded from LRS → **ZRS** (zone-redundant storage)

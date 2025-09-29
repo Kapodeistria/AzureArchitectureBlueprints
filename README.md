@@ -1,4 +1,4 @@
-# 🏗️ AgenticWellArchitectedBlueprint v3.2.4
+# 🏗️ AgenticWellArchitectedBlueprint v4.0.0
 
 ```
  █████╗  ██████╗ ███████╗███╗   ██╗████████╗██╗ ██████╗    ██╗    ██╗ █████╗ ███████╗
@@ -19,6 +19,26 @@
 **Microsoft Well-Architected Framework AI Assessment Platform**
 
 Enterprise-grade agentic AI system that conducts comprehensive Microsoft Well-Architected Framework assessments with **11 specialized agents**. Generate WAF-compliant architecture blueprints, compliance scores, and implementation roadmaps following official Microsoft methodology.
+
+## ✨ **What's New in v4.0.0**
+
+### 🎨 **Modern Web Interface**
+- Beautiful Azure-inspired gradient design with glassmorphism UI
+- Real-time progress tracking with shimmer animations
+- Responsive layout with feature badges and stats cards
+- Quick Mode enabled by default for faster testing
+
+### 🔐 **Enterprise Security**
+- Managed identities for Function App and Web App
+- Service Bus RBAC with Data Receiver/Sender roles
+- Parameterized deployments with no hard-coded values
+- Static website hosting support for blob storage
+
+### 🔧 **Developer Experience**
+- Service Bus diagnostic tools (health check, send/drain)
+- Environment variable-based configuration
+- Clean Bicep templates with role assignments
+- Improved deployment scripts
 
 ---
 

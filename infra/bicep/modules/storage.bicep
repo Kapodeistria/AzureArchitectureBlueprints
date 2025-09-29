@@ -35,13 +35,14 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
     allowBlobPublicAccess: true
     minimumTlsVersion: 'TLS1_2'
     supportsHttpsTrafficOnly: true
-    allowSharedKeyAccess: false // Enhanced security - require Azure AD authentication
-    defaultToOAuthAuthentication: true
+    allowSharedKeyAccess: true // Required for Azure Functions storage mounting
+    defaultToOAuthAuthentication: false
   }
 }
 
 resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
-  name: '${storage.name}/default'
+  parent: storage
+  name: 'default'
   properties: {
     deleteRetentionPolicy: {
       enabled: true
@@ -57,22 +58,24 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01'
     containerDeleteRetentionPolicy: {
       enabled: false
     }
-    staticWebsite: enableStaticWebsite ? {
-      enabled: true
-      indexDocument: indexDocument
-      errorDocument404Path: errorDocument
-    } : null
+  }
+}
+
+// Enable static website hosting (requires post-storage creation)
+resource staticWebsite 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = if (enableStaticWebsite) {
+  parent: blobService
+  name: '$web'
+  properties: {
+    publicAccess: 'Blob'
   }
 }
 
 resource artifactContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
-  name: '${storage.name}/default/${publicContainerName}'
+  parent: blobService
+  name: publicContainerName
   properties: {
     publicAccess: 'Blob'
   }
-  dependsOn: [
-    blobService
-  ]
 }
 
 output storageAccountName string = storage.name
@@ -80,4 +83,4 @@ output resourceId string = storage.id
 output containerName string = publicContainerName
 output primaryEndpoints object = storage.properties.primaryEndpoints
 output containerUrl string = '${storage.properties.primaryEndpoints.blob}${publicContainerName}'
-output staticWebsiteUrl string = enableStaticWebsite ? storage.properties.primaryEndpoints.web : ''
+output staticWebsiteUrl string = enableStaticWebsite ? storage.properties.primaryEndpoints.web : '${storage.properties.primaryEndpoints.blob}$web/'

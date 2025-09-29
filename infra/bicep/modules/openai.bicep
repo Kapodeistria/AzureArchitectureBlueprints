@@ -11,13 +11,13 @@ param skuName string = 'S0'
 param tags object = {}
 
 @description('Deployment name provisioned inside the Azure OpenAI account.')
-param deploymentName string = 'gpt4o'
+param deploymentName string = 'gpt-4.1'
 
-@description('Azure OpenAI model identifier to deploy.')
-param modelName string = 'gpt-4o'
+@description('Azure OpenAI model identifier to deploy (latest GPT-4 model).')
+param modelName string = 'gpt-4.1'
 
 @description('Model version to deploy.')
-param modelVersion string = '2024-08-06'
+param modelVersion string = '2025-04-14'
 
 @description('Model format for the deployment.')
 @allowed([
@@ -45,14 +45,15 @@ resource account 'Microsoft.CognitiveServices/accounts@2024-04-01-preview' = {
 
 resource deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-04-01-preview' = {
   name: '${account.name}/${deploymentName}'
+  sku: {
+    name: 'Standard'
+    capacity: deploymentCapacity
+  }
   properties: {
     model: {
       name: modelName
       version: modelVersion
       format: modelFormat
-    }
-    scaleSettings: {
-      capacity: deploymentCapacity
     }
   }
 }

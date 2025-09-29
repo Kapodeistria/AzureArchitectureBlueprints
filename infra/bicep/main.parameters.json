@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "environmentName": {
-      "value": "agenticpoc"
+      "value": "agenticwaf"
     },
     "location": {
       "value": "westeurope"
@@ -14,17 +14,20 @@
     "tags": {
       "value": {
         "project": "AgenticWellArchitected",
-        "env": "poc"
+        "env": "production"
       }
     },
-    "openAiDeploymentName": {
-      "value": "agentic-gpt4o"
+    "useExistingOpenAI": {
+      "value": true
     },
-    "openAiModelName": {
-      "value": "gpt-4o"
+    "existingOpenAIAccountName": {
+      "value": "kapodeistria-1337-resource"
     },
-    "openAiModelVersion": {
-      "value": "2024-08-06"
+    "existingOpenAIDeploymentName": {
+      "value": "kapodeistria-1337"
+    },
+    "existingOpenAIResourceGroup": {
+      "value": "rg-kapodeistria-3079"
     }
   }
 }

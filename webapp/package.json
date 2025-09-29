@@ -1,0 +1,28 @@
+{
+  "name": "agentic-waf-webapp",
+  "version": "1.0.0",
+  "description": "Web interface for Agentic Well-Architected Framework",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "build": "echo 'No build step required'",
+    "test": "echo 'Tests not implemented yet'"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "dotenv": "^16.3.1",
+    "@azure/identity": "^4.0.0",
+    "@azure/storage-blob": "^12.17.0",
+    "@azure/service-bus": "^7.9.0",
+    "axios": "^1.6.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

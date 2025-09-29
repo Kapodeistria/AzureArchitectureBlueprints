@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure Well-Architected Framework | AI-Powered Case Studies</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☁️</text></svg>">
+    <style>
+        :root {
+            --azure-blue: #0078D4;
+            --azure-blue-dark: #106EBE;
+            --azure-blue-darker: #005A9E;
+            --azure-blue-light: #50E6FF;
+            --azure-teal: #00BCF2;
+            --success-green: #107C10;
+            --warning-yellow: #FFB900;
+            --error-red: #E81123;
+            --text-primary: #323130;
+            --text-secondary: #605E5C;
+            --text-tertiary: #8A8886;
+            --bg-white: #FFFFFF;
+            --bg-light: #FAF9F8;
+            --bg-lighter: #F3F2F1;
+            --border-color: #EDEBE9;
+            --shadow-sm: 0 0.3px 0.9px rgba(0,0,0,0.1), 0 1.6px 3.6px rgba(0,0,0,0.13);
+            --shadow-md: 0 3.2px 7.2px rgba(0,0,0,0.13), 0 0.6px 1.8px rgba(0,0,0,0.11);
+            --shadow-lg: 0 6.4px 14.4px rgba(0,0,0,0.13), 0 1.2px 3.6px rgba(0,0,0,0.11);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header-bar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--azure-blue);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--azure-blue);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 64px 32px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 80px 64px;
+            margin-bottom: 48px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 50% 0 0 50%;
+            transform: translateX(20%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--azure-blue) 0%, var(--azure-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 24px;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+
+        .hero-badges {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-white);
+            border-radius: 24px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .badge svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+
+        .form-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 48px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .form-card h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        label small {
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9375rem;
+            resize: vertical;
+            min-height: 240px;
+            transition: all 0.2s ease;
+            background: var(--bg-white);
+        }
+
+        textarea:hover {
+            border-color: var(--text-tertiary);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--azure-blue);
+            box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg-light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checkbox-group:hover {
+            background: var(--bg-lighter);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--azure-blue);
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        button {
+            padding: 14px 32px;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            font-family: inherit;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 140px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--azure-blue) 0%, var(--azure-blue-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 120, 212, 0.4);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            background: var(--bg-lighter);
+            color: var(--text-tertiary);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: var(--bg-white);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-light);
+            border-color: var(--text-tertiary);
+        }
+
+        .info-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .info-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .info-card ul {
+            list-style: none;
+        }
+
+        .info-card li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .info-card li:last-child {
+            border-bottom: none;
+        }
+
+        .info-card li::before {
+            content: '✓';
+            color: var(--success-green);
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: var(--bg-light);
+            border-radius: 12px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--azure-blue);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .status-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 32px;
+            margin-top: 32px;
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid var(--azure-blue);
+            display: none;
+        }
+
+        .status-section.active {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-message {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .progress-container {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-lighter);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--azure-blue) 0%, var(--azure-teal) 100%);
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .agent-status {
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            border-radius: 12px;
+            margin-top: 24px;
+        }
+
+        .results-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 48px;
+            margin-top: 32px;
+            box-shadow: var(--shadow-lg);
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .results-section h3 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .recent-outputs {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 48px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .recent-outputs h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 32px;
+        }
+
+        .output-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .output-card {
+            background: var(--bg-white);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .output-card:hover {
+            border-color: var(--azure-blue);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+
+        .output-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .output-time {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 48px 32px;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 32px 16px;
+            }
+
+            .form-card, .info-card, .recent-outputs {
+                padding: 24px;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        .files-grid {
+            display: grid;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: var(--bg-white);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .file-item:hover {
+            border-color: var(--azure-blue);
+            background: var(--bg-light);
+            transform: translateX(4px);
+        }
+
+        .file-icon {
+            font-size: 1.5rem;
+            margin-right: 12px;
+        }
+
+        .error-banner {
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(232, 17, 35, 0.1) 0%, rgba(232, 17, 35, 0.05) 100%);
+            border-left: 4px solid var(--error-red);
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .success-banner {
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(16, 124, 16, 0.1) 0%, rgba(16, 124, 16, 0.05) 100%);
+            border-left: 4px solid var(--success-green);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-bar">
+        <div class="header-content">
+            <div class="logo">
+                <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#0078D4;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#00BCF2;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M48 0L0 24v48l48 24 48-24V24L48 0zm32 62L48 80 16 62V34l32-18 32 18v28z" fill="url(#gradient)"/>
+                </svg>
+                Azure Well-Architected Framework
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#outputs">Case Studies</a>
+                <a href="https://learn.microsoft.com/en-us/azure/well-architected/" target="_blank">Docs</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="hero">
+            <div class="hero-content">
+                <h1>AI-Powered Architecture Analysis</h1>
+                <p>Generate comprehensive Azure architecture case studies using AI agents aligned with Microsoft's Well-Architected Framework. Get expert insights on security, reliability, performance, cost optimization, and operational excellence.</p>
+                <div class="hero-badges">
+                    <span class="badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                        </svg>
+                        AI-Powered
+                    </span>
+                    <span class="badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v20M2 12h20"/>
+                        </svg>
+                        Multi-Agent System
+                    </span>
+                    <span class="badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                        Real-Time Updates
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="form-card">
+                <h2>Create Case Study</h2>
+                <form id="caseStudyForm">
+                    <div class="form-group">
+                        <label for="caseStudyInput">
+                            Architecture Description
+                            <small>Describe your Azure architecture or paste existing documentation</small>
+                        </label>
+                        <textarea
+                            id="caseStudyInput"
+                            name="caseStudyInput"
+                            placeholder="Example: Build a scalable e-commerce platform on Azure with microservices architecture, using AKS for container orchestration, Cosmos DB for global data distribution, and Azure Front Door for content delivery..."
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="quickMode" name="quickMode" checked>
+                        <label for="quickMode">
+                            Quick Mode (faster processing with reduced analysis depth - recommended for testing)
+                        </label>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-primary" id="submitBtn">
+                            Generate Case Study
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="resetForm()">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="info-sidebar">
+                <div class="info-card">
+                    <h3 id="features">What You Get</h3>
+                    <ul>
+                        <li>Comprehensive architecture analysis</li>
+                        <li>Security & compliance review</li>
+                        <li>Performance optimization recommendations</li>
+                        <li>Cost analysis & savings opportunities</li>
+                        <li>Reliability & disaster recovery planning</li>
+                        <li>Operational excellence guidelines</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3>Analysis Coverage</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-value">5</span>
+                            <span class="stat-label">WAF Pillars</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">12+</span>
+                            <span class="stat-label">AI Agents</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">30+</span>
+                            <span class="stat-label">Checkpoints</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">100%</span>
+                            <span class="stat-label">Azure Aligned</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-section" id="statusSection">
+            <div class="status-message" id="statusMessage">
+                Processing your case study...
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">0%</div>
+            </div>
+            <div class="agent-status" id="agentStatus" style="display:none;">
+                <div style="font-weight:600;margin-bottom:12px;color:var(--text-primary);">Agent Status</div>
+                <div id="currentAgent" style="color:var(--azure-blue);font-weight:500;"></div>
+                <div id="completedAgents" style="margin-top:8px;font-size:0.875rem;color:var(--text-secondary);"></div>
+            </div>
+            <div id="filesSection" style="display:none;">
+                <h4 style="margin:24px 0 12px 0;font-weight:600;color:var(--text-primary);">Generated Files</h4>
+                <div id="filesList" class="files-grid"></div>
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div id="resultContent"></div>
+        </div>
+
+        <div class="recent-outputs" id="outputs">
+            <h2>Recent Case Studies</h2>
+            <div class="output-grid" id="outputList">
+                <p style="color: var(--text-secondary);">Loading recent outputs...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('caseStudyForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusSection = document.getElementById('statusSection');
+        const resultsSection = document.getElementById('resultsSection');
+        const statusMessage = document.getElementById('statusMessage');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const agentStatus = document.getElementById('agentStatus');
+        const currentAgent = document.getElementById('currentAgent');
+        const completedAgents = document.getElementById('completedAgents');
+        const resultContent = document.getElementById('resultContent');
+        const outputList = document.getElementById('outputList');
+        const filesSection = document.getElementById('filesSection');
+        const filesList = document.getElementById('filesList');
+
+        let currentEventSource = null;
+
+        loadRecentOutputs();
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                caseStudyInput: document.getElementById('caseStudyInput').value,
+                quickMode: document.getElementById('quickMode').checked
+            };
+
+            statusSection.classList.add('active');
+            resultsSection.classList.remove('active');
+            agentStatus.style.display = 'none';
+            filesSection.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Submitting...';
+
+            try {
+                const response = await fetch('/api/case-study/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || result.status === 'not_implemented') {
+                    showResult('error', '⚠️ Feature Not Yet Available', result.message, result);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Generate Case Study';
+                    return;
+                }
+
+                statusMessage.textContent = 'Job submitted! Connecting to real-time updates...';
+                submitBtn.innerHTML = '<span class="spinner"></span> Processing...';
+
+                if (currentEventSource) currentEventSource.close();
+                currentEventSource = new EventSource(result.streamUrl);
+
+                currentEventSource.onmessage = (event) => {
+                    const jobData = JSON.parse(event.data);
+                    updateJobStatus(jobData);
+
+                    if (jobData.status === 'completed' || jobData.status === 'failed') {
+                        currentEventSource.close();
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = 'Generate Case Study';
+                        if (jobData.status === 'completed') loadRecentOutputs();
+                    }
+                };
+
+                currentEventSource.onerror = (error) => {
+                    console.error('SSE Error:', error);
+                    currentEventSource.close();
+                    statusMessage.textContent = 'Connection error. Polling for status...';
+                    pollJobStatus(result.sessionId);
+                };
+
+            } catch (error) {
+                showResult('error', '❌ Error', error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Generate Case Study';
+            }
+        });
+
+        function updateJobStatus(jobData) {
+            progressFill.style.width = jobData.progress + '%';
+            progressText.textContent = jobData.progress + '%';
+
+            const statusMap = {
+                'queued': 'Queued in processing pipeline...',
+                'processing': 'Initializing AI agents...',
+                'running': 'Analyzing architecture...',
+                'completed': 'Analysis complete!',
+                'failed': 'Analysis failed'
+            };
+            statusMessage.textContent = statusMap[jobData.status] || jobData.status;
+
+            if (jobData.currentAgent || jobData.completedAgents?.length > 0) {
+                agentStatus.style.display = 'block';
+                if (jobData.currentAgent) {
+                    currentAgent.innerHTML = `🤖 <strong>${jobData.currentAgent}</strong>`;
+                }
+                if (jobData.completedAgents?.length > 0) {
+                    completedAgents.innerHTML = `✓ Completed: ${jobData.completedAgents.join(', ')}`;
+                }
+            }
+
+            if (jobData.files?.length > 0) {
+                filesSection.style.display = 'block';
+                filesList.innerHTML = jobData.files.map(file => `
+                    <a href="${file.url}" target="_blank" class="file-item">
+                        <div style="display:flex;align-items:center;">
+                            <span class="file-icon">📄</span>
+                            <span style="font-weight:500;">${file.name}</span>
+                        </div>
+                        <span style="color:var(--azure-blue);font-weight:600;">→</span>
+                    </a>
+                `).join('');
+            }
+
+            if (jobData.status === 'completed') {
+                statusSection.classList.remove('active');
+                const filesHtml = jobData.files?.map(f => `
+                    <a href="${f.url}" target="_blank" class="file-item">
+                        <div style="display:flex;align-items:center;">
+                            <span class="file-icon">📄</span>
+                            <div>
+                                <div style="font-weight:500;">${f.name}</div>
+                                <div style="font-size:0.8125rem;color:var(--text-secondary);margin-top:4px;">
+                                    ${new Date(f.timestamp).toLocaleString()}
+                                </div>
+                            </div>
+                        </div>
+                        <span style="color:var(--azure-blue);font-weight:600;">View →</span>
+                    </a>
+                `).join('') || '';
+
+                showResult('success', '✅ Case Study Generated Successfully!',
+                    jobData.result?.message || 'Your architecture analysis is complete.',
+                    { files: filesHtml });
+            }
+
+            if (jobData.status === 'failed') {
+                showResult('error', '❌ Generation Failed', jobData.error || 'An error occurred during processing');
+            }
+        }
+
+        function showResult(type, title, message, extra = {}) {
+            statusSection.classList.remove('active');
+            resultsSection.classList.add('active');
+
+            const bannerClass = type === 'error' ? 'error-banner' : 'success-banner';
+            resultContent.innerHTML = `
+                <div class="${bannerClass}">
+                    <h3 style="margin-bottom:12px;">${title}</h3>
+                    <p style="color:var(--text-primary);margin-bottom:${extra.files ? '24px' : '0'};">${message}</p>
+                    ${extra.files ? `<div class="files-grid">${extra.files}</div>` : ''}
+                </div>
+            `;
+        }
+
+        function pollJobStatus(sessionId) {
+            const pollInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/case-study/status/${sessionId}`);
+                    const jobData = await response.json();
+                    updateJobStatus(jobData);
+
+                    if (jobData.status === 'completed' || jobData.status === 'failed') {
+                        clearInterval(pollInterval);
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = 'Generate Case Study';
+                    }
+                } catch (error) {
+                    console.error('Polling error:', error);
+                    clearInterval(pollInterval);
+                }
+            }, 2000);
+        }
+
+        async function loadRecentOutputs() {
+            try {
+                const response = await fetch('/api/outputs');
+                const data = await response.json();
+
+                if (data.outputs?.length > 0) {
+                    outputList.innerHTML = data.outputs.map(output => `
+                        <div class="output-card" onclick="window.open('${output.url}', '_blank')">
+                            <div class="output-name">${output.name}</div>
+                            <div class="output-time">${new Date(output.timestamp).toLocaleString()}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    outputList.innerHTML = '<p style="color: var(--text-secondary);grid-column:1/-1;">No case studies generated yet. Create your first one above!</p>';
+                }
+            } catch (error) {
+                outputList.innerHTML = '<p style="color: var(--error-red);grid-column:1/-1;">Failed to load recent outputs.</p>';
+            }
+        }
+
+        function resetForm() {
+            form.reset();
+            statusSection.classList.remove('active');
+            resultsSection.classList.remove('active');
+            progressFill.style.width = '0%';
+            progressText.textContent = '0%';
+        }
+    </script>
+</body>
+</html>

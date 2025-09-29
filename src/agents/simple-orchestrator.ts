@@ -565,7 +565,8 @@ Create a comprehensive report that includes all visual diagrams, Well-Architecte
     if (!caseStudyFolder) return;
 
     try {
-      const outputDir = path.join(process.cwd(), 'output', caseStudyFolder);
+      // Create agent-reports subfolder for detailed agent outputs
+      const outputDir = path.join(process.cwd(), 'output', caseStudyFolder, 'agent-reports');
       await fs.mkdir(outputDir, { recursive: true });
 
       const timestamp = getLocalTimestamp();
@@ -597,7 +598,7 @@ Create a comprehensive report that includes all visual diagrams, Well-Architecte
         const formattedContent = `# ${step}\nGenerated: ${timestamp}\nStatus: Completed\n\n${content}\n\n---\nIntermediate result: ${step}\n`;
         await fs.writeFile(filepath, formattedContent, 'utf-8');
       }
-      console.log(`   📁 Saved: ${filename}`);
+      console.log(`   📁 Saved: agent-reports/${filename}`);
     } catch (error) {
       console.warn(`   ⚠️ Failed to save ${step}: ${error.message}`);
     }

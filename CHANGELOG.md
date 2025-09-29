@@ -23,6 +23,99 @@
 
 ---
 
+## 📁 [3.2.4] - 2025-09-29 - **Organized Output Structure**
+
+### 🗂️ **Restructured Output Folders**
+- **agent-reports/ Subfolder**: All detailed agent reports now organized in dedicated subfolder
+- **Clean Root Level**: Main deliverables (solution.md, quick-summary.md, performance-report.json) remain at root
+- **Better Organization**: Separates user-facing documents from debugging/detailed agent outputs
+
+### 📁 **New Folder Structure**
+```
+case-study-2025-09-29T22-30-45-summary/
+├── solution-*.md                    # Main solution document
+├── quick-summary-*.md               # Interview reference
+├── performance-report-*.json        # Metrics
+├── metadata-*.json                  # Workflow data
+├── original-case-study.md           # Input
+├── agent-debug/                     # Health monitoring
+└── agent-reports/                   # NEW: Detailed agent outputs
+    ├── research-intelligence-*.md
+    ├── requirements-analysis-*.md
+    ├── architecture-design-*.md
+    ├── cost-analysis-*.md
+    ├── risk-assessment-*.md
+    └── [all other agent reports]
+```
+
+### 📝 **Updated Documentation**
+- Added comprehensive output structure section to README
+- Clear distinction between main deliverables and detailed reports
+- File purpose documentation for all output types
+
+### 🎯 **Benefits**
+- Cleaner case study folders - easier to find main documents
+- Detailed agent reports still available for debugging
+- Better user experience when reviewing results
+- Maintains all existing functionality and reports
+
+---
+
+## 🐛 [3.2.3] - 2025-09-29 - **Memory Leak Fix & Satisfaction Target Update**
+
+### 🐛 **Fixed EventEmitter Memory Leak**
+- **Root Cause**: Each BaseAgent added 4 process listeners (exit, SIGINT, SIGTERM, uncaughtException)
+- **Impact**: 11 agents = 44 listeners, exceeding Node.js default limit of 10 per event
+- **Fix**: Global agent registry pattern with single set of cleanup handlers
+- **Result**: Eliminated MaxListenersExceededWarning across all process event types
+
+### 🎯 **Satisfaction Score Target Adjustment**
+- **Updated Target**: 8.5/10 → 8.0/10 (more realistic for production architectures)
+- **Increased Iterations**: Max 3 → Max 5 iterations for refinement loop
+- **Improved Console Output**: Shows target score in progress messages
+
+### 📊 **Better Visual Feedback**
+```
+📊 Initial Satisfaction Score: 7.2/10 (target: 8.0/10)
+   WAF: 7.5/10, Cost: 6.8/10, Risk: 7.3/10
+```
+
+---
+
+## 🎨 [3.2.2] - 2025-09-29 - **Quick Summary Quality Improvements**
+
+### 🧹 **Cleaned LLM Conversational Text**
+- **Stripped Preambles**: Removed "Certainly!", "Here's", "Let me" from cost/risk sections
+- **Cleaner Output**: Professional, direct content without conversational fluff
+- **Better Extraction**: Enhanced section detection with validation (min 10 chars)
+
+### 📋 **Improved WAF Coverage Display**
+- **Graceful Fallback**: Clear message when WAF data not yet available
+- **Helpful Guidance**: "Run `npm run local` for full WAF coverage analysis"
+- **No More Confusion**: Eliminated misleading "0% coverage" display
+
+---
+
+## 🕐 [3.2.1] - 2025-09-29 - **Local Timezone Support**
+
+### 🌍 **Local Timezone Implementation**
+- **All Timestamps Local**: Folder names, file timestamps, reports now use system timezone
+- **ISO 8601 Format**: Proper timezone offset included (e.g., +02:00 for Zurich)
+- **Consistent Display**: Replaced all UTC timestamps with local time across entire system
+
+### 📁 **Updated File Naming**
+- **Folders**: `case-study-2025-09-29T22-30-45-summary/`
+- **Reports**: `solution-2025-09-29T22-30-45.md`
+- **Generated Times**: `Generated: 2025-09-29T22:30:45.123+02:00`
+
+### 🔧 **New Utility Module**
+- `src/utils/local-timestamp.ts`: Centralized timezone handling
+- `getLocalTimestamp()`: Full ISO 8601 with timezone
+- `getLocalTimestampForFilename()`: Filename-safe format
+- `getTimezoneName()`: Current timezone name (e.g., "Europe/Zurich")
+
+---
+
 ## 🔄 [3.2.0] - 2025-09-29 - **Cost-Aware Refinement & Satisfaction Scoring**
 
 ### 🎯 **NEW: Post-Cost-Analysis Refinement Loop**

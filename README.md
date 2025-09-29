@@ -1,4 +1,4 @@
-# 🏗️ AgenticWellArchitectedBlueprint v3.2
+# 🏗️ AgenticWellArchitectedBlueprint v3.2.4
 
 ```
  █████╗  ██████╗ ███████╗███╗   ██╗████████╗██╗ ██████╗    ██╗    ██╗ █████╗ ███████╗
@@ -267,6 +267,52 @@ Phase 3 (6-12 months): Operational excellence and advanced monitoring
 ## 📋 WAF Compliance Recommendations
 Priority improvements ranked by pillar impact and implementation effort
 ```
+
+---
+
+## 📁 **Output Structure**
+
+### **Organized Case Study Folder**
+
+Each analysis generates a timestamped folder with organized outputs:
+
+```
+output/
+└── case-study-2025-09-29T22-30-45-summary/
+    ├── solution-2025-09-29T22-30-45.md          # Complete analysis & recommendation
+    ├── quick-summary-2025-09-29T22-30-45.md     # Interview reference guide
+    ├── performance-report-2025-09-29T22-30-45.json  # Execution metrics
+    ├── metadata-2025-09-29T22-30-45.json        # Workflow metadata & WAF scores
+    ├── original-case-study.md                    # Input case study
+    ├── agent-debug/                              # Agent health monitoring
+    │   ├── orchestrator-debug.json
+    │   └── health-debug.json
+    └── agent-reports/                            # Detailed agent analysis reports
+        ├── research-intelligence-2025-09-29T22-30-15.md
+        ├── requirements-analysis-2025-09-29T22-30-45.md
+        ├── architecture-design-2025-09-29T22-31-00.md
+        ├── optimized-architecture-2025-09-29T22-31-30.md
+        ├── visual-architecture-diagrams-2025-09-29T22-31-45.md
+        ├── well-architected-framework-assessment-2025-09-29T22-32-00.md
+        ├── cost-analysis-2025-09-29T22-32-20.md
+        ├── risk-assessment-2025-09-29T22-32-20.md
+        ├── change-management-strategy-2025-09-29T22-32-20.md
+        └── cost-aware-refinement-2025-09-29T22-32-45.md
+```
+
+### **Key Files**
+
+**Main Deliverables (Root Level):**
+- **solution-*.md**: Complete architecture solution with all sections integrated
+- **quick-summary-*.md**: Quick interview reference with talking points and highlights
+- **performance-report-*.json**: Execution metrics, agent performance, timing data
+- **metadata-*.json**: Workflow tracking, WAF scores, checklist coverage
+
+**Detailed Analysis (agent-reports/ subfolder):**
+- Step-by-step agent outputs for debugging and deep analysis
+- Individual agent reports with timestamps
+- Intermediate results from architecture refinement iterations
+- Full WAF assessment details and scoring breakdowns
 
 ---
 

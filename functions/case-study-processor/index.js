@@ -60,9 +60,23 @@ module.exports = async function (context, jobMessage) {
         // Define agents based on mode
         const agents = quickMode
             ? ['requirements-analysis', 'architecture-design', 'waf-security']
-            : ['research-orchestrator', 'requirements-analysis', 'architecture-design',
-               'waf-security', 'waf-reliability', 'waf-performance', 'waf-cost',
-               'cost-estimation', 'risk-assessment'];
+            : [
+                'research-orchestrator',
+                'requirements-analysis',
+                'architecture-design',
+                'waf-security',
+                'waf-reliability',
+                'waf-performance',
+                'waf-cost-optimization',
+                'waf-operational-excellence',
+                'cost-estimation',
+                'risk-assessment',
+                'documentation',
+                'infrastructure-as-code',
+                'monitoring-observability',
+                'disaster-recovery',
+                'compliance-governance'
+            ];
 
         // Process each agent with simulated delay and file generation
         for (let i = 0; i < agents.length; i++) {
@@ -72,8 +86,8 @@ module.exports = async function (context, jobMessage) {
             context.log(`Running agent: ${agent}`);
             sendStatus('running', progress, agent, agents.slice(0, i));
 
-            // Simulate agent processing time
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Simulate agent processing time (shorter for faster demo)
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
             // Generate agent output file
             const agentOutput = {

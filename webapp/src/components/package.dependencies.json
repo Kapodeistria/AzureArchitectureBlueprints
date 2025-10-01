@@ -1,0 +1,23 @@
+{
+  "description": "Required dependencies for FilePreview component",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "^9.0.1",
+    "remark-gfm": "^4.0.0",
+    "xterm": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@tailwindcss/typography": "^0.5.10",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "typescript": "^5.2.2"
+  },
+  "installCommands": [
+    "npm install react react-dom react-markdown remark-gfm xterm",
+    "npm install --save-dev @types/react @types/react-dom @tailwindcss/typography autoprefixer postcss tailwindcss typescript"
+  ]
+}

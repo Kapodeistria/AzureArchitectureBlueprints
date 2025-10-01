@@ -15,7 +15,7 @@ echo "📤 Deploying to Azure Web App: $WEBAPP_NAME..."
 
 # Create deployment zip
 echo "Creating deployment package..."
-zip -r deploy.zip . -x "*.git*" "node_modules/*" ".env*" "deploy.sh"
+zip -r deploy.zip . -x "*.git*" "node_modules/*" "webapp/node_modules/*" ".env*" "deploy.sh" "*.DS_Store"
 
 # Deploy to Azure
 echo "Uploading to Azure..."

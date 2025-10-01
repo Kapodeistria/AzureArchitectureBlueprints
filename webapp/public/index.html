@@ -14,11 +14,13 @@
             --bg-lighter: #F9FAFB;
             --bg-white: #FFFFFF;
             --bg-shell: #FFFFFF;
+            --bg-panel: #FFFFFF;
 
             /* Azure Brand Colors */
             --ms-blue-800: #0078D4;
             --ms-blue-700: #106EBE;
             --ms-blue-600: #2B88D8;
+            --ms-blue-500: #2B88D8;
             --brand: #0078D4;
             --brand-hover: #106EBE;
 
@@ -490,15 +492,15 @@
         }
 
         button {
-            padding: 12px 24px;
-            font-size: 15px;
+            padding: 16px 32px !important;
+            font-size: 16px;
             font-weight: 600;
             font-family: inherit;
             border: 1px solid transparent;
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.15s ease;
-            min-width: 120px;
+            min-width: 140px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -795,6 +797,121 @@
 
         details:not([open]) summary .toggle-icon {
             transform: rotate(-90deg);
+        }
+
+        /* File Preview Modal */
+        .preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10000;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .preview-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-content {
+            background: var(--bg);
+            border-radius: 12px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .preview-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .preview-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .preview-close:hover {
+            background: var(--bg-light);
+        }
+
+        .preview-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .preview-loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .preview-body pre {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        .preview-body h1, .preview-body h2, .preview-body h3 {
+            color: var(--text-primary);
+            margin-top: 24px;
+            margin-bottom: 12px;
+        }
+
+        .preview-body h1 { font-size: 28px; }
+        .preview-body h2 { font-size: 22px; }
+        .preview-body h3 { font-size: 18px; }
+
+        .preview-body ul, .preview-body ol {
+            margin-left: 20px;
+            color: var(--text-primary);
+        }
+
+        .preview-body li {
+            margin-bottom: 8px;
+        }
+
+        .preview-body strong {
+            color: var(--brand);
+        }
+
+        .preview-body code {
+            background: rgba(0, 120, 212, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
         }
 
         .command-input {
@@ -1199,6 +1316,26 @@
             text-decoration: none;
             color: var(--text-primary);
             transition: all 0.2s;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .file-item.hydrated {
+            animation: fileHydrate 0.4s ease-out forwards;
+        }
+
+        @keyframes fileHydrate {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            60% {
+                transform: translateY(-5px) scale(1.02);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .file-item:hover {
@@ -1210,6 +1347,46 @@
         .file-icon {
             font-size: 1.5rem;
             margin-right: 12px;
+        }
+
+        .file-action-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            background: var(--bg-white);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .file-action-btn:hover {
+            border-color: var(--brand);
+            background: var(--bg-light);
+            transform: translateY(-1px);
+        }
+
+        .preview-btn {
+            color: var(--brand);
+            border-color: var(--brand);
+        }
+
+        .preview-btn:hover {
+            background: rgba(0, 120, 212, 0.08);
+        }
+
+        .download-btn {
+            color: var(--success-green);
+            border-color: var(--success-green);
+        }
+
+        .download-btn:hover {
+            background: rgba(16, 124, 16, 0.08);
         }
 
         .error-banner {
@@ -1375,6 +1552,17 @@
             margin-top: 2px;
         }
     </style>
+
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="/styles.css">
+
+    <!-- xterm.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css">
+
+    <!-- React & FilePreview Bundle -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script defer src="/filepreview.bundle.js"></script>
 </head>
 <body>
     <div class="header-bar">
@@ -1387,7 +1575,7 @@
                     <span class="ms-tile yellow"></span>
                 </span>
                 <span>Microsoft Azure · Well-Architected</span>
-                <span id="versionBadge" style="display:inline-flex;align-items:center;gap:6px;margin-left:14px;padding:4px 10px;background:var(--bg-light);border-radius:2px;font-size:11px;font-weight:600;color:var(--text-secondary);border:1px solid var(--border-color);">v...</span>
+                <span id="versionBadge" style="display:none;align-items:center;gap:6px;margin-left:14px;padding:4px 10px;background:var(--bg-light);border-radius:2px;font-size:11px;font-weight:600;color:var(--text-secondary);border:1px solid var(--border-color);opacity:0;transition:opacity 0.2s ease-in;"></span>
             </div>
             <div class="nav-links">
                 <a href="#features">Solutions</a>
@@ -1403,29 +1591,7 @@
             <div class="hero-content">
                 <h1>Design with Microsoft Azure Well-Architected</h1>
                 <p>Bring Microsoft-grade architecture guidance to every proposal. Our Azure AI Foundry agents assess your solution against Well-Architected pillars, surface risks, and produce executive-ready documentation in minutes.</p>
-                <div class="waf-pillars">
-                    <div class="pillar-card">
-                        <span class="pillar-icon">🔒</span>
-                        <span class="pillar-name">Security</span>
-                    </div>
-                    <div class="pillar-card">
-                        <span class="pillar-icon">⚡</span>
-                        <span class="pillar-name">Reliability</span>
-                    </div>
-                    <div class="pillar-card">
-                        <span class="pillar-icon">🚀</span>
-                        <span class="pillar-name">Performance</span>
-                    </div>
-                    <div class="pillar-card">
-                        <span class="pillar-icon">💰</span>
-                        <span class="pillar-name">Cost</span>
-                    </div>
-                    <div class="pillar-card">
-                        <span class="pillar-icon">⚙️</span>
-                        <span class="pillar-name">Operations</span>
-                    </div>
-                </div>
-                <div class="hero-badges">
+                <div class="hero-badges" style="margin-top:24px;">
                     <span class="badge">Azure AI Foundry Agents</span>
                     <span class="badge">Microsoft Well-Architected</span>
                 </div>
@@ -1441,37 +1607,59 @@
 
         <div class="main-content">
             <div class="form-card">
-                <h2>Create Case Study</h2>
+                <h2 style="font-size:28px;margin-bottom:16px;">Create Case Study</h2>
                 <form id="caseStudyForm">
                     <div class="form-group">
-                        <label for="caseStudyInput">
+                        <label for="caseStudyInput" style="font-size:14px;font-weight:500;">
                             Architecture Description
-                            <small>Describe your Azure architecture or paste existing documentation</small>
                         </label>
                         <textarea
                             id="caseStudyInput"
                             name="caseStudyInput"
-                            placeholder="Example: Build a scalable e-commerce platform on Azure with microservices architecture, using AKS for container orchestration, Cosmos DB for global data distribution, and Azure Front Door for content delivery..."
                             required
-                        ></textarea>
+                            style="min-height:120px;"
+                        >UBS RED AI Platform for Swiss Wealth Management
+
+UBS, Switzerland's largest bank ($5T AUM), deployed Azure-based AI assistant "UBS Red" for 30,000 employees across wealth management divisions. Platform digitizes 60,000+ investment documents while maintaining 100% Swiss data residency (FINMA, nFADP compliant).
+
+Architecture:
+- Azure OpenAI Service (GPT-4) in Swiss data centers (Zürich North, Geneva West)
+- Azure AI Search for multi-language document indexing (German, French, Italian, English)
+- Provisioned Throughput Units (PTUs) ensuring sub-second response times
+- Azure Kubernetes Service for orchestration
+- Azure SQL Database with Swiss residency
+- Azure Key Vault for secrets management
+- Confidential Computing for sensitive operations
+
+Key Requirements:
+- 100% Swiss data sovereignty (no data leaves Switzerland)
+- Multi-language support for Swiss market
+- Scale from pilot to 30,000 users in 10 months
+- Sub-second query response times
+- Integration with legacy banking systems
+- 70% reduction in client meeting preparation time
+
+Success Metrics Achieved:
+- 30,000 employees actively using platform
+- 60,000+ documents digitized and searchable
+- Zero data residency violations
+- Consistent performance with Azure PTUs
+- Sparked enterprise-wide data modernization</textarea>
                     </div>
 
-                    <div class="checkbox-group">
+                    <div class="checkbox-group" style="margin:12px 0;">
                         <input type="checkbox" id="quickMode" name="quickMode" checked>
-                        <label for="quickMode">
-                            Quick Mode (faster processing with reduced analysis depth - recommended for testing)
+                        <label for="quickMode" style="font-size:13px;">
+                            Quick Mode (faster, reduced depth)
                         </label>
                     </div>
 
                     <div class="button-group">
                         <button type="submit" class="btn-primary" id="submitBtn">
-                            Generate Case Study
+                            Generate Analysis
                         </button>
                         <button type="button" class="btn-secondary" onclick="loadDemoExample()">
                             ⚡ Try Example
-                        </button>
-                        <button type="button" class="btn-secondary" onclick="resetForm()">
-                            Reset
                         </button>
                     </div>
                 </form>
@@ -1479,42 +1667,15 @@
 
             <div class="info-sidebar">
                 <div class="info-card">
-                    <h3 id="features">What You Get</h3>
-                    <details open>
-                        <summary style="cursor:pointer;font-weight:600;color:var(--ms-blue-800);margin-bottom:12px;list-style:none;display:flex;align-items:center;gap:8px;">
-                            <span class="toggle-icon">▼</span> Analysis & Reports
-                        </summary>
-                        <ul>
-                            <li>Comprehensive architecture analysis</li>
-                            <li>Security & compliance review</li>
-                            <li>Performance optimization recommendations</li>
-                            <li>Cost analysis & savings opportunities</li>
-                            <li>Reliability & disaster recovery planning</li>
-                            <li>Operational excellence guidelines</li>
-                        </ul>
-                    </details>
-                </div>
-
-                <div class="info-card">
-                    <h3>Analysis Coverage</h3>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <span class="stat-value">5</span>
-                            <span class="stat-label">WAF Pillars</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value">12+</span>
-                            <span class="stat-label">AI Agents</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value">30+</span>
-                            <span class="stat-label">Checkpoints</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value">100%</span>
-                            <span class="stat-label">Azure Aligned</span>
-                        </div>
-                    </div>
+                    <h3 id="features" style="font-size:16px;margin-bottom:12px;">What You Get</h3>
+                    <ul style="font-size:13px;line-height:1.8;">
+                        <li>Architecture design & diagrams</li>
+                        <li>Security & compliance review</li>
+                        <li>Performance optimization</li>
+                        <li>Cost analysis & savings</li>
+                        <li>Reliability assessment</li>
+                        <li>Operational excellence</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -1601,19 +1762,74 @@
         const fileRequestCache = new Map();
         const latestJobPayload = new Map();
 
-        // Fetch and display version
+        // Fetch and display version (with smooth fade-in to prevent flicker)
         fetch('/api/version?t=' + Date.now())
             .then(res => res.json())
             .then(data => {
                 const badge = document.getElementById('versionBadge');
-                const footerVersion = document.querySelector('footer strong');
-                if (badge) badge.textContent = 'v' + data.version;
-                if (footerVersion) footerVersion.textContent = 'v' + data.version;
+                const footerVersionText = document.getElementById('footerVersionText');
+                if (badge) {
+                    badge.textContent = 'v' + data.version;
+                    badge.style.display = 'inline-flex';
+                    // Trigger fade-in after content is set
+                    setTimeout(() => badge.style.opacity = '1', 10);
+                }
+                if (footerVersionText) {
+                    footerVersionText.textContent = 'v' + data.version;
+                }
             })
             .catch(() => {
                 const badge = document.getElementById('versionBadge');
-                if (badge) badge.textContent = 'v?.?.?';
+                const footerVersionText = document.getElementById('footerVersionText');
+                if (badge) {
+                    badge.textContent = 'v?.?.?';
+                    badge.style.display = 'inline-flex';
+                    setTimeout(() => badge.style.opacity = '1', 10);
+                }
+                if (footerVersionText) {
+                    footerVersionText.textContent = 'v?.?.?';
+                }
             });
+
+        // Mount DocViewer component
+        function mountDocViewer(files) {
+            console.log('[DocViewer] mountDocViewer called with', files?.length, 'files');
+            const mount = document.getElementById('docviewer-root');
+            console.log('[DocViewer] mount element:', mount);
+            console.log('[DocViewer] window.DocViewer:', window.DocViewer);
+            console.log('[DocViewer] window.React:', window.React);
+            console.log('[DocViewer] window.ReactDOM:', window.ReactDOM);
+
+            if (!mount) {
+                console.error('[DocViewer] Mount element not found');
+                return;
+            }
+            if (!files?.length) {
+                console.error('[DocViewer] No files provided');
+                return;
+            }
+            if (!window.DocViewer) {
+                console.error('[DocViewer] window.DocViewer not available');
+                return;
+            }
+            if (!window.React || !window.ReactDOM) {
+                console.error('[DocViewer] React or ReactDOM not available');
+                return;
+            }
+
+            mount.style.display = 'block';
+            const normalized = files.map((f, i) => ({
+                id: f.id || f.name || String(i),
+                name: f.name || f.id || `file-${i}`,
+                url: f.url,
+                size: f.size
+            }));
+            console.log('[DocViewer] Mounting with normalized files:', normalized);
+            ReactDOM.createRoot(mount).render(
+                React.createElement(window.DocViewer, { files: normalized, initialId: normalized[0].id })
+            );
+            console.log('[DocViewer] Mounted successfully');
+        }
 
         resetCommandConsole();
         loadRecentOutputs();
@@ -2151,245 +2367,304 @@
             }, 2000);
         }
 
-        // Demo Example - UBS RED Platform (cached, no API calls)
-        function loadDemoExample() {
-            const demoInput = `UBS RED AI Platform for Swiss Wealth Management
+        // Demo Example - UBS RED Platform (uses real session data)
+        async function loadDemoExample() {
+            const demoSessionId = 'web-1759344628762'; // Real production session
 
-UBS, Switzerland's largest bank ($5T AUM), deployed Azure-based AI assistant "UBS Red" for 30,000 employees across wealth management divisions. Platform digitizes 60,000+ investment documents while maintaining 100% Swiss data residency (FINMA, nFADP compliant).
-
-Architecture:
-- Azure OpenAI Service (GPT-4) in Swiss data centers (Zürich North, Geneva West)
-- Azure AI Search for multi-language document indexing (German, French, Italian, English)
-- Provisioned Throughput Units (PTUs) ensuring sub-second response times
-- Azure Kubernetes Service for orchestration
-- Azure SQL Database with Swiss residency
-- Azure Key Vault for secrets management
-- Confidential Computing for sensitive operations
-
-Key Requirements:
-- 100% Swiss data sovereignty (no data leaves Switzerland)
-- Multi-language support for Swiss market
-- Scale from pilot to 30,000 users in 10 months
-- Sub-second query response times
-- Integration with legacy banking systems
-- 70% reduction in client meeting preparation time
-
-Success Metrics Achieved:
-- 30,000 employees actively using platform
-- 60,000+ documents digitized and searchable
-- Zero data residency violations
-- Consistent performance with Azure PTUs
-- Sparked enterprise-wide data modernization`;
-
-            document.getElementById('caseStudyInput').value = demoInput;
-            document.getElementById('quickMode').checked = true;
-
-            // Simulate demo execution
-            runDemoSimulation();
-        }
-
-        function runDemoSimulation() {
             statusSection.classList.add('active');
             resultsSection.classList.remove('active');
             agentStatus.style.display = 'none';
             filesSection.style.display = 'none';
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner"></span> Running Demo...';
+            submitBtn.innerHTML = '<span class="spinner"></span> Loading Demo...';
 
-            const demoFiles = [
-                { name: 'architecture-overview.md', icon: '📝', size: '12.5 KB' },
-                { name: 'waf-security-analysis.md', icon: '🔒', size: '18.2 KB' },
-                { name: 'reliability-assessment.md', icon: '⚡', size: '15.8 KB' },
-                { name: 'performance-optimization.md', icon: '🚀', size: '14.3 KB' },
-                { name: 'cost-analysis.md', icon: '💰', size: '11.7 KB' },
-                { name: 'operational-excellence.md', icon: '⚙️', size: '13.4 KB' },
-                { name: 'executive-summary.md', icon: '📋', size: '8.9 KB' }
-            ];
+            try {
+                console.log('[Demo] Fetching real session files:', demoSessionId);
 
+                // Fetch real files from the session
+                const response = await fetch(`/api/case-study/files/${demoSessionId}`);
+                const data = await response.json();
+
+                if (!data.files || data.files.length === 0) {
+                    throw new Error('No files found in demo session');
+                }
+
+                console.log('[Demo] Found', data.files.length, 'files');
+
+                // Simulate progress animation
+                runDemoSimulation(data.files);
+
+            } catch (error) {
+                console.error('[Demo] Error loading demo:', error);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Generate Analysis';
+                alert('Demo session temporarily unavailable. Please try analyzing your own architecture.');
+            }
+        }
+
+        function runDemoSimulation(realFiles) {
             const agents = [
-                'Architecture Analyzer',
-                'Security Specialist',
-                'Reliability Engineer',
-                'Performance Optimizer',
-                'Cost Analyst',
-                'Operations Expert',
-                'Report Generator'
+                { name: 'Research Intelligence', status: 'Analyzing case study requirements and context...' },
+                { name: 'Architecture Design', status: 'Designing Azure architecture solution...' },
+                { name: 'Visual Diagrams', status: 'Creating architecture diagrams...' },
+                { name: 'WAF Assessment', status: 'Evaluating Well-Architected Framework pillars...' },
+                { name: 'Security Analysis', status: 'Analyzing security posture and compliance...' },
+                { name: 'Cost Optimization', status: 'Calculating costs and optimization opportunities...' },
+                { name: 'Documentation', status: 'Finalizing comprehensive reports...' }
             ];
 
             let progress = 0;
             let agentIndex = 0;
             const interval = setInterval(() => {
-                progress += 15;
+                progress += 14;
                 if (progress > 100) progress = 100;
 
                 progressFill.style.width = progress + '%';
                 progressText.textContent = progress + '%';
 
                 if (agentIndex < agents.length) {
+                    const agent = agents[agentIndex];
+                    statusMessage.textContent = agent.status;
                     agentStatus.style.display = 'block';
-                    currentAgent.innerHTML = `🤖 <strong>${agents[agentIndex]}</strong>`;
+                    currentAgent.innerHTML = `🤖 <strong>${agent.name}</strong>`;
                     if (agentIndex > 0) {
-                        completedAgents.innerHTML = `✓ Completed: ${agents.slice(0, agentIndex).join(', ')}`;
+                        const completed = agents.slice(0, agentIndex).map(a => a.name).join(', ');
+                        completedAgents.innerHTML = `✓ Completed: ${completed}`;
                     }
                     agentIndex++;
                 }
 
                 if (progress >= 100) {
                     clearInterval(interval);
-                    showDemoResults(demoFiles);
+                    statusMessage.textContent = 'Analysis complete!';
+                    setTimeout(() => showDemoResults(realFiles), 500);
                 }
             }, 400);
+        }
+
+        // Global files array for React modal
+        let globalDemoFiles = [];
+
+        function showFilePreview(fileIndex) {
+            const docviewerRoot = document.getElementById('docviewer-root');
+            if (docviewerRoot && docviewerRoot.style.display !== 'none') {
+                // Scroll to DocViewer
+                docviewerRoot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                // Click the corresponding file in the sidebar after a short delay
+                setTimeout(() => {
+                    const fileButtons = docviewerRoot.querySelectorAll('button');
+                    if (fileButtons[fileIndex]) {
+                        fileButtons[fileIndex].click();
+                    }
+                }, 500);
+            } else {
+                // Fallback: open in new tab
+                window.open(globalDemoFiles[fileIndex].url, '_blank');
+            }
         }
 
         function showDemoResults(files) {
             statusSection.classList.remove('active');
             submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Generate Case Study';
+            submitBtn.innerHTML = 'Generate Analysis';
 
-            const filesHtml = files.map(f => `
-                <div class="file-item" style="cursor:default;opacity:0.9;">
+            // Map file icons based on name
+            const getFileIcon = (name) => {
+                if (name.includes('architecture')) return '📝';
+                if (name.includes('security')) return '🔒';
+                if (name.includes('reliability')) return '⚡';
+                if (name.includes('performance')) return '🚀';
+                if (name.includes('cost')) return '💰';
+                if (name.includes('operational')) return '⚙️';
+                if (name.includes('summary')) return '📋';
+                if (name.includes('diagram')) return '📐';
+                return '📄';
+            };
+
+            // Filter canonical files for display (exclude metadata but keep ASCII for DocViewer)
+            const canonicalFiles = files.filter(f =>
+                !f.name.includes('metadata') &&
+                !f.name.includes('performance-report') &&
+                !f.name.includes('solution-') &&
+                !f.name.includes('quick-summary') &&
+                !f.name.includes('original-case-study')
+            );
+
+            // For grid display, exclude ASCII files
+            const displayFiles = canonicalFiles.filter(f => !f.name.includes('ascii-'));
+
+            // Store files globally for React modal and DocViewer (include ASCII)
+            globalDemoFiles = canonicalFiles;
+
+            const filesHtml = displayFiles.map((f, index) => {
+                const globalIndex = globalDemoFiles.indexOf(f);
+                return `
+                <div class="file-item">
                     <div style="display:flex;align-items:center;gap:12px;">
-                        <span class="file-icon">${f.icon}</span>
+                        <span class="file-icon">${getFileIcon(f.name)}</span>
                         <div style="flex:1;">
                             <div style="font-weight:600;color:var(--text-primary);">${f.name}</div>
                             <div style="font-size:0.8125rem;color:var(--text-secondary);margin-top:4px;">
-                                Demo • ${f.size}
+                                Real Demo • ${(f.size / 1024).toFixed(1)} KB
                             </div>
                         </div>
                     </div>
                     <div style="display:flex;align-items:center;gap:8px;">
-                        <span style="color:var(--text-tertiary);font-size:0.85rem;">Preview</span>
+                        <button class="file-action-btn preview-btn" onclick="showFilePreview(${globalIndex}); event.stopPropagation();">
+                            👁️ Preview
+                        </button>
+                        <a href="${f.url}" download="${f.name}" class="file-action-btn download-btn" onclick="event.stopPropagation();">
+                            ⬇️ Download
+                        </a>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
 
             resultsSection.classList.add('active');
             resultContent.innerHTML = `
                 <div class="success-banner">
                     <h3 style="margin-bottom:12px;">✅ Demo: UBS RED Platform Analysis Complete!</h3>
                     <p style="color:var(--text-primary);margin-bottom:24px;">
-                        Successfully analyzed UBS RED AI Platform using 12 AI agents. 7 comprehensive reports generated.
+                        Real agentic analysis of UBS RED AI Platform ($5T AUM, 30,000 users, Swiss data sovereignty). 15 AI agents generated comprehensive architecture assessment.
                         <br><br>
-                        <strong>Overall WAF Score: 92/100</strong>
-                        <span style="margin-left:16px;color:var(--success-green);">● Security: 95</span>
-                        <span style="margin-left:16px;color:var(--success-green);">● Reliability: 92</span>
-                        <span style="margin-left:16px;color:var(--success-green);">● Performance: 94</span>
-                        <span style="margin-left:16px;color:var(--warning-yellow);">● Cost: 88</span>
-                        <span style="margin-left:16px;color:var(--success-green);">● Operations: 91</span>
+                        <strong>Overall WAF Score: 72/100</strong>
+                        <span style="margin-left:16px;color:var(--success-green);">● Security: 70</span>
+                        <span style="margin-left:16px;color:var(--success-green);">● Reliability: 70</span>
+                        <span style="margin-left:16px;color:var(--success-green);">● Performance: 80</span>
+                        <span style="margin-left:16px;color:var(--success-green);">● Cost: 70</span>
+                        <span style="margin-left:16px;color:var(--success-green);">● Operations: 70</span>
                     </p>
                     <div style="padding:16px;background:rgba(0,120,212,0.08);border-radius:8px;margin-bottom:24px;">
-                        <strong style="color:var(--brand);">💡 Demo Mode:</strong> This is a pre-generated example showcasing our AI analysis capabilities. To analyze your own architecture, enter your description above and click "Generate Case Study".
+                        <strong style="color:var(--brand);">💡 Demo Mode:</strong> This is a real analysis from our AI agents showcasing production capabilities. To analyze your own architecture, enter your description above and click "Generate Analysis".
                     </div>
                 </div>
 
                 <div class="solution-overview">
                     <div class="solution-header">
                         <span style="font-size:32px;">🏗️</span>
-                        <h4>Proposed Architecture Solution</h4>
+                        <h4>Architecture Solution</h4>
                     </div>
 
                     <div class="solution-metrics">
                         <div class="metric-card">
-                            <span class="metric-value">12</span>
+                            <span class="metric-value">15</span>
                             <span class="metric-label">AI Agents</span>
                         </div>
                         <div class="metric-card">
-                            <span class="metric-value">8.9m</span>
+                            <span class="metric-value">2m 20s</span>
                             <span class="metric-label">Processing Time</span>
                         </div>
                         <div class="metric-card">
-                            <span class="metric-value">9</span>
+                            <span class="metric-value">11</span>
                             <span class="metric-label">Azure Services</span>
                         </div>
                         <div class="metric-card">
-                            <span class="metric-value">4</span>
-                            <span class="metric-label">Regions</span>
+                            <span class="metric-value">2</span>
+                            <span class="metric-label">Swiss Regions</span>
                         </div>
                     </div>
 
-                    <h5 style="font-size:15px;font-weight:600;color:var(--text-primary);margin:20px 0 12px 0;">Azure Services Stack</h5>
+                    <h5 style="font-size:15px;font-weight:600;color:var(--text-primary);margin:20px 0 12px 0;">Azure Services Identified</h5>
                     <div class="architecture-grid">
                         <div class="service-tile">
                             <span class="service-icon">🧠</span>
                             <div class="service-name">Azure OpenAI</div>
-                            <div class="service-category">AI/ML</div>
+                            <div class="service-category">GPT-4, 10 PTUs</div>
                         </div>
                         <div class="service-tile">
                             <span class="service-icon">🔍</span>
                             <div class="service-name">AI Search</div>
-                            <div class="service-category">Search</div>
+                            <div class="service-category">S3, 3 replicas</div>
                         </div>
                         <div class="service-tile">
                             <span class="service-icon">⚡</span>
-                            <div class="service-name">Kubernetes</div>
-                            <div class="service-category">Compute</div>
+                            <div class="service-name">AKS</div>
+                            <div class="service-category">3x D8_v4</div>
                         </div>
                         <div class="service-tile">
                             <span class="service-icon">💾</span>
                             <div class="service-name">SQL Database</div>
-                            <div class="service-category">Data</div>
+                            <div class="service-category">Business Critical</div>
                         </div>
                         <div class="service-tile">
                             <span class="service-icon">🔐</span>
                             <div class="service-name">Key Vault</div>
-                            <div class="service-category">Security</div>
+                            <div class="service-category">Standard</div>
                         </div>
                         <div class="service-tile">
                             <span class="service-icon">🌐</span>
-                            <div class="service-name">Front Door</div>
-                            <div class="service-category">Networking</div>
+                            <div class="service-name">App Gateway</div>
+                            <div class="service-category">WAF v2</div>
                         </div>
                         <div class="service-tile">
                             <span class="service-icon">📊</span>
                             <div class="service-name">Monitor</div>
-                            <div class="service-category">Observability</div>
-                        </div>
-                        <div class="service-tile">
-                            <span class="service-icon">🛡️</span>
-                            <div class="service-name">Entra ID</div>
-                            <div class="service-category">Identity</div>
+                            <div class="service-category">Log Analytics</div>
                         </div>
                         <div class="service-tile">
                             <span class="service-icon">🔒</span>
                             <div class="service-name">Confidential</div>
-                            <div class="service-category">Computing</div>
+                            <div class="service-category">DCsv3 Compute</div>
+                        </div>
+                        <div class="service-tile">
+                            <span class="service-icon">🌍</span>
+                            <div class="service-name">Cognitive Services</div>
+                            <div class="service-category">Translation, OCR</div>
+                        </div>
+                        <div class="service-tile">
+                            <span class="service-icon">🖥️</span>
+                            <div class="service-name">App Service</div>
+                            <div class="service-category">Premium P2v3</div>
+                        </div>
+                        <div class="service-tile">
+                            <span class="service-icon">🛡️</span>
+                            <div class="service-name">Entra ID</div>
+                            <div class="service-category">SSO Federation</div>
                         </div>
                     </div>
 
-                    <div class="implementation-timeline">
-                        <h5 style="font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">Implementation Timeline</h5>
-                        <div class="timeline-phases">
-                            <div class="phase-bar">
-                                <span class="phase-number">1</span>
-                                <div class="phase-name">Foundation</div>
-                                <div class="phase-duration">Weeks 1-2</div>
-                            </div>
-                            <div class="phase-bar">
-                                <span class="phase-number">2</span>
-                                <div class="phase-name">Core Build</div>
-                                <div class="phase-duration">Weeks 3-6</div>
-                            </div>
-                            <div class="phase-bar">
-                                <span class="phase-number">3</span>
-                                <div class="phase-name">Integration</div>
-                                <div class="phase-duration">Weeks 7-9</div>
-                            </div>
-                            <div class="phase-bar">
-                                <span class="phase-number">4</span>
-                                <div class="phase-name">Launch</div>
-                                <div class="phase-duration">Week 10</div>
-                            </div>
+                    <h5 style="font-size:15px;font-weight:600;color:var(--text-primary);margin:24px 0 12px 0;">Key Architecture Highlights</h5>
+                    <div style="display:grid;gap:12px;font-size:13px;line-height:1.6;">
+                        <div style="padding:12px;background:var(--bg-light);border-left:3px solid var(--brand);border-radius:4px;">
+                            <strong>🇨🇭 100% Swiss Data Residency</strong> - All data in Zurich North & Geneva West regions (FINMA & nFADP compliant)
+                        </div>
+                        <div style="padding:12px;background:var(--bg-light);border-left:3px solid var(--success-green);border-radius:4px;">
+                            <strong>⚡ High Performance</strong> - 10 PTUs ensure sub-second response times for 30,000 concurrent UBS advisors
+                        </div>
+                        <div style="padding:12px;background:var(--bg-light);border-left:3px solid #8A3FFC;border-radius:4px;">
+                            <strong>🔒 Enterprise Security</strong> - Confidential computing, Key Vault integration, WAF v2 protection
+                        </div>
+                        <div style="padding:12px;background:var(--bg-light);border-left:3px solid #F59E0B;border-radius:4px;">
+                            <strong>📚 60,000+ Documents</strong> - Multi-language (DE, FR, IT, EN) AI Search with custom models
                         </div>
                     </div>
                 </div>
 
                 <div style="margin-top:24px;">
                     <h4 style="font-weight:600;color:var(--text-primary);margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-                        📦 Generated Reports (Demo)
+                        📦 Generated Reports
                     </h4>
-                    <div class="files-grid">${filesHtml}</div>
+                    <div class="files-grid" id="demoFilesGrid">${filesHtml}</div>
                 </div>
+
+                <!-- DocViewer Container -->
+                <div id="docviewer-root" style="display:none;margin-top:32px;"></div>
             `;
+
+            // Trigger file hydration animation sequentially
+            setTimeout(() => {
+                const fileItems = document.querySelectorAll('#demoFilesGrid .file-item');
+                fileItems.forEach((item, index) => {
+                    setTimeout(() => {
+                        item.classList.add('hydrated');
+                    }, index * 100); // 100ms delay between each file
+                });
+            }, 100);
+
+            // Mount DocViewer after demo completes
+            mountDocViewer(canonicalFiles);
         }
 
         async function loadRecentOutputs() {
@@ -2576,20 +2851,27 @@ Success Metrics Achieved:
 
             telemetryFeed.scrollTop = telemetryFeed.scrollHeight;
         }
+
+        // Auto-load demo if /demo route is accessed
+        if (window.location.pathname === '/demo') {
+            console.log('[Demo Route] Auto-loading demo example...');
+            loadDemoExample();
+        }
+
     </script>
 
     <!-- Footer with Version and Copyright -->
     <footer style="position: fixed; bottom: 0; left: 0; right: 0; background: #1e1e1e; padding: 12px 0; text-align: center; border-top: 1px solid #333; z-index: 100;">
         <div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;">
-            <span style="color: #999; font-size: 0.875rem;">
-                <strong>v5.0.3</strong> | Powered by Microsoft Azure AI Foundry
+            <span id="footerVersion" style="color: #999; font-size: 0.875rem;">
+                <strong id="footerVersionText">v7.3.0</strong> | Powered by Microsoft Azure AI Foundry
             </span>
             <span style="color: #999; font-size: 0.875rem;">
                 © 2025 <a href="https://github.com/kapodeistria" target="_blank" style="color: #0078d4; text-decoration: none; font-weight: 600;">Christos Kapodistrias</a>
             </span>
             <a href="https://github.com/kapodeistria/agentic-waf" target="_blank" style="display: flex; align-items: center; gap: 6px; color: #999; text-decoration: none; font-size: 0.875rem; transition: color 0.2s;">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.20 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
                 </svg>
                 View on GitHub
             </a>

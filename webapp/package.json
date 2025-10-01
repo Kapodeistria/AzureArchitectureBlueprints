@@ -1,6 +1,6 @@
 {
   "name": "agentic-waf-webapp",
-  "version": "7.1.6",
+  "version": "7.1.7",
   "description": "Web interface for Agentic Well-Architected Framework",
   "author": "Christos Kapodistrias",
   "repository": {

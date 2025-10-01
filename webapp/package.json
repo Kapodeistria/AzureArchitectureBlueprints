@@ -1,10 +1,16 @@
 {
   "name": "agentic-waf-webapp",
-  "version": "1.0.0",
+  "version": "7.1.4",
   "description": "Web interface for Agentic Well-Architected Framework",
+  "author": "Christos Kapodistrias",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kapodeistria"
+  },
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
+    "start-durable": "node src/server-durable.js",
     "dev": "nodemon src/server.js",
     "build": "echo 'No build step required'",
     "test": "echo 'Tests not implemented yet'"
@@ -17,7 +23,9 @@
     "@azure/service-bus": "^7.9.0",
     "axios": "^1.6.0",
     "body-parser": "^1.20.2",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "compression": "^1.7.4",
+    "helmet": "^7.1.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

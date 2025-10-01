@@ -3,28 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Azure Well-Architected Framework | AI-Powered Case Studies</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☁️</text></svg>">
+    <title>AgenticWAF | Microsoft-grade architecture guidance, automated</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
     <style>
         :root {
-            --azure-blue: #0078D4;
-            --azure-blue-dark: #106EBE;
-            --azure-blue-darker: #005A9E;
-            --azure-blue-light: #50E6FF;
-            --azure-teal: #00BCF2;
-            --success-green: #107C10;
-            --warning-yellow: #FFB900;
-            --error-red: #E81123;
-            --text-primary: #323130;
-            --text-secondary: #605E5C;
-            --text-tertiary: #8A8886;
-            --bg-white: #FFFFFF;
-            --bg-light: #FAF9F8;
-            --bg-lighter: #F3F2F1;
-            --border-color: #EDEBE9;
-            --shadow-sm: 0 0.3px 0.9px rgba(0,0,0,0.1), 0 1.6px 3.6px rgba(0,0,0,0.13);
-            --shadow-md: 0 3.2px 7.2px rgba(0,0,0,0.13), 0 0.6px 1.8px rgba(0,0,0,0.11);
-            --shadow-lg: 0 6.4px 14.4px rgba(0,0,0,0.13), 0 1.2px 3.6px rgba(0,0,0,0.11);
+            /* Dark Theme Colors */
+            --bg-dark: #0a0a0a;
+            --bg-dark-card: rgba(23, 23, 23, 0.5);
+            --bg-dark-hover: rgba(38, 38, 38, 0.8);
+            --border-dark: rgba(255, 255, 255, 0.05);
+            --border-dark-hover: rgba(255, 255, 255, 0.1);
+
+            /* Azure/Indigo Accent */
+            --accent-primary: #6366f1;
+            --accent-primary-hover: #818cf8;
+            --accent-cyan: #06b6d4;
+
+            /* Text Colors */
+            --text-primary: #f5f5f5;
+            --text-secondary: #a3a3a3;
+            --text-tertiary: #737373;
+
+            /* Success/Status */
+            --success-green: #10b981;
+            --error-red: #ef4444;
+            --warning-yellow: #f59e0b;
+
+            /* Shadows - Azure Style */
+            --shadow-sm: 0 0.3px 0.9px rgba(0, 0, 0, 0.1), 0 1.6px 3.6px rgba(0, 0, 0, 0.13);
+            --shadow-md: 0 0.6px 1.8px rgba(0, 0, 0, 0.1), 0 3.2px 7.2px rgba(0, 0, 0, 0.13);
+            --shadow-lg: 0 6.4px 14.4px rgba(0, 0, 0, 0.13), 0 0.6px 1.8px rgba(0, 0, 0, 0.11);
+
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #0078d4 0%, #50e6ff 100%);
+            --gradient-hero: linear-gradient(135deg, rgba(0, 120, 212, 0.05) 0%, rgba(80, 230, 255, 0.05) 100%);
+
+            /* Typography */
+            --text-primary: #1b1b1f;
+            --text-secondary: #605e5c;
+            --text-tertiary: #8a8886;
+
+            /* Spacing - 4px base */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            --space-3xl: 64px;
+
+            /* Border Radius */
+            --radius-sm: 2px;
+            --radius-md: 4px;
+            --radius-lg: 8px;
+            --radius-xl: 12px;
         }
 
         * {
@@ -34,163 +66,276 @@
         }
 
         body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
-            line-height: 1.6;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            background-attachment: fixed;
+            font-family: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            background: var(--bg-shell);
             min-height: 100vh;
             color: var(--text-primary);
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            position: relative;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-hero);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        footer a:hover {
+            color: #40a9ff !important;
         }
 
         .header-bar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            background: #ffffff;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .header-content {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 16px 32px;
+            padding: 0 var(--space-xl);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            height: 50px;
         }
 
         .logo {
-            font-size: 1.25rem;
+            font-size: 15px;
             font-weight: 600;
-            color: var(--azure-blue);
+            color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: var(--space-sm);
         }
 
-        .logo svg {
-            width: 32px;
-            height: 32px;
+        .ms-mark {
+            display: grid;
+            grid-template-columns: repeat(2, 12px);
+            grid-template-rows: repeat(2, 12px);
+            gap: 4px;
         }
+
+        .ms-tile {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .ms-tile.orange { background: #f25022; }
+        .ms-tile.green { background: #7fba00; }
+        .ms-tile.blue { background: #00a4ef; }
+        .ms-tile.yellow { background: #ffb900; }
 
         .nav-links {
             display: flex;
-            gap: 24px;
+            gap: var(--space-lg);
             align-items: center;
         }
 
         .nav-links a {
             color: var(--text-secondary);
             text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: color 0.2s;
+            font-size: 13px;
+            font-weight: 400;
+            transition: color 0.15s ease;
+            padding: var(--space-sm) var(--space-md);
         }
 
         .nav-links a:hover {
-            color: var(--azure-blue);
+            color: var(--ms-blue-800);
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 64px 32px;
+            padding: var(--space-3xl) var(--space-xl) var(--space-3xl);
         }
 
         .hero {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
-            backdrop-filter: blur(20px);
-            border-radius: 16px;
-            padding: 80px 64px;
-            margin-bottom: 48px;
-            box-shadow: var(--shadow-lg);
-            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: var(--space-3xl);
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-3xl) var(--space-2xl);
+            margin-bottom: var(--space-3xl);
+            box-shadow: var(--shadow-md);
             overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-radius: 50% 0 0 50%;
-            transform: translateX(20%);
+            border: 1px solid var(--border-color);
+            position: relative;
         }
 
         .hero-content {
             position: relative;
             z-index: 1;
-            max-width: 700px;
+            max-width: 720px;
         }
 
         .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--azure-blue) 0%, var(--azure-teal) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 24px;
-            line-height: 1.1;
+            font-size: 46px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+            line-height: 1.2;
+            letter-spacing: -0.02em;
         }
 
         .hero p {
-            font-size: 1.25rem;
+            font-size: 18px;
             color: var(--text-secondary);
-            line-height: 1.7;
-            margin-bottom: 32px;
+            line-height: 1.6;
+            margin-bottom: var(--space-xl);
+        }
+
+        .waf-pillars {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .pillar-card {
+            background: var(--bg-white);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px 12px;
+            text-align: center;
+            transition: all 0.2s ease;
+            cursor: default;
+        }
+
+        .pillar-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .pillar-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .pillar-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
         .hero-badges {
             display: flex;
             gap: 16px;
             flex-wrap: wrap;
+            margin-top: 28px;
         }
 
         .badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: var(--bg-white);
-            border-radius: 24px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--text-primary);
-            box-shadow: var(--shadow-sm);
+            gap: var(--space-sm);
+            padding: 6px 12px;
+            background: var(--bg-light);
+            border-radius: 2px;
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
         }
 
-        .badge svg {
-            width: 16px;
-            height: 16px;
+        .hero-actions {
+            margin-top: 28px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .cta-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            background: var(--ms-blue-800);
+            color: #fff;
+            font-weight: 600;
+            font-size: 15px;
+            text-decoration: none;
+            transition: background 0.1s ease;
+            border: none;
+        }
+
+        .cta-primary:hover {
+            background: #106ebe;
+        }
+
+        .cta-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--ms-blue-800);
+            color: var(--ms-blue-800);
+            font-weight: 600;
+            font-size: 15px;
+            text-decoration: none;
+            background: transparent;
+            transition: background 0.1s ease;
+        }
+
+        .cta-secondary:hover {
+            background: rgba(0, 120, 212, 0.05);
+        }
+
+        .hero-visual {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .hero-visual img {
+            width: 100%;
+            height: auto;
+            max-width: 540px;
+            object-fit: contain;
         }
 
         .main-content {
             display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 32px;
-            margin-bottom: 48px;
+            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+            gap: 36px;
+            margin-bottom: 56px;
         }
 
         .form-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 16px;
-            padding: 48px;
-            box-shadow: var(--shadow-lg);
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-2xl);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
         }
 
         .form-card h2 {
-            font-size: 1.75rem;
+            font-size: 24px;
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 32px;
+            margin-bottom: var(--space-lg);
         }
 
         .form-group {
@@ -199,10 +344,10 @@
 
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: var(--space-sm);
             font-weight: 600;
             color: var(--text-primary);
-            font-size: 0.875rem;
+            font-size: 14px;
         }
 
         label small {
@@ -212,14 +357,14 @@
 
         textarea {
             width: 100%;
-            padding: 16px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
+            padding: var(--space-sm) 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
             font-family: inherit;
-            font-size: 0.9375rem;
+            font-size: 14px;
             resize: vertical;
-            min-height: 240px;
-            transition: all 0.2s ease;
+            min-height: 200px;
+            transition: all 0.1s ease;
             background: var(--bg-white);
         }
 
@@ -229,8 +374,7 @@
 
         textarea:focus {
             outline: none;
-            border-color: var(--azure-blue);
-            box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+            border-color: var(--ms-blue-800);
         }
 
         .checkbox-group {
@@ -252,7 +396,7 @@
             width: 20px;
             height: 20px;
             cursor: pointer;
-            accent-color: var(--azure-blue);
+            accent-color: var(--ms-blue-800);
         }
 
         .checkbox-group label {
@@ -268,41 +412,41 @@
         }
 
         button {
-            padding: 14px 32px;
-            font-size: 0.9375rem;
+            padding: 10px 20px;
+            font-size: 15px;
             font-weight: 600;
             font-family: inherit;
-            border: 2px solid transparent;
-            border-radius: 8px;
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            transition: all 0.2s ease;
-            min-width: 140px;
+            transition: all 0.1s ease;
+            min-width: 100px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: var(--space-sm);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--azure-blue) 0%, var(--azure-blue-dark) 100%);
+            background: var(--ms-blue-800);
             color: white;
-            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+            border-color: var(--ms-blue-800);
         }
 
         .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 120, 212, 0.4);
+            background: #106ebe;
+            border-color: #106ebe;
         }
 
         .btn-primary:active:not(:disabled) {
-            transform: translateY(0);
+            background: #005a9e;
         }
 
         .btn-primary:disabled {
             background: var(--bg-lighter);
             color: var(--text-tertiary);
             cursor: not-allowed;
-            box-shadow: none;
+            border-color: var(--bg-lighter);
         }
 
         .btn-secondary {
@@ -323,18 +467,18 @@
         }
 
         .info-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 16px;
-            padding: 32px;
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
             box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
         }
 
         .info-card h3 {
-            font-size: 1.25rem;
+            font-size: 20px;
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 16px;
+            margin-bottom: var(--space-md);
         }
 
         .info-card ul {
@@ -342,13 +486,14 @@
         }
 
         .info-card li {
-            padding: 12px 0;
+            padding: 14px 0;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: flex-start;
             gap: 12px;
-            font-size: 0.875rem;
+            font-size: 0.9375rem;
             color: var(--text-secondary);
+            line-height: 1.6;
         }
 
         .info-card li:last-child {
@@ -378,7 +523,7 @@
         .stat-value {
             font-size: 2rem;
             font-weight: 700;
-            color: var(--azure-blue);
+            color: var(--ms-blue-800);
             display: block;
         }
 
@@ -391,13 +536,12 @@
         }
 
         .status-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 16px;
-            padding: 32px;
-            margin-top: 32px;
-            box-shadow: var(--shadow-lg);
-            border-left: 4px solid var(--azure-blue);
+            background: var(--bg-panel);
+            border-radius: 24px;
+            padding: 36px;
+            margin-top: 36px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(15,120,212,0.08);
             display: none;
         }
 
@@ -443,7 +587,7 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--azure-blue) 0%, var(--azure-teal) 100%);
+            background: linear-gradient(110deg, var(--ms-blue-800) 0%, var(--ms-blue-500) 100%);
             width: 0%;
             transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
@@ -474,20 +618,204 @@
             font-weight: 600;
         }
 
+        .command-center {
+            margin-top: 24px;
+            background: var(--bg-panel);
+            border: 1px solid rgba(15,120,212,0.08);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            display: none;
+        }
+
+        .command-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .command-header h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .command-status {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .command-history {
+            max-height: 160px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            background: var(--bg-light);
+            margin-bottom: 12px;
+        }
+
+        .command-entry {
+            padding: 8px 10px;
+            border-radius: 6px;
+            background: rgba(15, 120, 212, 0.08);
+            border: 1px solid rgba(15, 120, 212, 0.15);
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        .command-entry:last-child {
+            margin-bottom: 0;
+        }
+
+        .command-time {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .command-source {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-left: 6px;
+        }
+
+        .command-empty {
+            text-align: center;
+            color: var(--text-tertiary);
+            font-size: 0.85rem;
+        }
+
+        .command-placeholder {
+            padding: 12px;
+            border-radius: 6px;
+            background: rgba(15, 120, 212, 0.05);
+            border: 1px dashed rgba(15, 120, 212, 0.2);
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        details summary .toggle-icon {
+            transition: transform 0.2s ease;
+        }
+
+        details[open] summary .toggle-icon {
+            transform: rotate(0deg);
+        }
+
+        details:not([open]) summary .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .command-input {
+            display: flex;
+            gap: 12px;
+        }
+
+        .command-input input {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .command-input input:focus {
+            border-color: var(--ms-blue-800);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(15, 120, 212, 0.18);
+        }
+
+        .command-input button {
+            padding: 10px 18px;
+            background: var(--ms-blue-800);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .command-input button:disabled {
+            background: var(--text-tertiary);
+            cursor: not-allowed;
+        }
+
+        .command-input button:not(:disabled):hover {
+            background: var(--ms-blue-700);
+        }
+
+        .telemetry-feed {
+            margin-top: 18px;
+            border: 1px solid rgba(12, 27, 87, 0.12);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.96);
+            padding: 16px 18px;
+            display: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .telemetry-entry {
+            border-left: 3px solid rgba(15, 120, 212, 0.45);
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            background: rgba(15, 120, 212, 0.08);
+            border-radius: 10px;
+            font-size: 0.85rem;
+        }
+
+        .telemetry-entry:last-child {
+            margin-bottom: 0;
+        }
+
+        .telemetry-header {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--ms-blue-800);
+            margin-bottom: 4px;
+        }
+
+        .telemetry-json {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
         .agent-status {
             padding: 20px;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-            border-radius: 12px;
+            background: linear-gradient(140deg, rgba(15,120,212,0.08) 0%, rgba(67,168,247,0.08) 100%);
+            border-radius: 16px;
             margin-top: 24px;
         }
 
         .results-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 16px;
+            background: var(--bg-panel);
+            border-radius: 24px;
             padding: 48px;
-            margin-top: 32px;
-            box-shadow: var(--shadow-lg);
+            margin-top: 36px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(15,120,212,0.08);
             display: none;
         }
 
@@ -502,19 +830,118 @@
             margin-bottom: 16px;
         }
 
-        .recent-outputs {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 16px;
-            padding: 48px;
+        .result-banner {
+            background: var(--bg-white);
+            border-radius: 18px;
+            padding: 32px;
             box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(12,27,87,0.08);
+        }
+
+        .result-header h3 {
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .result-subtitle {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .result-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin: 28px 0;
+        }
+
+        .result-summary-row {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .result-summary-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: var(--text-tertiary);
+        }
+
+        .result-summary-value {
+            font-weight: 600;
+            color: var(--text-primary);
+            word-break: break-word;
+        }
+
+        .result-section {
+            margin-top: 32px;
+        }
+
+        .result-section h4 {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .result-log-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .result-log-entry {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid rgba(12,27,87,0.06);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .result-log-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-bottom: 6px;
+        }
+
+        .result-log-level {
+            font-weight: 600;
+            color: var(--ms-blue-800);
+        }
+
+        .result-link {
+            color: var(--ms-blue-800);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .result-link:hover {
+            text-decoration: underline;
+        }
+
+        .recent-outputs {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-2xl);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
         }
 
         .recent-outputs h2 {
-            font-size: 1.75rem;
+            font-size: 24px;
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 32px;
+            margin-bottom: var(--space-lg);
         }
 
         .output-grid {
@@ -525,17 +952,16 @@
 
         .output-card {
             background: var(--bg-white);
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            transition: all 0.1s ease;
             cursor: pointer;
         }
 
         .output-card:hover {
-            border-color: var(--azure-blue);
-            box-shadow: var(--shadow-md);
-            transform: translateY(-4px);
+            border-color: var(--ms-blue-800);
+            box-shadow: var(--shadow-sm);
         }
 
         .output-name {
@@ -570,11 +996,12 @@
             }
 
             .hero {
-                padding: 48px 32px;
+                grid-template-columns: 1fr;
+                padding: var(--space-xl);
             }
 
             .hero h1 {
-                font-size: 2.5rem;
+                font-size: 36px;
             }
 
             .nav-links {
@@ -584,19 +1011,66 @@
 
         @media (max-width: 640px) {
             .container {
-                padding: 32px 16px;
+                padding: var(--space-lg) var(--space-md);
             }
 
             .form-card, .info-card, .recent-outputs {
-                padding: 24px;
+                padding: var(--space-md);
+            }
+
+            .hero {
+                padding: var(--space-lg);
+                gap: var(--space-lg);
             }
 
             .hero h1 {
-                font-size: 2rem;
+                font-size: 28px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .waf-pillars {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                gap: 12px;
+            }
+
+            .pillar-card {
+                padding: 12px 8px;
+            }
+
+            .pillar-icon {
+                font-size: 24px;
+            }
+
+            .pillar-name {
+                font-size: 11px;
+            }
+
+            .hero-badges {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .badge {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .cta-primary, .cta-secondary {
+                width: 100%;
+                text-align: center;
             }
 
             .stats-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
             }
 
             .button-group {
@@ -605,6 +1079,31 @@
 
             button {
                 width: 100%;
+            }
+
+            .output-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .files-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .result-summary {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .command-history {
+                max-height: 120px;
+            }
+
+            .header-content {
+                padding: 0 var(--space-md);
+            }
+
+            .logo {
+                font-size: 13px;
             }
         }
 
@@ -628,7 +1127,7 @@
         }
 
         .file-item:hover {
-            border-color: var(--azure-blue);
+            border-color: var(--ms-blue-800);
             background: var(--bg-light);
             transform: translateX(4px);
         }
@@ -658,22 +1157,20 @@
     <div class="header-bar">
         <div class="header-content">
             <div class="logo">
-                <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#0078D4;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#00BCF2;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                    <path d="M48 0L0 24v48l48 24 48-24V24L48 0zm32 62L48 80 16 62V34l32-18 32 18v28z" fill="url(#gradient)"/>
-                </svg>
-                Azure Well-Architected Framework
+                <span class="ms-mark">
+                    <span class="ms-tile orange"></span>
+                    <span class="ms-tile green"></span>
+                    <span class="ms-tile blue"></span>
+                    <span class="ms-tile yellow"></span>
+                </span>
+                <span>Microsoft Azure · Well-Architected</span>
+                <span id="versionBadge" style="display:inline-flex;align-items:center;gap:6px;margin-left:14px;padding:4px 10px;background:var(--bg-light);border-radius:2px;font-size:11px;font-weight:600;color:var(--text-secondary);border:1px solid var(--border-color);">v...</span>
             </div>
             <div class="nav-links">
-                <a href="#features">Features</a>
-                <a href="#how-it-works">How It Works</a>
+                <a href="#features">Solutions</a>
+                <a href="#how-it-works">Capabilities</a>
                 <a href="#outputs">Case Studies</a>
-                <a href="https://learn.microsoft.com/en-us/azure/well-architected/" target="_blank">Docs</a>
+                <a href="https://learn.microsoft.com/en-us/azure/well-architected/" target="_blank">Documentation</a>
             </div>
         </div>
     </div>
@@ -681,29 +1178,41 @@
     <div class="container">
         <div class="hero">
             <div class="hero-content">
-                <h1>AI-Powered Architecture Analysis</h1>
-                <p>Generate comprehensive Azure architecture case studies using AI agents aligned with Microsoft's Well-Architected Framework. Get expert insights on security, reliability, performance, cost optimization, and operational excellence.</p>
-                <div class="hero-badges">
-                    <span class="badge">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                        </svg>
-                        AI-Powered
-                    </span>
-                    <span class="badge">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2v20M2 12h20"/>
-                        </svg>
-                        Multi-Agent System
-                    </span>
-                    <span class="badge">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 6v6l4 2"/>
-                        </svg>
-                        Real-Time Updates
-                    </span>
+                <h1>Design with Microsoft Azure Well-Architected</h1>
+                <p>Bring Microsoft-grade architecture guidance to every proposal. Our Azure AI Foundry agents assess your solution against Well-Architected pillars, surface risks, and produce executive-ready documentation in minutes.</p>
+                <div class="waf-pillars">
+                    <div class="pillar-card">
+                        <span class="pillar-icon">🔒</span>
+                        <span class="pillar-name">Security</span>
+                    </div>
+                    <div class="pillar-card">
+                        <span class="pillar-icon">⚡</span>
+                        <span class="pillar-name">Reliability</span>
+                    </div>
+                    <div class="pillar-card">
+                        <span class="pillar-icon">🚀</span>
+                        <span class="pillar-name">Performance</span>
+                    </div>
+                    <div class="pillar-card">
+                        <span class="pillar-icon">💰</span>
+                        <span class="pillar-name">Cost</span>
+                    </div>
+                    <div class="pillar-card">
+                        <span class="pillar-icon">⚙️</span>
+                        <span class="pillar-name">Operations</span>
+                    </div>
                 </div>
+                <div class="hero-badges">
+                    <span class="badge">Azure AI Foundry Agents</span>
+                    <span class="badge">Microsoft Well-Architected</span>
+                </div>
+                <div class="hero-actions">
+                    <a class="cta-primary" href="#caseStudyForm">Get started</a>
+                    <a class="cta-secondary" href="https://learn.microsoft.com/en-us/azure/well-architected/" target="_blank">Explore guidance</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <img src="well-architected-hub.png" alt="Azure Well-Architected Framework" />
             </div>
         </div>
 
@@ -745,14 +1254,19 @@
             <div class="info-sidebar">
                 <div class="info-card">
                     <h3 id="features">What You Get</h3>
-                    <ul>
-                        <li>Comprehensive architecture analysis</li>
-                        <li>Security & compliance review</li>
-                        <li>Performance optimization recommendations</li>
-                        <li>Cost analysis & savings opportunities</li>
-                        <li>Reliability & disaster recovery planning</li>
-                        <li>Operational excellence guidelines</li>
-                    </ul>
+                    <details open>
+                        <summary style="cursor:pointer;font-weight:600;color:var(--ms-blue-800);margin-bottom:12px;list-style:none;display:flex;align-items:center;gap:8px;">
+                            <span class="toggle-icon">▼</span> Analysis & Reports
+                        </summary>
+                        <ul>
+                            <li>Comprehensive architecture analysis</li>
+                            <li>Security & compliance review</li>
+                            <li>Performance optimization recommendations</li>
+                            <li>Cost analysis & savings opportunities</li>
+                            <li>Reliability & disaster recovery planning</li>
+                            <li>Operational excellence guidelines</li>
+                        </ul>
+                    </details>
                 </div>
 
                 <div class="info-card">
@@ -791,9 +1305,30 @@
             </div>
             <div class="agent-status" id="agentStatus" style="display:none;">
                 <div style="font-weight:600;margin-bottom:12px;color:var(--text-primary);">Agent Status</div>
-                <div id="currentAgent" style="color:var(--azure-blue);font-weight:500;"></div>
+                <div id="currentAgent" style="color:var(--ms-blue-800);font-weight:500;"></div>
                 <div id="completedAgents" style="margin-top:8px;font-size:0.875rem;color:var(--text-secondary);"></div>
             </div>
+            <div class="command-center" id="commandCenter">
+                <div class="command-header">
+                    <h4>Live Feedback Console</h4>
+                    <span class="command-status" id="commandStatus">Waiting for session...</span>
+                </div>
+                <div class="command-history" id="commandHistory">
+                    <div class="command-placeholder">
+                        <span>💭</span>
+                        <span>Waiting for agent activity...</span>
+                    </div>
+                    <div class="command-placeholder" style="animation-delay: 0.3s;">
+                        <span>🤖</span>
+                        <span>Live feedback will appear here</span>
+                    </div>
+                </div>
+                <div class="command-input">
+                    <input type="text" id="commandInput" placeholder="Enter prompts or feedback for the agents" autocomplete="off" />
+                    <button type="button" id="sendCommandBtn" disabled>Send</button>
+                </div>
+            </div>
+            <div class="telemetry-feed" id="telemetryFeed"></div>
             <div id="filesSection" style="display:none;">
                 <h4 style="margin:24px 0 12px 0;font-weight:600;color:var(--text-primary);">Generated Files</h4>
                 <div id="filesList" class="files-grid"></div>
@@ -827,10 +1362,56 @@
         const outputList = document.getElementById('outputList');
         const filesSection = document.getElementById('filesSection');
         const filesList = document.getElementById('filesList');
+        const commandCenter = document.getElementById('commandCenter');
+        const commandHistoryEl = document.getElementById('commandHistory');
+        const commandInput = document.getElementById('commandInput');
+        const sendCommandBtn = document.getElementById('sendCommandBtn');
+        const commandStatus = document.getElementById('commandStatus');
+        const telemetryFeed = document.getElementById('telemetryFeed');
 
         let currentEventSource = null;
+        let activeSessionId = null;
+        const jobFileCache = new Map();
+        const fileRequestCache = new Map();
+        const latestJobPayload = new Map();
 
+        // Fetch and display version
+        fetch('/api/version?t=' + Date.now())
+            .then(res => res.json())
+            .then(data => {
+                const badge = document.getElementById('versionBadge');
+                const footerVersion = document.querySelector('footer strong');
+                if (badge) badge.textContent = 'v' + data.version;
+                if (footerVersion) footerVersion.textContent = 'v' + data.version;
+            })
+            .catch(() => {
+                const badge = document.getElementById('versionBadge');
+                if (badge) badge.textContent = 'v?.?.?';
+            });
+
+        resetCommandConsole();
         loadRecentOutputs();
+
+        const initialSessionId = new URLSearchParams(window.location.search).get('session');
+        if (initialSessionId) {
+            showExistingSession(initialSessionId);
+        }
+
+        sendCommandBtn.addEventListener('click', sendCommand);
+        commandInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendCommand();
+            }
+        });
+
+        commandInput.addEventListener('input', () => {
+            if (!activeSessionId) {
+                sendCommandBtn.disabled = true;
+                return;
+            }
+            sendCommandBtn.disabled = !commandInput.value.trim();
+        });
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -844,6 +1425,7 @@
             resultsSection.classList.remove('active');
             agentStatus.style.display = 'none';
             filesSection.style.display = 'none';
+            submitBtn.classList.remove('ready-for-rerun');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner"></span> Submitting...';
 
@@ -866,6 +1448,8 @@
                 statusMessage.textContent = 'Job submitted! Connecting to real-time updates...';
                 submitBtn.innerHTML = '<span class="spinner"></span> Processing...';
 
+                initCommandConsole(result.sessionId);
+
                 if (currentEventSource) currentEventSource.close();
                 currentEventSource = new EventSource(result.streamUrl);
 
@@ -876,8 +1460,14 @@
                     if (jobData.status === 'completed' || jobData.status === 'failed') {
                         currentEventSource.close();
                         submitBtn.disabled = false;
-                        submitBtn.innerHTML = 'Generate Case Study';
-                        if (jobData.status === 'completed') loadRecentOutputs();
+                        if (jobData.status === 'completed') {
+                            submitBtn.innerHTML = 'Run Another Case Study';
+                            submitBtn.classList.add('ready-for-rerun');
+                            loadRecentOutputs();
+                        } else {
+                            submitBtn.innerHTML = 'Try Again';
+                            submitBtn.classList.add('ready-for-rerun');
+                        }
                     }
                 };
 
@@ -885,6 +1475,9 @@
                     console.error('SSE Error:', error);
                     currentEventSource.close();
                     statusMessage.textContent = 'Connection error. Polling for status...';
+                    if (activeSessionId) {
+                        commandStatus.textContent = 'Connection interrupted, polling for updates...';
+                    }
                     pollJobStatus(result.sessionId);
                 };
 
@@ -896,81 +1489,331 @@
         });
 
         function updateJobStatus(jobData) {
-            progressFill.style.width = jobData.progress + '%';
-            progressText.textContent = jobData.progress + '%';
+            if (jobData.sessionId) {
+                latestJobPayload.set(jobData.sessionId, jobData);
+            }
 
-            const statusMap = {
-                'queued': 'Queued in processing pipeline...',
-                'processing': 'Initializing AI agents...',
-                'running': 'Analyzing architecture...',
-                'completed': 'Analysis complete!',
-                'failed': 'Analysis failed'
-            };
-            statusMessage.textContent = statusMap[jobData.status] || jobData.status;
+            const currentProgress = typeof jobData.progress === 'number'
+                ? jobData.progress
+                : parseInt(progressText.textContent, 10) || 0;
+
+            progressFill.style.width = currentProgress + '%';
+            progressText.textContent = currentProgress + '%';
+
+            const telemetrySnapshots = Array.isArray(jobData.telemetry) ? jobData.telemetry : [];
+            updateTelemetryFeed(telemetrySnapshots);
+
+            const latestLogEntry = [...telemetrySnapshots].find(entry => entry?.raw?.logEntry);
+            const latestLogMessage = latestLogEntry?.raw?.logEntry?.message;
+            const latestLogType = latestLogEntry?.raw?.logEntry?.type;
+
+            const resolvedFiles = resolveFiles(jobData);
+            if (resolvedFiles.length) {
+                jobData.files = resolvedFiles;
+            }
+
+            // Dynamic status messages based on progress
+            let statusMsg = '';
+            if (jobData.status === 'queued') {
+                statusMsg = 'Queued in processing pipeline...';
+            } else if (jobData.status === 'processing') {
+                const completedCount = jobData.completedAgents?.length || 0;
+                const expectedCount = jobData.quickMode ? 3 : 15;
+
+                if (completedCount === 0) {
+                    statusMsg = 'Initializing AI agents...';
+                } else if (jobData.currentAgent) {
+                    statusMsg = `Running agent: ${jobData.currentAgent} (${completedCount}/${expectedCount})`;
+                } else {
+                    statusMsg = `Processing with AI agents (${completedCount}/${expectedCount} completed)`;
+                }
+            } else if (jobData.status === 'running') {
+                statusMsg = 'Analyzing architecture...';
+            } else if (jobData.status === 'completed') {
+                statusMsg = 'Analysis complete!';
+            } else if (jobData.status === 'failed') {
+                statusMsg = 'Analysis failed';
+            } else {
+                statusMsg = jobData.status;
+            }
+
+            if (latestLogMessage) {
+                const badge = latestLogType ? `[${latestLogType.toUpperCase()}] ` : '';
+                statusMessage.textContent = `${statusMsg} • ${badge}${latestLogMessage}`;
+            } else {
+                statusMessage.textContent = statusMsg;
+            }
+
+            if (jobData.sessionId && jobData.sessionId === activeSessionId) {
+                updateCommandConsoleState(jobData);
+            }
+
+            if (Array.isArray(jobData.commands)) {
+                updateCommandHistory(jobData.commands);
+            }
 
             if (jobData.currentAgent || jobData.completedAgents?.length > 0) {
                 agentStatus.style.display = 'block';
                 if (jobData.currentAgent) {
-                    currentAgent.innerHTML = `🤖 <strong>${jobData.currentAgent}</strong>`;
+                    currentAgent.innerHTML = `🤖 <strong>${formatAgentName(jobData.currentAgent)}</strong>`;
+                } else if (jobData.completedAgents?.length > 0) {
+                    currentAgent.innerHTML = `⏳ <strong>Finalizing...</strong>`;
                 }
                 if (jobData.completedAgents?.length > 0) {
-                    completedAgents.innerHTML = `✓ Completed: ${jobData.completedAgents.join(', ')}`;
+                    const formatted = jobData.completedAgents.map(a => `• ${formatAgentName(a)}`).join('<br>');
+                    completedAgents.innerHTML = `✓ Completed agents:<br>${formatted}`;
                 }
-            }
-
-            if (jobData.files?.length > 0) {
-                filesSection.style.display = 'block';
-                filesList.innerHTML = jobData.files.map(file => `
-                    <a href="${file.url}" target="_blank" class="file-item">
-                        <div style="display:flex;align-items:center;">
-                            <span class="file-icon">📄</span>
-                            <span style="font-weight:500;">${file.name}</span>
-                        </div>
-                        <span style="color:var(--azure-blue);font-weight:600;">→</span>
-                    </a>
-                `).join('');
             }
 
             if (jobData.status === 'completed') {
-                statusSection.classList.remove('active');
+                ensureFilesLoaded(jobData)
+                    .then((files) => {
+                        const latest = latestJobPayload.get(jobData.sessionId) || jobData;
+                        const hydrated = { ...latest };
+                        if (Array.isArray(files) && files.length) {
+                            hydrated.files = files;
+                        }
+                        showJobFiles(hydrated);
+                        handleJobCompletion(hydrated);
+                    })
+                    .catch((error) => {
+                        console.error('File hydration failed:', error);
+                        showJobFiles(jobData);
+                        handleJobCompletion(jobData);
+                    });
+                return;
+            }
 
-                const getFileIcon = (fileName) => {
-                    if (fileName.endsWith('.md')) return '📝';
-                    if (fileName.endsWith('.json')) return '📊';
-                    if (fileName.includes('summary')) return '📋';
-                    if (fileName.includes('report')) return '📈';
-                    return '📄';
-                };
+            // Show files if available while processing
+            showJobFiles(jobData);
 
-                const getFileSize = (url) => {
-                    // Estimate based on file type for display
-                    return 'View';
-                };
+            if (jobData.status === 'failed' && jobData.error) {
+                showResult('error', '❌ Analysis Failed', jobData.error);
+            }
+        }
 
-                const filesHtml = jobData.files?.map(f => `
-                    <a href="${f.url}" target="_blank" class="file-item">
+        function formatAgentName(agentId) {
+            // Convert "requirements-analyst" to "Requirements Analyst"
+            return agentId
+                .split('-')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
+        function resolveFiles(jobData) {
+            if (Array.isArray(jobData.files) && jobData.files.length) {
+                console.info('[Artifacts] Resolved', jobData.files.length, 'files from jobData.files');
+                return jobData.files;
+            }
+            if (Array.isArray(jobData.result?.artifactUrls) && jobData.result.artifactUrls.length) {
+                console.info('[Artifacts] Resolved', jobData.result.artifactUrls.length, 'files from jobData.result.artifactUrls');
+                return jobData.result.artifactUrls;
+            }
+            if (Array.isArray(jobData.result?.files) && jobData.result.files.length) {
+                console.info('[Artifacts] Resolved', jobData.result.files.length, 'files from jobData.result.files');
+                return jobData.result.files;
+            }
+            if (jobData.sessionId && jobFileCache.has(jobData.sessionId)) {
+                const cached = jobFileCache.get(jobData.sessionId);
+                console.info('[Artifacts] Resolved', cached.length, 'files from cache for', jobData.sessionId);
+                return cached;
+            }
+            console.warn('[Artifacts] No files resolved for session', jobData.sessionId, '- jobData:', jobData);
+            return [];
+        }
+
+        async function fetchFilesForSession(sessionId) {
+            if (!sessionId) return [];
+            try {
+                const response = await fetch(`/api/case-study/files/${sessionId}`);
+                if (!response.ok) {
+                    const payload = await response.json().catch(() => ({}));
+                    const reason = payload.message || payload.error || `HTTP ${response.status}`;
+                    throw new Error(reason);
+                }
+                const payload = await response.json();
+                const files = Array.isArray(payload.files) ? payload.files : [];
+                console.info('[Artifacts] Retrieved', files.length, 'file(s) for session', sessionId);
+                return files;
+            } catch (error) {
+                console.error(`[Artifacts] Failed to fetch files for session ${sessionId}:`, error);
+                throw error;
+            }
+        }
+
+        function cacheFiles(sessionId, files = []) {
+            if (!sessionId) return files;
+            jobFileCache.set(sessionId, files);
+            const latest = latestJobPayload.get(sessionId);
+            if (latest) {
+                latestJobPayload.set(sessionId, { ...latest, files });
+            }
+            return files;
+        }
+
+        function ensureFilesLoaded(jobData) {
+            const sessionId = jobData.sessionId;
+            if (!sessionId) return Promise.resolve([]);
+
+            const existing = resolveFiles(jobData);
+            if (existing.length > 0) {
+                jobData.files = cacheFiles(sessionId, existing);
+                console.info('[Artifacts] Using cached files for session', sessionId, '-', existing.length, 'file(s)');
+                return Promise.resolve(existing);
+            }
+
+            if (fileRequestCache.has(sessionId)) {
+                return fileRequestCache.get(sessionId);
+            }
+
+            const request = fetchFilesForSession(sessionId)
+                .then(files => {
+                    const cached = cacheFiles(sessionId, files);
+                    jobData.files = cached;
+                    return cached;
+                })
+                .finally(() => {
+                    fileRequestCache.delete(sessionId);
+                });
+
+            fileRequestCache.set(sessionId, request);
+            return request;
+        }
+
+        function showJobFiles(jobData) {
+            const resolvedFiles = resolveFiles(jobData);
+            if (resolvedFiles.length > 0) {
+                filesSection.style.display = 'block';
+                filesList.innerHTML = resolvedFiles.map(file => `
+                    <a href="${file.url}" target="_blank" class="file-item">
+                        <div style="display:flex;align-items:center;">
+                            <span class="file-icon">${getFileIcon(file.name)}</span>
+                            <span style="font-weight:500;">${escapeHtml(file.name || '')}</span>
+                        </div>
+                        <span style="color:var(--ms-blue-800);font-weight:600;">→</span>
+                    </a>
+                `).join('');
+            } else if (jobData.status === 'completed') {
+                filesSection.style.display = 'block';
+                const fallbackFolderUrl = jobData.sessionId
+                    ? `https://agenticwafartifactsthkyg.blob.core.windows.net/final-artifacts/${encodeURIComponent(jobData.sessionId)}/`
+                    : null;
+                const folderMessage = fallbackFolderUrl
+                    ? `<a href="${fallbackFolderUrl}" target="_blank" rel="noopener" class="result-link">Open storage folder</a>`
+                    : 'Check storage configuration.';
+                filesList.innerHTML = `<div class="file-item" style="justify-content:center;color:var(--text-secondary);text-align:center;">
+                    No downloadable files were returned by the API.<br>${folderMessage}
+                </div>`;
+            }
+        }
+
+        function handleJobCompletion(jobData) {
+            statusSection.classList.remove('active');
+            filesSection.style.display = 'none';
+
+            const resolvedFiles = resolveFiles(jobData);
+            const fileCount = resolvedFiles.length;
+
+            const completionTimestamp = (() => {
+                const telemetry = Array.isArray(jobData.telemetry) ? jobData.telemetry : [];
+                const timestamps = telemetry
+                    .map(entry => entry.timestamp || entry.raw?.timestamp)
+                    .filter(Boolean)
+                    .sort((a, b) => new Date(b) - new Date(a));
+                return timestamps.length ? timestamps[0] : new Date().toISOString();
+            })();
+
+            const agentCount = jobData.result?.agentsRun?.length
+                || jobData.completedAgents?.length
+                || 'multiple';
+
+            const sessionLink = jobData.sessionId
+                ? `<a href="?session=${encodeURIComponent(jobData.sessionId)}" class="result-link">${escapeHtml(jobData.sessionId)}</a>`
+                : '—';
+
+            const folderUrl = jobData.sessionId
+                ? `https://agenticwafartifactsthkyg.blob.core.windows.net/final-artifacts/${encodeURIComponent(jobData.sessionId)}/`
+                : null;
+            const folderLabel = jobData.result?.directory || jobData.sessionId || '—';
+            const folderValue = folderUrl
+                ? `<a href="${folderUrl}" target="_blank" rel="noopener" class="result-link">${escapeHtml(folderLabel)}</a>`
+                : escapeHtml(folderLabel);
+
+            const summaryRows = [
+                { label: 'Session ID', value: sessionLink, html: true },
+                { label: 'Result Folder', value: folderValue, html: Boolean(folderUrl) },
+                { label: 'Generated Files', value: String(fileCount) },
+                { label: 'Completed Agents', value: typeof agentCount === 'number' ? `${agentCount}` : agentCount },
+                { label: 'Elapsed Time', value: jobData.elapsed ? formatDuration(jobData.elapsed) : '—' },
+                { label: 'Completed', value: new Date(completionTimestamp).toLocaleString() }
+            ];
+
+            const summaryHtml = summaryRows.map(row => `
+                <div class="result-summary-row">
+                    <span class="result-summary-label">${row.label}</span>
+                    <span class="result-summary-value">${row.html ? row.value : escapeHtml(row.value || '')}</span>
+                </div>
+            `).join('');
+
+            const filesHtml = resolvedFiles.length
+                ? resolvedFiles.map(f => `
+                    <a href="${f.url}" target="_blank" rel="noopener" class="file-item">
                         <div style="display:flex;align-items:center;gap:12px;">
                             <span class="file-icon">${getFileIcon(f.name)}</span>
                             <div style="flex:1;">
-                                <div style="font-weight:600;color:var(--text-primary);">${f.name}</div>
+                                <div style="font-weight:600;color:var(--text-primary);">${escapeHtml(f.name)}</div>
                                 <div style="font-size:0.8125rem;color:var(--text-secondary);margin-top:4px;">
-                                    Generated ${new Date(f.timestamp).toLocaleTimeString()}
+                                    Generated ${new Date(f.timestamp || completionTimestamp).toLocaleTimeString()}
                                 </div>
                             </div>
                         </div>
                         <div style="display:flex;align-items:center;gap:8px;">
-                            <span style="color:var(--azure-blue);font-weight:600;">Open →</span>
+                            <span style="color:var(--ms-blue-800);font-weight:600;">Open →</span>
                         </div>
                     </a>
-                `).join('') || '<p style="color:var(--text-secondary);">No files generated.</p>';
+                `).join('')
+                : '<p style="color:var(--text-secondary);">No files generated.</p>';
 
-                showResult('success', '✅ Case Study Analysis Complete!',
-                    `Successfully analyzed your architecture using ${jobData.result?.agentsRun || 'multiple'} AI agents. ${jobData.files?.length || 0} files generated.`,
-                    { files: filesHtml, summary: jobData.result?.summary });
-            }
+            const recentLogs = (jobData.logs || []).slice(-6).map(log => `
+                <div class="result-log-entry">
+                    <div class="result-log-meta">
+                        <span class="result-log-time">${new Date(log.timestamp || completionTimestamp).toLocaleTimeString()}</span>
+                        <span class="result-log-level">${escapeHtml((log.level || 'INFO').toUpperCase())}</span>
+                        <span class="result-log-elapsed">${typeof log.elapsed === 'number' ? `+${formatDuration(log.elapsed)}` : ''}</span>
+                    </div>
+                    <div>${escapeHtml(log.message || '')}</div>
+                </div>
+            `).join('');
 
-            if (jobData.status === 'failed') {
-                showResult('error', '❌ Generation Failed', jobData.error || 'An error occurred during processing');
+            resultsSection.classList.add('active');
+            resultContent.innerHTML = `
+                <div class="result-banner">
+                    <div class="result-header">
+                        <h3>Case Study Ready</h3>
+                        <p class="result-subtitle">Generated ${fileCount} file${fileCount === 1 ? '' : 's'} with ${agentCount} AI agent${agentCount === 1 ? '' : 's'}.</p>
+                    </div>
+                    <div class="result-summary">
+                        ${summaryHtml}
+                    </div>
+                    <div class="result-section">
+                        <h4>📦 Generated Files</h4>
+                        <div class="files-grid">${filesHtml}</div>
+                    </div>
+                    <div class="result-section">
+                        <h4>🕒 Recent Activity</h4>
+                        <div class="result-log-list">${recentLogs || '<p style="color:var(--text-secondary);">No log entries captured.</p>'}</div>
+                    </div>
+                </div>
+            `;
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Run Another Case Study';
+            submitBtn.classList.add('ready-for-rerun');
+
+            if (jobData.sessionId) {
+                const updatedUrl = new URL(window.location.href);
+                updatedUrl.searchParams.set('session', jobData.sessionId);
+                history.replaceState({}, '', updatedUrl);
             }
         }
 
@@ -996,6 +1839,67 @@
             `;
         }
 
+        function getFileIcon(fileName = '') {
+            const lower = fileName.toLowerCase();
+            if (lower.endsWith('.md')) return '📝';
+            if (lower.endsWith('.json')) return '📊';
+            if (lower.endsWith('.txt')) return '📄';
+            if (lower.includes('summary')) return '📋';
+            if (lower.includes('report')) return '📈';
+            return '📦';
+        }
+
+        function formatDuration(durationMs = 0) {
+            if (!Number.isFinite(durationMs) || durationMs <= 0) return '—';
+            const totalSeconds = Math.round(durationMs / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            if (minutes > 0) {
+                return `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
+            }
+            return `${seconds}s`;
+        }
+
+        async function showExistingSession(sessionId) {
+            if (!sessionId) return;
+            resetCommandConsole();
+            statusSection.classList.add('active');
+            agentStatus.style.display = 'none';
+            filesSection.style.display = 'none';
+            statusMessage.textContent = `Loading session ${sessionId}...`;
+
+            const previousText = submitBtn.innerHTML;
+            const previousDisabled = submitBtn.disabled;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Loading...';
+
+            try {
+                const response = await fetch(`/api/case-study/status/${sessionId}`);
+                if (!response.ok) {
+                    throw new Error('Session not found or still processing.');
+                }
+
+                const jobData = await response.json();
+                latestJobPayload.set(sessionId, jobData);
+
+                await ensureFilesLoaded(jobData);
+
+                if (jobData.status !== 'completed') {
+                    showResult('warning', 'Session Not Complete', 'This session has not finished processing yet. Start a new case study to generate fresh results.');
+                } else {
+                    handleJobCompletion(jobData);
+                }
+            } catch (error) {
+                console.error('Failed to load session:', error);
+                showResult('error', 'Unable to Load Session', escapeHtml(error.message || 'Unknown error'));
+            } finally {
+                if (!submitBtn.classList.contains('ready-for-rerun')) {
+                    submitBtn.disabled = previousDisabled;
+                    submitBtn.innerHTML = previousText;
+                }
+            }
+        }
+
         function pollJobStatus(sessionId) {
             const pollInterval = setInterval(async () => {
                 try {
@@ -1006,7 +1910,13 @@
                     if (jobData.status === 'completed' || jobData.status === 'failed') {
                         clearInterval(pollInterval);
                         submitBtn.disabled = false;
-                        submitBtn.innerHTML = 'Generate Case Study';
+                        if (jobData.status === 'completed') {
+                            submitBtn.innerHTML = 'Run Another Case Study';
+                            submitBtn.classList.add('ready-for-rerun');
+                        } else {
+                            submitBtn.innerHTML = 'Try Again';
+                            submitBtn.classList.add('ready-for-rerun');
+                        }
                     }
                 } catch (error) {
                     console.error('Polling error:', error);
@@ -1041,7 +1951,183 @@
             resultsSection.classList.remove('active');
             progressFill.style.width = '0%';
             progressText.textContent = '0%';
+            resetCommandConsole();
+        }
+
+        function initCommandConsole(sessionId) {
+            activeSessionId = sessionId;
+            commandCenter.style.display = 'block';
+            commandInput.disabled = false;
+            commandInput.value = '';
+            sendCommandBtn.disabled = true;
+            commandStatus.textContent = `Live session: ${sessionId}`;
+            updateCommandHistory([]);
+        }
+
+        function resetCommandConsole() {
+            activeSessionId = null;
+            commandCenter.style.display = 'none';
+            commandHistoryEl.innerHTML = `
+                <div class="command-placeholder">
+                    <span>💭</span>
+                    <span>Waiting for agent activity...</span>
+                </div>
+                <div class="command-placeholder" style="animation-delay: 0.3s;">
+                    <span>🤖</span>
+                    <span>Live feedback will appear here</span>
+                </div>
+            `;
+            commandInput.value = '';
+            commandInput.disabled = true;
+            sendCommandBtn.disabled = true;
+            commandStatus.textContent = 'Waiting for session...';
+            telemetryFeed.style.display = 'none';
+            telemetryFeed.innerHTML = '';
+        }
+
+        function updateCommandConsoleState(jobData) {
+            commandCenter.style.display = 'block';
+            if (jobData.status === 'processing') {
+                commandStatus.textContent = 'Live session active';
+                commandInput.disabled = false;
+                sendCommandBtn.disabled = !commandInput.value.trim();
+            } else if (jobData.status === 'completed') {
+                commandStatus.textContent = 'Session completed';
+                commandInput.disabled = true;
+                sendCommandBtn.disabled = true;
+            } else if (jobData.status === 'failed') {
+                commandStatus.textContent = 'Session failed';
+                commandInput.disabled = true;
+                sendCommandBtn.disabled = true;
+            } else {
+                commandStatus.textContent = `Session ${jobData.status}`;
+            }
+        }
+
+        function updateCommandHistory(commands = []) {
+            if (!commands.length) {
+                commandHistoryEl.innerHTML = '<p class="command-empty">No commands yet.</p>';
+                return;
+            }
+
+            commandHistoryEl.innerHTML = commands.map(entry => {
+                const timestamp = formatCommandTime(entry.issuedAt);
+                const source = entry.source ? `<span class="command-source">${escapeHtml(entry.source)}</span>` : '';
+                return `
+                    <div class="command-entry">
+                        <span class="command-time">${timestamp}${source}</span>
+                        <div>${escapeHtml(entry.command || '')}</div>
+                    </div>
+                `;
+            }).join('');
+
+            commandHistoryEl.scrollTop = commandHistoryEl.scrollHeight;
+        }
+
+        function formatCommandTime(value) {
+            if (!value) return 'Just now';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) {
+                return 'Just now';
+            }
+            return date.toLocaleTimeString();
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        async function sendCommand() {
+            if (!activeSessionId) return;
+            const text = commandInput.value.trim();
+            if (!text) return;
+
+            sendCommandBtn.disabled = true;
+            commandStatus.textContent = 'Sending command...';
+
+            try {
+                const response = await fetch('/api/case-study/command', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sessionId: activeSessionId, command: text })
+                });
+
+                const payload = await response.json().catch(() => ({}));
+                if (!response.ok || payload.ok === false) {
+                    throw new Error(payload.error || 'Failed to send command');
+                }
+
+                commandInput.value = '';
+                commandStatus.textContent = payload.message || 'Command sent';
+            } catch (error) {
+                console.error('Command error:', error);
+                commandStatus.textContent = error.message || 'Failed to send command';
+            } finally {
+                const shouldEnable = Boolean(activeSessionId && !commandInput.disabled && commandInput.value.trim());
+                sendCommandBtn.disabled = !shouldEnable;
+            }
+        }
+
+        function updateTelemetryFeed(entries = []) {
+            if (!entries.length) {
+                telemetryFeed.style.display = 'none';
+                telemetryFeed.innerHTML = '';
+                return;
+            }
+
+            telemetryFeed.style.display = 'block';
+            const orderedEntries = [...entries].sort((a, b) => {
+                const tb = new Date(b.timestamp || b.raw?.timestamp || 0).getTime();
+                const ta = new Date(a.timestamp || a.raw?.timestamp || 0).getTime();
+                return tb - ta;
+            });
+
+            telemetryFeed.innerHTML = orderedEntries.map(entry => {
+                const timestamp = formatCommandTime(entry.timestamp || entry.raw?.timestamp);
+                const status = entry.status || 'unknown';
+                const progress = typeof entry.progress === 'number' ? `${entry.progress}%` : 'n/a';
+                const raw = escapeHtml(JSON.stringify(entry.raw ?? entry, null, 2));
+                const displayName = entry.metadata?.displayName || (entry.currentAgent ? formatAgentName(entry.currentAgent) : '');
+                const agent = displayName ? ` • Agent: ${escapeHtml(displayName)}` : '';
+                const logBadge = entry.raw?.logEntry ? `<span style="margin-left:8px;color:#8a8a8a;font-size:0.75rem;">[${escapeHtml(entry.raw.logEntry.type || 'log')}]</span>` : '';
+                const message = entry.message || entry.raw?.message;
+                const logContent = entry.raw?.logEntry ? `<div style="margin-top:6px;color:#4a4a4a;">${escapeHtml(entry.raw.logEntry.message || '')}</div>` : '';
+                const messageContent = message ? `<div style="margin-top:6px;color:#4a4a4a;">${escapeHtml(message)}</div>` : '';
+                return `
+                    <div class="telemetry-entry">
+                        <div class="telemetry-header">⏱️ ${timestamp} • Status: ${escapeHtml(status)} • Progress: ${progress}${agent}${logBadge}</div>
+                        ${messageContent || logContent}
+                        <pre class="telemetry-json">${raw}</pre>
+                    </div>
+                `;
+            }).join('');
+
+            telemetryFeed.scrollTop = telemetryFeed.scrollHeight;
         }
     </script>
+
+    <!-- Footer with Version and Copyright -->
+    <footer style="position: fixed; bottom: 0; left: 0; right: 0; background: #1e1e1e; padding: 12px 0; text-align: center; border-top: 1px solid #333; z-index: 100;">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <span style="color: #999; font-size: 0.875rem;">
+                <strong>v5.0.3</strong> | Powered by Microsoft Azure AI Foundry
+            </span>
+            <span style="color: #999; font-size: 0.875rem;">
+                © 2025 <a href="https://github.com/kapodeistria" target="_blank" style="color: #0078d4; text-decoration: none; font-weight: 600;">Christos Kapodistrias</a>
+            </span>
+            <a href="https://github.com/kapodeistria/agentic-waf" target="_blank" style="display: flex; align-items: center; gap: 6px; color: #999; text-decoration: none; font-size: 0.875rem; transition: color 0.2s;">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+                View on GitHub
+            </a>
+        </div>
+    </footer>
+
 </body>
 </html>

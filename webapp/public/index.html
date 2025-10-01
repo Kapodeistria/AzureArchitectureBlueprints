@@ -1319,6 +1319,9 @@
                         <button type="submit" class="btn-primary" id="submitBtn">
                             Generate Case Study
                         </button>
+                        <button type="button" class="btn-secondary" onclick="loadDemoExample()">
+                            ⚡ Try Example
+                        </button>
                         <button type="button" class="btn-secondary" onclick="resetForm()">
                             Reset
                         </button>
@@ -1998,6 +2001,145 @@
                     clearInterval(pollInterval);
                 }
             }, 2000);
+        }
+
+        // Demo Example - UBS RED Platform (cached, no API calls)
+        function loadDemoExample() {
+            const demoInput = `UBS RED AI Platform for Swiss Wealth Management
+
+UBS, Switzerland's largest bank ($5T AUM), deployed Azure-based AI assistant "UBS Red" for 30,000 employees across wealth management divisions. Platform digitizes 60,000+ investment documents while maintaining 100% Swiss data residency (FINMA, nFADP compliant).
+
+Architecture:
+- Azure OpenAI Service (GPT-4) in Swiss data centers (Zürich North, Geneva West)
+- Azure AI Search for multi-language document indexing (German, French, Italian, English)
+- Provisioned Throughput Units (PTUs) ensuring sub-second response times
+- Azure Kubernetes Service for orchestration
+- Azure SQL Database with Swiss residency
+- Azure Key Vault for secrets management
+- Confidential Computing for sensitive operations
+
+Key Requirements:
+- 100% Swiss data sovereignty (no data leaves Switzerland)
+- Multi-language support for Swiss market
+- Scale from pilot to 30,000 users in 10 months
+- Sub-second query response times
+- Integration with legacy banking systems
+- 70% reduction in client meeting preparation time
+
+Success Metrics Achieved:
+- 30,000 employees actively using platform
+- 60,000+ documents digitized and searchable
+- Zero data residency violations
+- Consistent performance with Azure PTUs
+- Sparked enterprise-wide data modernization`;
+
+            document.getElementById('caseStudyInput').value = demoInput;
+            document.getElementById('quickMode').checked = true;
+
+            // Simulate demo execution
+            runDemoSimulation();
+        }
+
+        function runDemoSimulation() {
+            statusSection.classList.add('active');
+            resultsSection.classList.remove('active');
+            agentStatus.style.display = 'none';
+            filesSection.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Running Demo...';
+
+            const demoFiles = [
+                { name: 'architecture-overview.md', icon: '📝', size: '12.5 KB' },
+                { name: 'waf-security-analysis.md', icon: '🔒', size: '18.2 KB' },
+                { name: 'reliability-assessment.md', icon: '⚡', size: '15.8 KB' },
+                { name: 'performance-optimization.md', icon: '🚀', size: '14.3 KB' },
+                { name: 'cost-analysis.md', icon: '💰', size: '11.7 KB' },
+                { name: 'operational-excellence.md', icon: '⚙️', size: '13.4 KB' },
+                { name: 'executive-summary.md', icon: '📋', size: '8.9 KB' }
+            ];
+
+            const agents = [
+                'Architecture Analyzer',
+                'Security Specialist',
+                'Reliability Engineer',
+                'Performance Optimizer',
+                'Cost Analyst',
+                'Operations Expert',
+                'Report Generator'
+            ];
+
+            let progress = 0;
+            let agentIndex = 0;
+            const interval = setInterval(() => {
+                progress += 15;
+                if (progress > 100) progress = 100;
+
+                progressFill.style.width = progress + '%';
+                progressText.textContent = progress + '%';
+
+                if (agentIndex < agents.length) {
+                    agentStatus.style.display = 'block';
+                    currentAgent.innerHTML = `🤖 <strong>${agents[agentIndex]}</strong>`;
+                    if (agentIndex > 0) {
+                        completedAgents.innerHTML = `✓ Completed: ${agents.slice(0, agentIndex).join(', ')}`;
+                    }
+                    agentIndex++;
+                }
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    showDemoResults(demoFiles);
+                }
+            }, 400);
+        }
+
+        function showDemoResults(files) {
+            statusSection.classList.remove('active');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Generate Case Study';
+
+            const filesHtml = files.map(f => `
+                <div class="file-item" style="cursor:default;opacity:0.9;">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <span class="file-icon">${f.icon}</span>
+                        <div style="flex:1;">
+                            <div style="font-weight:600;color:var(--text-primary);">${f.name}</div>
+                            <div style="font-size:0.8125rem;color:var(--text-secondary);margin-top:4px;">
+                                Demo • ${f.size}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="color:var(--text-tertiary);font-size:0.85rem;">Preview</span>
+                    </div>
+                </div>
+            `).join('');
+
+            resultsSection.classList.add('active');
+            resultContent.innerHTML = `
+                <div class="success-banner">
+                    <h3 style="margin-bottom:12px;">✅ Demo: UBS RED Platform Analysis Complete!</h3>
+                    <p style="color:var(--text-primary);margin-bottom:24px;">
+                        Successfully analyzed UBS RED AI Platform using 12 AI agents. 7 comprehensive reports generated.
+                        <br><br>
+                        <strong>Overall WAF Score: 92/100</strong>
+                        <span style="margin-left:16px;color:var(--success-green);">● Security: 95</span>
+                        <span style="margin-left:16px;color:var(--success-green);">● Reliability: 92</span>
+                        <span style="margin-left:16px;color:var(--success-green);">● Performance: 94</span>
+                        <span style="margin-left:16px;color:var(--warning-yellow);">● Cost: 88</span>
+                        <span style="margin-left:16px;color:var(--success-green);">● Operations: 91</span>
+                    </p>
+                    <div style="padding:16px;background:rgba(0,120,212,0.08);border-radius:8px;margin-bottom:24px;">
+                        <strong style="color:var(--brand);">💡 Demo Mode:</strong> This is a pre-generated example showcasing our AI analysis capabilities. To analyze your own architecture, enter your description above and click "Generate Case Study".
+                    </div>
+                    <div style="margin-top:24px;">
+                        <h4 style="font-weight:600;color:var(--text-primary);margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+                            📦 Generated Reports (Demo)
+                        </h4>
+                        <div class="files-grid">${filesHtml}</div>
+                    </div>
+                </div>
+            `;
         }
 
         async function loadRecentOutputs() {

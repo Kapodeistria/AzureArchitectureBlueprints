@@ -7,41 +7,47 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
     <style>
         :root {
-            /* Dark Theme Colors */
-            --bg-dark: #0a0a0a;
-            --bg-dark-card: rgba(23, 23, 23, 0.5);
-            --bg-dark-hover: rgba(38, 38, 38, 0.8);
-            --border-dark: rgba(255, 255, 255, 0.05);
-            --border-dark-hover: rgba(255, 255, 255, 0.1);
+            /* BG-FIX: Azure Light Theme (azure.com style) */
+            --bg: #FFFFFF;
+            --bg-soft: #F5F7FA;
+            --bg-light: #FAFBFC;
+            --bg-lighter: #F9FAFB;
+            --bg-white: #FFFFFF;
+            --bg-shell: #FFFFFF;
 
-            /* Azure/Indigo Accent */
-            --accent-primary: #6366f1;
-            --accent-primary-hover: #818cf8;
-            --accent-cyan: #06b6d4;
+            /* Azure Brand Colors */
+            --ms-blue-800: #0078D4;
+            --ms-blue-700: #106EBE;
+            --ms-blue-600: #2B88D8;
+            --brand: #0078D4;
+            --brand-hover: #106EBE;
 
-            /* Text Colors */
-            --text-primary: #f5f5f5;
-            --text-secondary: #a3a3a3;
-            --text-tertiary: #737373;
+            /* Text Colors (WCAG AA compliant) */
+            --text-primary: #111418;
+            --text-secondary: #475467;
+            --text-tertiary: #6B7280;
+            --fg: #111418;
+            --fg-muted: #475467;
 
-            /* Success/Status */
-            --success-green: #10b981;
-            --error-red: #ef4444;
-            --warning-yellow: #f59e0b;
+            /* Status Colors */
+            --success-green: #107C10;
+            --error-red: #D13438;
+            --warning-yellow: #F59E0B;
+            --success: #107C10;
+            --danger: #D13438;
+            --warning: #8A3FFC;
 
-            /* Shadows - Azure Style */
-            --shadow-sm: 0 0.3px 0.9px rgba(0, 0, 0, 0.1), 0 1.6px 3.6px rgba(0, 0, 0, 0.13);
-            --shadow-md: 0 0.6px 1.8px rgba(0, 0, 0, 0.1), 0 3.2px 7.2px rgba(0, 0, 0, 0.13);
-            --shadow-lg: 0 6.4px 14.4px rgba(0, 0, 0, 0.13), 0 0.6px 1.8px rgba(0, 0, 0, 0.11);
+            /* Borders & Surfaces */
+            --border-color: #E5E7EB;
+            --border: #E5E7EB;
+            --card: #FFFFFF;
+            --console: #0B0E11;
 
-            /* Gradients */
-            --gradient-primary: linear-gradient(135deg, #0078d4 0%, #50e6ff 100%);
-            --gradient-hero: linear-gradient(135deg, rgba(0, 120, 212, 0.05) 0%, rgba(80, 230, 255, 0.05) 100%);
-
-            /* Typography */
-            --text-primary: #1b1b1f;
-            --text-secondary: #605e5c;
-            --text-tertiary: #8a8886;
+            /* Shadows - Azure.com style */
+            --shadow-soft: 0 6px 24px rgba(17, 20, 24, 0.06);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.04), 0 4px 6px rgba(0, 0, 0, 0.05);
 
             /* Spacing - 4px base */
             --space-xs: 4px;
@@ -65,30 +71,78 @@
             box-sizing: border-box;
         }
 
+        html {
+            min-height: 100%;
+            background: var(--bg);
+        }
+
         body {
-            font-family: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
-            font-size: 14px;
-            line-height: 1.5;
-            background: var(--bg-shell);
+            font-family: "Segoe UI", SegoeUI, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            background: var(--bg);
             min-height: 100vh;
-            color: var(--text-primary);
+            color: var(--fg);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
             position: relative;
             overflow-x: hidden;
             padding-bottom: 80px;
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--gradient-hero);
-            z-index: -1;
-            pointer-events: none;
+        /* BG-FIX: Removed dark body::before overlay */
+
+        /* Typography Scale - Azure.com style */
+        h1 {
+            font-size: 44px;
+            line-height: 1.2;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 30px;
+            line-height: 1.25;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 21px;
+            line-height: 1.35;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        p, li {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--fg);
+        }
+
+        .small, .meta {
+            font-size: 13px;
+            color: var(--fg-muted);
+        }
+
+        /* Links - Azure brand */
+        a {
+            color: var(--brand);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        a:hover {
+            color: var(--brand-hover);
+        }
+
+        /* Focus States - WCAG 2.1 AA */
+        :focus-visible {
+            outline: 2px solid var(--brand);
+            outline-offset: 2px;
         }
 
         footer a:hover {
@@ -263,38 +317,54 @@
             flex-wrap: wrap;
         }
 
-        .cta-primary {
+        /* Button Styles - Azure.com */
+        .cta-primary, .button-primary {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 10px 20px;
-            border-radius: var(--radius-sm);
-            background: var(--ms-blue-800);
-            color: #fff;
+            padding: 12px 24px;
+            border-radius: 10px;
+            background: var(--brand);
+            color: #ffffff;
             font-weight: 600;
             font-size: 15px;
             text-decoration: none;
-            transition: background 0.1s ease;
-            border: none;
+            transition: all 0.15s ease;
+            border: 1px solid var(--brand);
+            cursor: pointer;
         }
 
-        .cta-primary:hover {
-            background: #106ebe;
+        .cta-primary:hover, .button-primary:hover {
+            background: var(--brand-hover);
+            border-color: var(--brand-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.2);
         }
 
-        .cta-secondary {
+        .cta-primary:focus-visible, .button-primary:focus-visible {
+            outline: 2px solid var(--brand);
+            outline-offset: 2px;
+        }
+
+        .cta-secondary, .button-secondary {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 10px 20px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--ms-blue-800);
-            color: var(--ms-blue-800);
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            color: var(--fg);
+            background: #fff;
             font-weight: 600;
             font-size: 15px;
             text-decoration: none;
-            background: transparent;
-            transition: background 0.1s ease;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+
+        .cta-secondary:hover, .button-secondary:hover {
+            background: #F9FAFB;
+            border-color: var(--text-tertiary);
         }
 
         .cta-secondary:hover {
@@ -323,12 +393,13 @@
             margin-bottom: 56px;
         }
 
-        .form-card {
-            background: var(--bg-white);
-            border-radius: var(--radius-lg);
+        /* Card Styles - Azure.com */
+        .form-card, .info-card, .card {
+            background: var(--card);
+            border-radius: 12px;
             padding: var(--space-2xl);
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border);
         }
 
         .form-card h2 {
@@ -355,26 +426,33 @@
             color: var(--text-secondary);
         }
 
-        textarea {
+        /* Form Inputs - Azure.com */
+        textarea, input[type="text"], input[type="email"] {
             width: 100%;
-            padding: var(--space-sm) 12px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
             font-family: inherit;
-            font-size: 14px;
+            font-size: 15px;
             resize: vertical;
             min-height: 200px;
-            transition: all 0.1s ease;
-            background: var(--bg-white);
+            transition: all 0.15s ease;
+            background: var(--bg);
+            color: var(--fg);
         }
 
-        textarea:hover {
+        textarea:hover, input[type="text"]:hover, input[type="email"]:hover {
             border-color: var(--text-tertiary);
         }
 
-        textarea:focus {
+        textarea:focus, input[type="text"]:focus, input[type="email"]:focus {
             outline: none;
-            border-color: var(--ms-blue-800);
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.12);
+        }
+
+        input[type="text"], input[type="email"] {
+            min-height: auto;
         }
 
         .checkbox-group {
@@ -412,15 +490,15 @@
         }
 
         button {
-            padding: 10px 20px;
+            padding: 12px 24px;
             font-size: 15px;
             font-weight: 600;
             font-family: inherit;
             border: 1px solid transparent;
-            border-radius: var(--radius-sm);
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.1s ease;
-            min-width: 100px;
+            transition: all 0.15s ease;
+            min-width: 120px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -428,18 +506,20 @@
         }
 
         .btn-primary {
-            background: var(--ms-blue-800);
-            color: white;
-            border-color: var(--ms-blue-800);
+            background: var(--brand);
+            color: #ffffff;
+            border-color: var(--brand);
         }
 
         .btn-primary:hover:not(:disabled) {
-            background: #106ebe;
-            border-color: #106ebe;
+            background: var(--brand-hover);
+            border-color: var(--brand-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.2);
         }
 
         .btn-primary:active:not(:disabled) {
-            background: #005a9e;
+            transform: translateY(0);
         }
 
         .btn-primary:disabled {
@@ -447,16 +527,17 @@
             color: var(--text-tertiary);
             cursor: not-allowed;
             border-color: var(--bg-lighter);
+            opacity: 0.6;
         }
 
         .btn-secondary {
-            background: var(--bg-white);
-            color: var(--text-primary);
-            border-color: var(--border-color);
+            background: #fff;
+            color: var(--fg);
+            border-color: var(--border);
         }
 
         .btn-secondary:hover {
-            background: var(--bg-light);
+            background: #F9FAFB;
             border-color: var(--text-tertiary);
         }
 
@@ -466,13 +547,7 @@
             gap: 24px;
         }
 
-        .info-card {
-            background: var(--bg-white);
-            border-radius: var(--radius-lg);
-            padding: var(--space-xl);
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
-        }
+        /* info-card already defined above with form-card */
 
         .info-card h3 {
             font-size: 20px;

@@ -1,13 +1,15 @@
 name: E2E Tests
 
 on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
-  schedule:
-    # Run tests daily at 2 AM UTC to catch drift/degradation
-    - cron: '0 2 * * *'
+  workflow_dispatch: # Manual trigger only
+  # Disabled until test files are created
+  # push:
+  #   branches: [ main, develop ]
+  # pull_request:
+  #   branches: [ main ]
+  # schedule:
+  #   # Run tests daily at 2 AM UTC to catch drift/degradation
+  #   - cron: '0 2 * * *'
 
 env:
   NODE_VERSION: '18'

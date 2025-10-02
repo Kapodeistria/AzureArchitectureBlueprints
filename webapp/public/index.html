@@ -447,6 +447,12 @@
             border-color: var(--text-tertiary);
         }
 
+        @media (min-width: 768px) {
+            textarea {
+                min-height: 400px;
+            }
+        }
+
         textarea:focus, input[type="text"]:focus, input[type="email"]:focus {
             outline: none;
             border-color: var(--brand);
@@ -1350,7 +1356,7 @@
         }
 
         .file-action-btn {
-            padding: 8px 16px;
+            padding: 16px;
             border-radius: 6px;
             font-size: 0.875rem;
             font-weight: 500;
@@ -1363,6 +1369,7 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            box-sizing: border-box;
         }
 
         .file-action-btn:hover {
@@ -1383,6 +1390,8 @@
         .download-btn {
             color: var(--success-green);
             border-color: var(--success-green);
+            text-align: center;
+            justify-content: center;
         }
 
         .download-btn:hover {
@@ -1559,9 +1568,21 @@
     <!-- xterm.js CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css">
 
-    <!-- React & FilePreview Bundle -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- React (pinned, executes before our bundle because of defer+order) -->
+    <script defer crossorigin src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+    <script defer crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+
+    <!-- Make sure window.React / window.ReactDOM exist before anything tries to use them -->
+    <script>
+      window.__ensureReactReady = new Promise((resolve) => {
+        (function check() {
+          if (window.React && window.ReactDOM) resolve();
+          else setTimeout(check, 50);
+        })();
+      });
+    </script>
+
+    <!-- Your DocViewer bundle (it relies on React globals) -->
     <script defer src="/filepreview.bundle.js"></script>
 </head>
 <body>
@@ -1607,7 +1628,7 @@
 
         <div class="main-content">
             <div class="form-card">
-                <h2 style="font-size:28px;margin-bottom:16px;">Create Case Study</h2>
+                <h2 style="font-size:28px;margin-bottom:16px;">Describe Architecture & Define Services</h2>
                 <form id="caseStudyForm">
                     <div class="form-group">
                         <label for="caseStudyInput" style="font-size:14px;font-weight:500;">
@@ -1617,7 +1638,6 @@
                             id="caseStudyInput"
                             name="caseStudyInput"
                             required
-                            style="min-height:120px;"
                         >UBS RED AI Platform for Swiss Wealth Management
 
 UBS, Switzerland's largest bank ($5T AUM), deployed Azure-based AI assistant "UBS Red" for 30,000 employees across wealth management divisions. Platform digitizes 60,000+ investment documents while maintaining 100% Swiss data residency (FINMA, nFADP compliant).
@@ -1725,13 +1745,6 @@ Success Metrics Achieved:
         <div class="results-section" id="resultsSection">
             <div id="resultContent"></div>
         </div>
-
-        <div class="recent-outputs" id="outputs">
-            <h2>Recent Case Studies</h2>
-            <div class="output-grid" id="outputList">
-                <p style="color: var(--text-secondary);">Loading recent outputs...</p>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -1791,14 +1804,24 @@ Success Metrics Achieved:
                 }
             });
 
+        // Store root instance to prevent multiple createRoot calls
+        let docViewerRoot = null;
+
         // Mount DocViewer component
         function mountDocViewer(files) {
             console.log('[DocViewer] mountDocViewer called with', files?.length, 'files');
             const mount = document.getElementById('docviewer-root');
             console.log('[DocViewer] mount element:', mount);
             console.log('[DocViewer] window.DocViewer:', window.DocViewer);
-            console.log('[DocViewer] window.React:', window.React);
-            console.log('[DocViewer] window.ReactDOM:', window.ReactDOM);
+
+            // Gate rendering until React is actually on window
+            if (!window.React || !window.ReactDOM) {
+                console.warn('[DocViewer] React not ready, delaying mount...');
+                if (window.__ensureReactReady) {
+                    window.__ensureReactReady.then(() => mountDocViewer(files));
+                }
+                return;
+            }
 
             if (!mount) {
                 console.error('[DocViewer] Mount element not found');
@@ -1812,27 +1835,43 @@ Success Metrics Achieved:
                 console.error('[DocViewer] window.DocViewer not available');
                 return;
             }
-            if (!window.React || !window.ReactDOM) {
-                console.error('[DocViewer] React or ReactDOM not available');
-                return;
-            }
 
             mount.style.display = 'block';
-            const normalized = files.map((f, i) => ({
-                id: f.id || f.name || String(i),
-                name: f.name || f.id || `file-${i}`,
-                url: f.url,
-                size: f.size
-            }));
+
+            // Normalize files array - handle both strings and objects
+            const baseUrl = window.__artifactsBaseUrl || '';
+            const normalized = files.map((f, i) => {
+                if (typeof f === 'string') {
+                    // String: synthesize object with url from base folder
+                    return {
+                        id: f,
+                        name: f,
+                        url: baseUrl ? `${baseUrl}${f}` : f,
+                        size: 0
+                    };
+                }
+                // Object: normalize to {id, name, url, size}
+                return {
+                    id: f.id || f.name || String(i),
+                    name: f.name || f.id || `file-${i}`,
+                    url: f.url || (baseUrl && f.name ? `${baseUrl}${f.name}` : ''),
+                    size: f.size || 0
+                };
+            });
             console.log('[DocViewer] Mounting with normalized files:', normalized);
-            ReactDOM.createRoot(mount).render(
+
+            // Create root only once, reuse for subsequent renders
+            if (!docViewerRoot) {
+                docViewerRoot = ReactDOM.createRoot(mount);
+            }
+
+            docViewerRoot.render(
                 React.createElement(window.DocViewer, { files: normalized, initialId: normalized[0].id })
             );
             console.log('[DocViewer] Mounted successfully');
         }
 
         resetCommandConsole();
-        loadRecentOutputs();
 
         const initialSessionId = new URLSearchParams(window.location.search).get('session');
         if (initialSessionId) {
@@ -1905,7 +1944,6 @@ Success Metrics Achieved:
                         if (jobData.status === 'completed') {
                             submitBtn.innerHTML = 'Run Another Case Study';
                             submitBtn.classList.add('ready-for-rerun');
-                            loadRecentOutputs();
                         } else {
                             submitBtn.innerHTML = 'Try Again';
                             submitBtn.classList.add('ready-for-rerun');
@@ -2176,6 +2214,12 @@ Success Metrics Achieved:
             const folderUrl = jobData.sessionId
                 ? `https://agenticwafartifactsthkyg.blob.core.windows.net/final-artifacts/${encodeURIComponent(jobData.sessionId)}/`
                 : null;
+
+            // Store artifacts base URL for DocViewer to use
+            if (folderUrl) {
+                window.__artifactsBaseUrl = folderUrl;
+            }
+
             const folderLabel = jobData.result?.directory || jobData.sessionId || '—';
             const folderValue = folderUrl
                 ? `<a href="${folderUrl}" target="_blank" rel="noopener" class="result-link">${escapeHtml(folderLabel)}</a>`
@@ -2197,8 +2241,12 @@ Success Metrics Achieved:
                 </div>
             `).join('');
 
+            console.log('[handleJobCompletion] resolvedFiles:', resolvedFiles.length, resolvedFiles);
+
             const filesHtml = resolvedFiles.length
-                ? resolvedFiles.map(f => `
+                ? resolvedFiles.map(f => {
+                    console.log('[handleJobCompletion] Mapping file:', f.name);
+                    return `
                     <a href="${f.url}" target="_blank" rel="noopener" class="file-item">
                         <div style="display:flex;align-items:center;gap:12px;">
                             <span class="file-icon">${getFileIcon(f.name)}</span>
@@ -2213,8 +2261,11 @@ Success Metrics Achieved:
                             <span style="color:var(--ms-blue-800);font-weight:600;">Open →</span>
                         </div>
                     </a>
-                `).join('')
+                    `;
+                }).join('')
                 : '<p style="color:var(--text-secondary);">No files generated.</p>';
+
+            console.log('[handleJobCompletion] filesHtml length:', filesHtml.length);
 
             const recentLogs = (jobData.logs || []).slice(-6).map(log => `
                 <div class="result-log-entry">
@@ -2247,6 +2298,16 @@ Success Metrics Achieved:
                     </div>
                 </div>
             `;
+
+            // Trigger file hydration animation
+            setTimeout(() => {
+                const fileItems = resultsSection.querySelectorAll('.file-item');
+                fileItems.forEach((item, index) => {
+                    setTimeout(() => {
+                        item.classList.add('hydrated');
+                    }, index * 50);
+                });
+            }, 100);
 
             submitBtn.disabled = false;
             submitBtn.innerHTML = 'Run Another Case Study';
@@ -2447,7 +2508,12 @@ Success Metrics Achieved:
 
         function showFilePreview(fileIndex) {
             const docviewerRoot = document.getElementById('docviewer-root');
-            if (docviewerRoot && docviewerRoot.style.display !== 'none') {
+            if (docviewerRoot) {
+                // Make sure DocViewer is visible
+                if (docviewerRoot.style.display === 'none') {
+                    docviewerRoot.style.display = 'block';
+                }
+
                 // Scroll to DocViewer
                 docviewerRoot.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
@@ -2459,8 +2525,26 @@ Success Metrics Achieved:
                     }
                 }, 500);
             } else {
+                console.error('[Preview] docviewer-root not found');
+            }
+        }
+
+        async function downloadFile(url, filename) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(blobUrl);
+            } catch (error) {
+                console.error('Download failed:', error);
                 // Fallback: open in new tab
-                window.open(globalDemoFiles[fileIndex].url, '_blank');
+                window.open(url, '_blank');
             }
         }
 
@@ -2511,12 +2595,9 @@ Success Metrics Achieved:
                         </div>
                     </div>
                     <div style="display:flex;align-items:center;gap:8px;">
-                        <button class="file-action-btn preview-btn" onclick="showFilePreview(${globalIndex}); event.stopPropagation();">
-                            👁️ Preview
-                        </button>
-                        <a href="${f.url}" download="${f.name}" class="file-action-btn download-btn" onclick="event.stopPropagation();">
+                        <button class="file-action-btn download-btn" onclick="event.stopPropagation(); downloadFile('${f.url}', '${f.name}');">
                             ⬇️ Download
-                        </a>
+                        </button>
                     </div>
                 </div>
             `;
@@ -2664,10 +2745,18 @@ Success Metrics Achieved:
             }, 100);
 
             // Mount DocViewer after demo completes
+            console.log('[Demo] Calling mountDocViewer with', canonicalFiles.length, 'files');
+            console.log('[Demo] Files:', canonicalFiles.map(f => f.name));
             mountDocViewer(canonicalFiles);
         }
 
         async function loadRecentOutputs() {
+            const outputList = document.getElementById('outputList');
+            if (!outputList) {
+                console.warn('[loadRecentOutputs] #outputList element not found, skipping');
+                return;
+            }
+
             try {
                 const response = await fetch('/api/outputs');
                 const data = await response.json();

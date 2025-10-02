@@ -13,11 +13,15 @@ const externalGlobalPlugin = {
       path: 'react-dom',
       namespace: 'external-global',
     }));
+    build.onResolve({ filter: /^react-dom\/client$/ }, () => ({
+      path: 'react-dom/client',
+      namespace: 'external-global',
+    }));
     build.onLoad({ filter: /.*/, namespace: 'external-global' }, (args) => {
       if (args.path === 'react') {
         return { contents: 'module.exports = window.React', loader: 'js' };
       }
-      if (args.path === 'react-dom') {
+      if (args.path === 'react-dom' || args.path === 'react-dom/client') {
         return { contents: 'module.exports = window.ReactDOM', loader: 'js' };
       }
     });

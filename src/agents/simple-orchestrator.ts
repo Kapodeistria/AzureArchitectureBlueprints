@@ -19,6 +19,27 @@ import { getAgentRegistry, isAgentDeployed } from '../utils/deploy-agents-to-fou
 import { getLocalTimestamp } from '../utils/local-timestamp.js';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { createProgressReporter, AgentProgressReporter } from '../integrations/service-bus-progress.js';
+
+const DEFAULT_AGENT_SEQUENCE = [
+  'research-orchestrator',
+  'research-infrastructure',
+  'research-ai-ml',
+  'research-enterprise',
+  'research-compliance',
+  'research-industry',
+  'research-architecture',
+  'requirements-analyst',
+  'architecture-designer',
+  'architecture-refinement',
+  'visual-architecture',
+  'waf-assessment',
+  'cost-analyst',
+  'risk-assessor',
+  'change-management',
+  'cost-aware-refinement',
+  'documentation-agent'
+];
 
 export class SimpleOrchestrator {
   private client: OpenAI;
@@ -47,21 +68,40 @@ export class SimpleOrchestrator {
   }
 
   async coordinate(caseStudyText: string, caseStudyFolder?: string): Promise<string> {
+    const sessionId = process.env.CASE_STUDY_SESSION_ID || caseStudyFolder || `local-${Date.now()}`;
+    const progressReporter = await createProgressReporter({
+      sessionId,
+      quickMode: false,
+      expectedAgents: DEFAULT_AGENT_SEQUENCE
+    });
+    const workflowMetadata = {
+      caseStudyFolder,
+      source: process.env.CASE_STUDY_SOURCE || 'cli-local'
+    };
+
     try {
       console.log('🚀 Starting WAF-compliant architecture analysis\n');
+
+      await progressReporter.workflowStarted({
+        expectedAgents: DEFAULT_AGENT_SEQUENCE,
+        metadata: workflowMetadata
+      });
 
       // Initialize agent registry
       this.initializeAgentRegistry();
 
       // Initialize agents
       const researchAgent = new ResearchOrchestratorAgent(this.client);
+      researchAgent.setProgressReporter(progressReporter);
       const visualAgent = new VisualArchitectureAgent(this.client);
       const wafOrchestrator = new WellArchitectedOrchestrator(this.client);
 
       // Step 0: Research Intelligence (6 parallel agents)
       console.log('🔍 Research Intelligence');
-      let researchResults = [];
+      let researchResults = [] as any[];
       let researchReport = '';
+      let researchFallback = false;
+      await progressReporter.agentStarted('research-orchestrator', { displayName: 'Research Intelligence', stage: 'research' });
       try {
         const timeoutPromise = new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Research intelligence timeout')), 120000)
@@ -77,15 +117,25 @@ export class SimpleOrchestrator {
         console.log(`   ✓ ${successful}/${researchResults.length} agents completed\n`);
 
       } catch (error) {
-        console.log(`   ⚠ Using fallback (${error.message})\n`);
+        researchFallback = true;
+        const message = error instanceof Error ? error.message : String(error);
+        console.log(`   ⚠ Using fallback (${message})\n`);
+        await progressReporter.agentFailed('research-orchestrator', error, { displayName: 'Research Intelligence', stage: 'research' });
         researchReport = `# Research Intelligence (Fallback)\n\nProceeding with standard analysis workflow.`;
       }
+      await progressReporter.agentCompleted('research-orchestrator', {
+        displayName: 'Research Intelligence',
+        stage: 'research',
+        status: researchFallback ? 'fallback' : 'success'
+      });
 
       await this.saveIntermediateResults('Research Intelligence', researchReport, caseStudyFolder);
 
       // Step 1: Requirements Analysis
       console.log('📋 Requirements Analysis');
       let requirements = '';
+      let requirementsFallback = false;
+      await progressReporter.agentStarted('requirements-analyst', { displayName: 'Requirements Analysis', stage: 'analysis' });
       try {
         requirements = await Promise.race([
           this.analyzeRequirements(caseStudyText, researchReport),
@@ -93,15 +143,24 @@ export class SimpleOrchestrator {
         ]) as string;
         console.log('   ✓ Complete\n');
       } catch (error) {
+        requirementsFallback = true;
         console.log('   ⚠ Using fallback\n');
+        await progressReporter.agentFailed('requirements-analyst', error, { displayName: 'Requirements Analysis', stage: 'analysis' });
         requirements = `# Requirements Analysis (Fallback)\n\n## Functional Requirements\n- Core functionality\n- Authentication\n- Data processing\n\n## Non-Functional Requirements\n- High availability\n- Performance & scalability\n- Security & compliance`;
       }
+      await progressReporter.agentCompleted('requirements-analyst', {
+        displayName: 'Requirements Analysis',
+        stage: 'analysis',
+        status: requirementsFallback ? 'fallback' : 'success'
+      });
 
       await this.saveIntermediateResults('Requirements Analysis', requirements, caseStudyFolder);
 
       // Step 2: Architecture Design
       console.log('🏗️  Architecture Design');
       let architecture = '';
+      let architectureFallback = false;
+      await progressReporter.agentStarted('architecture-designer', { displayName: 'Architecture Design', stage: 'design' });
       try {
         architecture = await Promise.race([
           this.designArchitecture(caseStudyText, requirements, researchReport),
@@ -109,63 +168,113 @@ export class SimpleOrchestrator {
         ]) as string;
         console.log('   ✓ Complete\n');
       } catch (error) {
+        architectureFallback = true;
         console.log('   ⚠ Using fallback\n');
+        await progressReporter.agentFailed('architecture-designer', error, { displayName: 'Architecture Design', stage: 'design' });
         architecture = `# Azure Architecture\n\n## Core Components\n- Azure App Service\n- Azure SQL Database\n- Azure Application Gateway\n- Azure Key Vault\n- Azure Monitor`;
       }
+      await progressReporter.agentCompleted('architecture-designer', {
+        displayName: 'Architecture Design',
+        stage: 'design',
+        status: architectureFallback ? 'fallback' : 'success'
+      });
 
       await this.saveIntermediateResults('Architecture Design', architecture, caseStudyFolder);
 
-      // Step 2.1: Architecture Refinement
-      console.log('🔄 Architecture Optimization');
+      // Step 2.1: Architecture Refinement (OPTIONAL - skip by default)
+      // Can be controlled via environment variables or hardcoded
+      const ENABLE_REFINEMENT = process.env.ENABLE_ARCHITECTURE_REFINEMENT === 'true' || false;
+      const REFINEMENT_ITERATIONS = parseInt(process.env.REFINEMENT_ITERATIONS || '0', 10);
+
       let refinedArchitecture = architecture;
-      try {
-        const refinementOrchestrator = new ArchitectureRefinementOrchestrator(this.client);
+      let refinementFallback = false;
 
-        const refinementTask = {
-          id: 'architecture-optimization',
-          type: 'architecture-refinement' as const,
-          priority: 'high' as const,
-          payload: {
-            caseStudy: caseStudyText,
-            requirements,
-            businessContext: caseStudyText,
-            targetWAFScore: 85,
-            maxIterations: 3,
-            caseStudyFolder
-          }
-        };
+      if (ENABLE_REFINEMENT && REFINEMENT_ITERATIONS > 0) {
+        console.log('🔄 Architecture Optimization');
+        await progressReporter.agentStarted('architecture-refinement', { displayName: 'Architecture Refinement', stage: 'optimization' });
+        try {
+          const refinementOrchestrator = new ArchitectureRefinementOrchestrator(this.client);
 
-        const refinementResult = await refinementOrchestrator.execute(refinementTask);
-        refinedArchitecture = refinementResult.finalArchitecture;
-        architecture = refinedArchitecture;
+          const refinementTask = {
+            id: 'architecture-optimization',
+            type: 'architecture-refinement' as const,
+            priority: 'high' as const,
+            payload: {
+              caseStudy: caseStudyText,
+              requirements,
+              businessContext: caseStudyText,
+              targetWAFScore: 70, // Reduced from 85 to avoid excessive iterations
+              maxIterations: REFINEMENT_ITERATIONS, // Use configurable iterations (0 = skip)
+              caseStudyFolder
+            }
+          };
 
-        console.log(`   ✓ WAF Score: ${refinementResult.finalWAFScore}/100 (${refinementResult.totalIterations} iterations)\n`);
+          // Add timeout to prevent refinement from taking too long (60 seconds max)
+          const refinementResult = await Promise.race([
+            refinementOrchestrator.execute(refinementTask),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Refinement timeout')), 60000))
+          ]) as any;
 
-        await this.saveIntermediateResults('Optimized Architecture', refinedArchitecture, caseStudyFolder);
+          refinedArchitecture = refinementResult.finalArchitecture;
+          architecture = refinedArchitecture;
 
-      } catch (error) {
-        console.log('   ⚠ Using initial design\n');
+          console.log(`   ✓ WAF Score: ${refinementResult.finalWAFScore}/100 (${refinementResult.totalIterations} iterations)\n`);
+
+          await this.saveIntermediateResults('Optimized Architecture', refinedArchitecture, caseStudyFolder);
+        } catch (error) {
+          refinementFallback = true;
+          console.log(`   ⚠ Refinement skipped: ${error.message}\n`);
+          await progressReporter.agentFailed('architecture-refinement', error, {
+            displayName: 'Architecture Refinement',
+            stage: 'optimization'
+          });
+        }
+        await progressReporter.agentCompleted('architecture-refinement', {
+          displayName: 'Architecture Refinement',
+          stage: 'optimization',
+          status: refinementFallback ? 'skipped' : 'success'
+        });
+      } else {
+        console.log('⏭️  Architecture Refinement: SKIPPED (refinement disabled)\n');
+        await progressReporter.agentCompleted('architecture-refinement', {
+          displayName: 'Architecture Refinement',
+          stage: 'optimization',
+          status: 'skipped'
+        });
       }
+
 
       // Step 2.5: Visual Diagrams (increased timeout for diagram generation)
       console.log('🎨 Architecture Diagrams');
       let visualDiagrams = '';
+      let diagramFallback = false;
+      await progressReporter.agentStarted('visual-architecture', { displayName: 'Visual Architecture', stage: 'design' });
       try {
         visualDiagrams = await Promise.race([
           visualAgent.generateDetailedDiagram(architecture, caseStudyText, caseStudyFolder),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 60000)) // 60s for diagrams
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 60000))
         ]) as string;
         console.log('   ✓ Complete (includes ASCII diagrams)\n');
       } catch (error) {
-        console.log(`   ⚠ Using fallback (${error.message})\n`);
-        visualDiagrams = `[Visual diagrams unavailable - timeout or error]\n\n${architecture}`;
+        diagramFallback = true;
+        const message = error instanceof Error ? error.message : String(error);
+        console.log(`   ⚠ Using fallback (${message})\n`);
+        await progressReporter.agentFailed('visual-architecture', error, { displayName: 'Visual Architecture', stage: 'design' });
+        visualDiagrams = `[Visual diagrams unavailable - timeout or error]\\n\\n${architecture}`;
       }
+      await progressReporter.agentCompleted('visual-architecture', {
+        displayName: 'Visual Architecture',
+        stage: 'design',
+        status: diagramFallback ? 'fallback' : 'success'
+      });
 
       await this.saveIntermediateResults('Visual Architecture Diagrams', visualDiagrams, caseStudyFolder);
 
       // Step 4: Well-Architected Framework Assessment
       console.log('🏗️  WAF Assessment');
       let wafAssessment;
+      let wafFallback = false;
+      await progressReporter.agentStarted('waf-assessment', { displayName: 'WAF Assessment', stage: 'assessment' });
       try {
         const wafTask = {
           id: 'waf-assessment',
@@ -187,42 +296,97 @@ export class SimpleOrchestrator {
         console.log(`   ✓ Score: ${wafAssessment.overallScore}/100\n`);
 
       } catch (error) {
+        wafFallback = true;
         console.log('   ⚠ Using fallback\n');
+        await progressReporter.agentFailed('waf-assessment', error, { displayName: 'WAF Assessment', stage: 'assessment' });
         wafAssessment = {
           overallScore: 70.0,
           assessmentSummary: 'Assessment unavailable',
           wafReport: 'WAF assessment in final report'
         };
       }
+      await progressReporter.agentCompleted('waf-assessment', {
+        displayName: 'WAF Assessment',
+        stage: 'assessment',
+        status: wafFallback ? 'fallback' : 'success'
+      });
       await this.saveIntermediateResults('Well-Architected Framework Assessment', wafAssessment.wafReport || wafAssessment.assessmentSummary, caseStudyFolder);
 
       // Step 5: Parallel Analysis with individual timeouts
       console.log('⚡ Cost, Risk & Change Analysis');
-      let costs, risks, changeManagement;
 
+      const runCostAnalysis = async (): Promise<string> => {
+        await progressReporter.agentStarted('cost-analyst', { displayName: 'Cost Analysis', stage: 'analysis' });
+        let fallback = false;
+        try {
+          const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 30000));
+          const result = await Promise.race([this.analyzeCosts(architecture), timeout]);
+          return result as string;
+        } catch (error) {
+          fallback = true;
+          console.log('   ⚠ Cost analysis timeout');
+          await progressReporter.agentFailed('cost-analyst', error, { displayName: 'Cost Analysis', stage: 'analysis' });
+          return '# Cost Analysis\\n\\n*Analysis unavailable - timeout exceeded*';
+        } finally {
+          await progressReporter.agentCompleted('cost-analyst', {
+            displayName: 'Cost Analysis',
+            stage: 'analysis',
+            status: fallback ? 'fallback' : 'success'
+          });
+        }
+      };
+
+      const runRiskAssessment = async (): Promise<string> => {
+        await progressReporter.agentStarted('risk-assessor', { displayName: 'Risk Assessment', stage: 'analysis' });
+        let fallback = false;
+        try {
+          const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 30000));
+          const result = await Promise.race([this.assessRisks(architecture), timeout]);
+          return result as string;
+        } catch (error) {
+          fallback = true;
+          console.log('   ⚠ Risk assessment timeout');
+          await progressReporter.agentFailed('risk-assessor', error, { displayName: 'Risk Assessment', stage: 'analysis' });
+          return '# Risk Assessment\\n\\n*Assessment unavailable - timeout exceeded*';
+        } finally {
+          await progressReporter.agentCompleted('risk-assessor', {
+            displayName: 'Risk Assessment',
+            stage: 'analysis',
+            status: fallback ? 'fallback' : 'success'
+          });
+        }
+      };
+
+      const runChangeStrategy = async (): Promise<string> => {
+        await progressReporter.agentStarted('change-management', { displayName: 'Change Management', stage: 'analysis' });
+        let fallback = false;
+        try {
+          const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 30000));
+          const result = await Promise.race([this.developChangeStrategy(caseStudyText, architecture), timeout]);
+          return result as string;
+        } catch (error) {
+          fallback = true;
+          console.log('   ⚠ Change strategy timeout');
+          await progressReporter.agentFailed('change-management', error, { displayName: 'Change Management', stage: 'analysis' });
+          return '# Change Management\\n\\n*Strategy unavailable - timeout exceeded*';
+        } finally {
+          await progressReporter.agentCompleted('change-management', {
+            displayName: 'Change Management',
+            stage: 'analysis',
+            status: fallback ? 'fallback' : 'success'
+          });
+        }
+      };
+
+      let costs: string;
+      let risks: string;
+      let changeManagement: string;
       try {
-        const timeout = (ms: number) => new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), ms)
-        );
-
         [costs, risks, changeManagement] = await Promise.all([
-          Promise.race([this.analyzeCosts(architecture), timeout(30000)])
-            .catch(err => {
-              console.log('   ⚠ Cost analysis timeout');
-              return '# Cost Analysis\n\n*Analysis unavailable - timeout exceeded*';
-            }),
-          Promise.race([this.assessRisks(architecture), timeout(30000)])
-            .catch(err => {
-              console.log('   ⚠ Risk assessment timeout');
-              return '# Risk Assessment\n\n*Assessment unavailable - timeout exceeded*';
-            }),
-          Promise.race([this.developChangeStrategy(caseStudyText, architecture), timeout(30000)])
-            .catch(err => {
-              console.log('   ⚠ Change strategy timeout');
-              return '# Change Management\n\n*Strategy unavailable - timeout exceeded*';
-            })
-        ]) as [string, string, string];
-
+          runCostAnalysis(),
+          runRiskAssessment(),
+          runChangeStrategy()
+        ]);
         console.log('   ✓ Complete\n');
       } catch (error) {
         console.log('   ✗ Failed\n');
@@ -240,7 +404,8 @@ export class SimpleOrchestrator {
       let finalArchitecture = architecture;
       let finalVisualDiagrams = visualDiagrams;
       let refinementReport = '';
-
+      let costAwareStatus: 'success' | 'fallback' | 'skipped' = 'skipped';
+      await progressReporter.agentStarted('cost-aware-refinement', { displayName: 'Cost-Aware Refinement', stage: 'optimization' });
       try {
         const costAwareOrchestrator = new CostAwareRefinementOrchestrator(this.client);
 
@@ -254,7 +419,6 @@ export class SimpleOrchestrator {
           caseStudyFolder
         );
 
-        // Use refined architecture and diagrams if improvement achieved
         if (refinementResult.totalIterations > 0 &&
             refinementResult.finalSatisfactionScore.overall > 7.0) {
           finalArchitecture = refinementResult.finalArchitecture;
@@ -264,22 +428,33 @@ export class SimpleOrchestrator {
           console.log(`      WAF: ${refinementResult.finalSatisfactionScore.waf.toFixed(1)}/10, Cost: ${refinementResult.finalSatisfactionScore.cost.toFixed(1)}/10, Risk: ${refinementResult.finalSatisfactionScore.risk.toFixed(1)}/10\n`);
 
           refinementReport = `\n## Cost-Aware Refinement Results\n${refinementResult.optimizationSummary}\n\nFinal Satisfaction Score: ${refinementResult.finalSatisfactionScore.overall.toFixed(1)}/10`;
+          costAwareStatus = 'success';
         } else {
           console.log(`   ✓ Initial architecture satisfactory (no refinement needed)\n`);
+          costAwareStatus = 'skipped';
         }
 
       } catch (error) {
-        console.log(`   ⚠ Refinement loop skipped (${error instanceof Error ? error.message : 'error'})\n`);
+        costAwareStatus = 'fallback';
+        const message = error instanceof Error ? error.message : 'error';
+        console.log(`   ⚠ Refinement loop skipped (${message})\n`);
+        await progressReporter.agentFailed('cost-aware-refinement', error, { displayName: 'Cost-Aware Refinement', stage: 'optimization' });
         refinementReport = '\n## Cost-Aware Refinement\n*Refinement loop skipped - using initial architecture*';
       }
+      await progressReporter.agentCompleted('cost-aware-refinement', {
+        displayName: 'Cost-Aware Refinement',
+        stage: 'optimization',
+        status: costAwareStatus
+      });
 
-      // Update architecture and diagrams with refined versions
       architecture = finalArchitecture;
       visualDiagrams = finalVisualDiagrams;
 
       // Step 6: Generate Documentation
       console.log('📝 Documentation');
       let report;
+      let documentationFallback = false;
+      await progressReporter.agentStarted('documentation-agent', { displayName: 'Documentation', stage: 'documentation' });
       try {
         report = await Promise.race([
           this.generateReport(caseStudyText, {
@@ -291,22 +466,38 @@ export class SimpleOrchestrator {
             costs,
             risks,
             changeManagement,
-            refinementReport
+            refinementReport,
+            agentCount: progressReporter.getAgentCount()
           }),
           new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 30000))
         ]);
         console.log('   ✓ Complete\n');
       } catch (error) {
+        documentationFallback = true;
         console.log('   ⚠ Using fallback\n');
+        await progressReporter.agentFailed('documentation-agent', error, { displayName: 'Documentation', stage: 'documentation' });
         report = `# Azure Architecture Analysis\n\n${caseStudyText}\n\n## Requirements\n${requirements}\n\n## Architecture\n${architecture}\n\n${refinementReport}\n\n## Diagrams\n${visualDiagrams}\n\n## Cost\n${costs}\n\n## Risk\n${risks}\n\n## Change\n${changeManagement}`;
       }
+      await progressReporter.agentCompleted('documentation-agent', {
+        displayName: 'Documentation',
+        stage: 'documentation',
+        status: documentationFallback ? 'fallback' : 'success'
+      });
 
       console.log('✅ Analysis complete\n');
+      await progressReporter.workflowCompleted({
+        message: 'Case study analysis completed successfully',
+        directory: caseStudyFolder,
+        agentsRun: progressReporter.getAgentCount()
+      });
       return report;
-      
+
     } catch (error) {
+      await progressReporter.workflowFailed(error);
       console.error('❌ Orchestration failed:', error);
       return `Analysis failed: ${error instanceof Error ? error.message : String(error)}`;
+    } finally {
+      await progressReporter.close();
     }
   }
 
@@ -524,7 +715,7 @@ Create a comprehensive report that includes all visual diagrams, Well-Architecte
         },
         {
           role: 'user',
-          content: `Generate comprehensive interview-ready report with MANDATORY visual diagrams and WAF assessment:\n\nCase Study:\n${caseStudyText}\n\nAnalysis Results:\n${JSON.stringify(analysis, null, 2)}\n\nCRITICAL REQUIREMENTS:\n- MUST include ALL ASCII architecture diagrams from visualDiagrams section\n- MUST include Azure Well-Architected Framework assessment with pillar scores\n- MUST show specific Azure SKUs with monthly costs\n- MUST reference diagrams in technical explanations\n- MUST provide WAF-based recommendations and compliance status\n- MUST provide visual-supported talking points\n\nThe success of this report depends on comprehensive visual integration and Well-Architected Framework compliance demonstration.`
+          content: `Generate comprehensive interview-ready report with MANDATORY visual diagrams and WAF assessment:\n\nCase Study:\n${caseStudyText}\n\nAnalysis Results:\n${JSON.stringify(analysis, null, 2)}\n\nCRITICAL REQUIREMENTS:\n- MUST include ALL ASCII architecture diagrams from visualDiagrams section\n- MUST include Azure Well-Architected Framework assessment with pillar scores\n- MUST show specific Azure SKUs with monthly costs\n- MUST reference diagrams in technical explanations\n- MUST provide WAF-based recommendations and compliance status\n- MUST provide visual-supported talking points\n- In performance section, use EXACTLY ${analysis.agentCount || 15} for "Agents Utilized" count\n\nThe success of this report depends on comprehensive visual integration and Well-Architected Framework compliance demonstration.`
         }
       ],
       max_tokens: 4000,
@@ -574,7 +765,21 @@ Create a comprehensive report that includes all visual diagrams, Well-Architecte
   // Phase 2 Structurizr DSL functionality removed - using ASCII diagrams only
 
   /**
+   * Map step names to canonical frontend filenames
+   * Note: WAF pillar files (reliability, security, performance, operational, cost)
+   * are saved by WellArchitectedOrchestrator
+   */
+  private getCanonicalFilename(step: string): string | null {
+    const mapping: { [key: string]: string } = {
+      'Architecture Design': 'architecture-overview.md',
+      'Documentation': 'executive-summary.md'
+    };
+    return mapping[step] || null;
+  }
+
+  /**
    * Save intermediate results with streaming for large content
+   * Saves both timestamped files (in agent-reports/) and canonical files (root)
    */
   private async saveIntermediateResults(
     step: string,
@@ -584,18 +789,20 @@ Create a comprehensive report that includes all visual diagrams, Well-Architecte
     if (!caseStudyFolder) return;
 
     try {
-      // Create agent-reports subfolder for detailed agent outputs
-      const outputDir = path.join(process.cwd(), 'output', caseStudyFolder, 'agent-reports');
-      await fs.mkdir(outputDir, { recursive: true });
+      const rootOutputDir = path.join(process.cwd(), 'output', caseStudyFolder);
+      const agentReportsDir = path.join(rootOutputDir, 'agent-reports');
+      await fs.mkdir(agentReportsDir, { recursive: true });
 
       const timestamp = getLocalTimestamp();
-      const filename = `${step.toLowerCase().replace(/\s+/g, '-')}-${timestamp.replace(/[:.+]/g, '-').slice(0, 19)}.md`;
-      const filepath = path.join(outputDir, filename);
+      const timestampedFilename = `${step.toLowerCase().replace(/\s+/g, '-')}-${timestamp.replace(/[:.+]/g, '-').slice(0, 19)}.md`;
+      const timestampedFilepath = path.join(agentReportsDir, timestampedFilename);
+
+      const formattedContent = `# ${step}\nGenerated: ${timestamp}\nStatus: Completed\n\n${content}\n\n---\nIntermediate result: ${step}\n`;
 
       // Use streaming for large content (>100KB)
       if (content.length > 100000) {
         const { createWriteStream } = await import('fs');
-        const stream = createWriteStream(filepath, { encoding: 'utf-8' });
+        const stream = createWriteStream(timestampedFilepath, { encoding: 'utf-8' });
 
         stream.write(`# ${step}\nGenerated: ${timestamp}\nStatus: Completed\n\n`);
 
@@ -613,11 +820,19 @@ Create a comprehensive report that includes all visual diagrams, Well-Architecte
           stream.on('error', reject);
         });
       } else {
-        // Regular write for smaller content
-        const formattedContent = `# ${step}\nGenerated: ${timestamp}\nStatus: Completed\n\n${content}\n\n---\nIntermediate result: ${step}\n`;
-        await fs.writeFile(filepath, formattedContent, 'utf-8');
+        // Regular write for smaller content (timestamped version)
+        await fs.writeFile(timestampedFilepath, formattedContent, 'utf-8');
       }
-      console.log(`   📁 Saved: agent-reports/${filename}`);
+      console.log(`   📁 Saved: agent-reports/${timestampedFilename}`);
+
+      // Also save canonical version (without timestamp) in root folder if mapped
+      const canonicalFilename = this.getCanonicalFilename(step);
+      if (canonicalFilename) {
+        const canonicalFilepath = path.join(rootOutputDir, canonicalFilename);
+        await fs.writeFile(canonicalFilepath, formattedContent, 'utf-8');
+        console.log(`   📋 Canonical: ${canonicalFilename}`);
+      }
+
     } catch (error) {
       console.warn(`   ⚠️ Failed to save ${step}: ${error.message}`);
     }

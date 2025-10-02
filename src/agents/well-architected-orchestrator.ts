@@ -427,18 +427,65 @@ ${this.generateImplementationRoadmap(pillarResults).map((phase, index) => `${ind
   private async saveWAFAssessment(assessment: WAFAssessmentResult, caseStudyFolder: string): Promise<void> {
     try {
       const outputDir = path.join(process.cwd(), 'output', caseStudyFolder);
-      await fs.mkdir(outputDir, { recursive: true });
-      
+      const agentReportsDir = path.join(outputDir, 'agent-reports');
+      await fs.mkdir(agentReportsDir, { recursive: true });
+
       const timestamp = getLocalTimestamp();
-      const filename = `well-architected-assessment-${timestamp.slice(0, 19)}.md`;
-      const filepath = path.join(outputDir, filename);
-      
-      await fs.writeFile(filepath, assessment.wafReport, 'utf-8');
-      console.log(`📁 WAF Assessment saved: ${filename}`);
-      
+
+      // Save timestamped comprehensive report in agent-reports
+      const timestampedFilename = `well-architected-assessment-${timestamp.slice(0, 19)}.md`;
+      const timestampedFilepath = path.join(agentReportsDir, timestampedFilename);
+      await fs.writeFile(timestampedFilepath, assessment.wafReport, 'utf-8');
+      console.log(`📁 WAF Assessment saved: agent-reports/${timestampedFilename}`);
+
+      // Save canonical pillar-specific files in root folder
+      const pillarFiles: { [key: string]: string } = {
+        'Reliability': 'reliability-assessment.md',
+        'Security': 'waf-security-analysis.md',
+        'Performance Efficiency': 'performance-optimization.md',
+        'Operational Excellence': 'operational-excellence.md',
+        'Cost Optimization': 'cost-analysis.md'
+      };
+
+      for (const pillarResult of assessment.pillarResults) {
+        const canonicalFilename = pillarFiles[pillarResult.pillarName];
+        if (canonicalFilename) {
+          const pillarReport = this.generatePillarReport(pillarResult, timestamp);
+          const canonicalFilepath = path.join(outputDir, canonicalFilename);
+          await fs.writeFile(canonicalFilepath, pillarReport, 'utf-8');
+          console.log(`📋 Canonical: ${canonicalFilename}`);
+        }
+      }
+
     } catch (error) {
       console.warn(`⚠️ Failed to save WAF assessment:`, error.message);
     }
+  }
+
+  private generatePillarReport(pillar: WAFPillarResult, timestamp: string): string {
+    return `# ${pillar.pillarName} Assessment
+Generated: ${timestamp}
+Score: ${pillar.score.toFixed(1)}/10
+Status: Completed
+
+## Compliance Status
+${pillar.compliance}
+
+## Key Findings
+${pillar.keyFindings.map(finding => `• ${finding}`).join('\n')}
+
+## Recommendations
+${pillar.recommendations.map(rec => `• ${rec}`).join('\n')}
+
+## Azure Services
+${pillar.azureServices.map(service => `• ${service}`).join('\n')}
+
+${pillar.criticalIssues.length > 0 ? `## Critical Issues
+${pillar.criticalIssues.map(issue => `⚠️ ${issue}`).join('\n')}` : ''}
+
+---
+*Assessment conducted using Azure Well-Architected Framework methodology*
+`;
   }
 
   private getWAFFallback(): WAFAssessmentResult {

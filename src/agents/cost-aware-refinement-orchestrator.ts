@@ -154,7 +154,7 @@ export class CostAwareRefinementOrchestrator {
         try {
           currentVisualDiagrams = await Promise.race([
             this.visualAgent.generateDetailedDiagram(currentArchitecture, caseStudyText, caseStudyFolder),
-            new Promise<string>((_, reject) => setTimeout(() => reject(new Error('timeout')), 60000))
+            new Promise<string>((_, reject) => setTimeout(() => reject(new Error('timeout')), 120000))
           ]);
         } catch (error) {
           console.log(`   ⚠ Visual diagram generation timeout, using text representation`);
@@ -189,7 +189,7 @@ export class CostAwareRefinementOrchestrator {
         try {
           currentCostAnalysis = await Promise.race([
             this.analyzeCosts(currentArchitecture),
-            new Promise<string>((_, reject) => setTimeout(() => reject(new Error('timeout')), 30000))
+            new Promise<string>((_, reject) => setTimeout(() => reject(new Error('timeout')), 60000))
           ]);
         } catch (error) {
           console.log(`   ⚠ Cost analysis timeout, using previous analysis`);
@@ -200,7 +200,7 @@ export class CostAwareRefinementOrchestrator {
         try {
           currentRiskAssessment = await Promise.race([
             this.assessRisks(currentArchitecture),
-            new Promise<string>((_, reject) => setTimeout(() => reject(new Error('timeout')), 30000))
+            new Promise<string>((_, reject) => setTimeout(() => reject(new Error('timeout')), 60000))
           ]);
         } catch (error) {
           console.log(`   ⚠ Risk assessment timeout, using previous assessment`);
@@ -454,7 +454,7 @@ Use the same markdown format as the original architecture.
           },
           { role: 'user', content: refinementPrompt }
         ],
-        max_tokens: 3000,
+        max_tokens: 6000,
         temperature: 0.3
       });
 

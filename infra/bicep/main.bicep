@@ -27,6 +27,15 @@ param openAiModelVersion string = '2025-04-14'
 @description('Token capacity for the model deployment (TPM - Tokens Per Minute).')
 param deploymentCapacity int = 240
 
+@description('Container image used for the worker that processes Service Bus jobs.')
+param containerImage string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+
+@description('Existing Azure Container Registry name (leave blank if using public image).')
+param acrName string = ''
+
+@description('Resource group of the Azure Container Registry (defaults to current).')
+param acrResourceGroup string = resourceGroup().name
+
 @description('Use existing Azure OpenAI resource instead of creating new one')
 param useExistingOpenAI bool = true
 
@@ -46,6 +55,9 @@ var workspaceName = '${sanitizedEnv}-mlw'
 var webAppName = '${sanitizedEnv}-webapp'
 var appServicePlanName = '${sanitizedEnv}-asp'
 var serviceBusNamespace = '${sanitizedEnv}-sb-${uniqueString(resourceGroup().id)}'
+var containerEnvironmentName = '${sanitizedEnv}-cae'
+var containerAppName = '${sanitizedEnv}-worker'
+var containerRegistryServer = !empty(acrName) ? '${acrName}.azurecr.io' : ''
 
 module storage 'modules/storage.bicep' = {
   name: 'storage${uniqueString(resourceGroup().id, storagePrefix)}'
@@ -96,17 +108,42 @@ module serviceBus 'modules/servicebus.bicep' = {
   }
 }
 
-// Function App for job processing
-module functionApp 'modules/functionapp.bicep' = {
-  name: 'functionapp${uniqueString(resourceGroup().id, '${sanitizedEnv}-func')}'
+var resolvedOpenAiEndpoint = useExistingOpenAI ? existingOpenAI.properties.endpoint : openAi.outputs.endpoint
+var resolvedOpenAiDeploymentName = useExistingOpenAI ? existingOpenAIDeploymentName : openAi.outputs.deploymentName
+var serviceBusConnectionString = listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', serviceBusNamespace, 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString
+
+// Container App worker for job processing
+module containerApp 'modules/containerapp.bicep' = {
+  name: 'containerapp${uniqueString(resourceGroup().id, containerAppName)}'
   params: {
-    functionAppName: '${sanitizedEnv}-func'
+    environmentName: containerEnvironmentName
+    containerAppName: containerAppName
     location: location
     tags: tags
-    serviceBusConnectionString: listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', serviceBusNamespace, 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString
+    containerImage: containerImage
+    serviceBusConnectionString: serviceBusConnectionString
+    serviceBusNamespace: '${serviceBusNamespace}.servicebus.windows.net'
+    acrServer: containerRegistryServer
+    openAiEndpoint: resolvedOpenAiEndpoint
+    openAiDeploymentName: resolvedOpenAiDeploymentName
     storageAccountName: storage.outputs.storageAccountName
+    mlWorkspaceName: workspace.outputs.workspaceName
   }
   dependsOn: [serviceBus, storage]
+}
+
+resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01' existing = if (!empty(acrName)) {
+  name: acrName
+}
+
+resource containerAcrPullAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(acrName)) {
+  name: guid(containerRegistry.id, containerAppName, 'AcrPull')
+  scope: containerRegistry
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d') // AcrPull
+    principalId: containerApp.outputs.principalId
+    principalType: 'ServicePrincipal'
+  }
 }
 
 // Reference to Service Bus namespace for role assignments
@@ -115,24 +152,24 @@ resource serviceBusNamespaceResource 'Microsoft.ServiceBus/namespaces@2022-10-01
 }
 
 // Role assignments for managed identities
-// Azure Service Bus Data Receiver role for Function App
-resource functionServiceBusDataReceiver 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(serviceBusNamespaceResource.id, '${sanitizedEnv}-func', 'ServiceBusDataReceiver')
+// Azure Service Bus Data Receiver role for Container App
+resource containerServiceBusDataReceiver 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(serviceBusNamespaceResource.id, containerAppName, 'ServiceBusDataReceiver')
   scope: serviceBusNamespaceResource
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0') // Service Bus Data Receiver
-    principalId: functionApp.outputs.principalId
+    principalId: containerApp.outputs.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
-// Azure Service Bus Data Sender role for Function App
-resource functionServiceBusDataSender 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(serviceBusNamespaceResource.id, '${sanitizedEnv}-func', 'ServiceBusDataSender')
+// Azure Service Bus Data Sender role for Container App
+resource containerServiceBusDataSender 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(serviceBusNamespaceResource.id, containerAppName, 'ServiceBusDataSender')
   scope: serviceBusNamespaceResource
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39') // Service Bus Data Sender
-    principalId: functionApp.outputs.principalId
+    principalId: containerApp.outputs.principalId
     principalType: 'ServicePrincipal'
   }
 }
@@ -189,6 +226,10 @@ module webApp 'modules/webapp.bicep' = {
         value: '${serviceBusNamespace}.servicebus.windows.net'
       }
       {
+        name: 'SERVICE_BUS_CONNECTION'
+        value: serviceBusConnectionString
+      }
+      {
         name: 'SERVICE_BUS_JOB_QUEUE'
         value: serviceBus.outputs.jobQueueName
       }
@@ -215,5 +256,6 @@ output webAppName string = webApp.outputs.webAppName
 output serviceBusNamespace string = serviceBus.outputs.namespaceName
 output jobQueueName string = serviceBus.outputs.jobQueueName
 output statusQueueName string = serviceBus.outputs.statusQueueName
-output functionAppName string = functionApp.outputs.functionAppName
-output functionAppUrl string = functionApp.outputs.functionAppUrl
+output containerAppName string = containerApp.outputs.containerAppName
+output containerAppId string = containerApp.outputs.containerAppId
+output containerEnvironmentId string = containerApp.outputs.environmentId

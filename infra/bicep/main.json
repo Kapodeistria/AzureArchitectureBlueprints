@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.37.4.10188",
-      "templateHash": "3524578711677595393"
+      "templateHash": "4306302785491601662"
     }
   },
   "parameters": {
@@ -68,6 +68,13 @@
         "description": "Token capacity for the model deployment (TPM - Tokens Per Minute)."
       }
     },
+    "containerImage": {
+      "type": "string",
+      "defaultValue": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
+      "metadata": {
+        "description": "Container image used for the worker that processes Service Bus jobs."
+      }
+    },
     "useExistingOpenAI": {
       "type": "bool",
       "defaultValue": true,
@@ -104,35 +111,37 @@
     "workspaceName": "[format('{0}-mlw', variables('sanitizedEnv'))]",
     "webAppName": "[format('{0}-webapp', variables('sanitizedEnv'))]",
     "appServicePlanName": "[format('{0}-asp', variables('sanitizedEnv'))]",
-    "serviceBusNamespace": "[format('{0}-sb-{1}', variables('sanitizedEnv'), uniqueString(resourceGroup().id))]"
+    "serviceBusNamespace": "[format('{0}-sb-{1}', variables('sanitizedEnv'), uniqueString(resourceGroup().id))]",
+    "containerEnvironmentName": "[format('{0}-cae', variables('sanitizedEnv'))]",
+    "containerAppName": "[format('{0}-worker', variables('sanitizedEnv'))]"
   },
   "resources": [
     {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
       "scope": "[format('Microsoft.ServiceBus/namespaces/{0}', variables('serviceBusNamespace'))]",
-      "name": "[guid(resourceId('Microsoft.ServiceBus/namespaces', variables('serviceBusNamespace')), format('{0}-func', variables('sanitizedEnv')), 'ServiceBusDataReceiver')]",
+      "name": "[guid(resourceId('Microsoft.ServiceBus/namespaces', variables('serviceBusNamespace')), variables('containerAppName'), 'ServiceBusDataReceiver')]",
       "properties": {
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0')]",
-        "principalId": "[reference(resourceId('Microsoft.Resources/deployments', format('functionapp{0}', uniqueString(resourceGroup().id, format('{0}-func', variables('sanitizedEnv'))))), '2022-09-01').outputs.principalId.value]",
+        "principalId": "[reference(resourceId('Microsoft.Resources/deployments', format('containerapp{0}', uniqueString(resourceGroup().id, variables('containerAppName')))), '2022-09-01').outputs.principalId.value]",
         "principalType": "ServicePrincipal"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', format('functionapp{0}', uniqueString(resourceGroup().id, format('{0}-func', variables('sanitizedEnv')))))]"
+        "[resourceId('Microsoft.Resources/deployments', format('containerapp{0}', uniqueString(resourceGroup().id, variables('containerAppName'))))]"
       ]
     },
     {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
       "scope": "[format('Microsoft.ServiceBus/namespaces/{0}', variables('serviceBusNamespace'))]",
-      "name": "[guid(resourceId('Microsoft.ServiceBus/namespaces', variables('serviceBusNamespace')), format('{0}-func', variables('sanitizedEnv')), 'ServiceBusDataSender')]",
+      "name": "[guid(resourceId('Microsoft.ServiceBus/namespaces', variables('serviceBusNamespace')), variables('containerAppName'), 'ServiceBusDataSender')]",
       "properties": {
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39')]",
-        "principalId": "[reference(resourceId('Microsoft.Resources/deployments', format('functionapp{0}', uniqueString(resourceGroup().id, format('{0}-func', variables('sanitizedEnv'))))), '2022-09-01').outputs.principalId.value]",
+        "principalId": "[reference(resourceId('Microsoft.Resources/deployments', format('containerapp{0}', uniqueString(resourceGroup().id, variables('containerAppName')))), '2022-09-01').outputs.principalId.value]",
         "principalType": "ServicePrincipal"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', format('functionapp{0}', uniqueString(resourceGroup().id, format('{0}-func', variables('sanitizedEnv')))))]"
+        "[resourceId('Microsoft.Resources/deployments', format('containerapp{0}', uniqueString(resourceGroup().id, variables('containerAppName'))))]"
       ]
     },
     {
@@ -822,15 +831,18 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "[format('functionapp{0}', uniqueString(resourceGroup().id, format('{0}-func', variables('sanitizedEnv'))))]",
+      "name": "[format('containerapp{0}', uniqueString(resourceGroup().id, variables('containerAppName')))]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
         },
         "mode": "Incremental",
         "parameters": {
-          "functionAppName": {
-            "value": "[format('{0}-func', variables('sanitizedEnv'))]"
+          "environmentName": {
+            "value": "[variables('containerEnvironmentName')]"
+          },
+          "containerAppName": {
+            "value": "[variables('containerAppName')]"
           },
           "location": {
             "value": "[parameters('location')]"
@@ -838,11 +850,22 @@
           "tags": {
             "value": "[parameters('tags')]"
           },
+          "containerImage": {
+            "value": "[parameters('containerImage')]"
+          },
           "serviceBusConnectionString": {
             "value": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('serviceBusNamespace'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]"
           },
+          "serviceBusNamespace": {
+            "value": "[format('{0}.servicebus.windows.net', variables('serviceBusNamespace'))]"
+          },
+          "openAiEndpoint": "[if(parameters('useExistingOpenAI'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('existingOpenAIResourceGroup')), 'Microsoft.CognitiveServices/accounts', parameters('existingOpenAIAccountName')), '2024-04-01-preview').endpoint), createObject('value', reference(resourceId('Microsoft.Resources/deployments', format('openai{0}', uniqueString(resourceGroup().id, variables('openAiAccountName')))), '2022-09-01').outputs.endpoint.value))]",
+          "openAiDeploymentName": "[if(parameters('useExistingOpenAI'), createObject('value', parameters('existingOpenAIDeploymentName')), createObject('value', reference(resourceId('Microsoft.Resources/deployments', format('openai{0}', uniqueString(resourceGroup().id, variables('openAiAccountName')))), '2022-09-01').outputs.deploymentName.value))]",
           "storageAccountName": {
             "value": "[reference(resourceId('Microsoft.Resources/deployments', format('storage{0}', uniqueString(resourceGroup().id, variables('storagePrefix')))), '2022-09-01').outputs.storageAccountName.value]"
+          },
+          "mlWorkspaceName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('workspace{0}', uniqueString(resourceGroup().id, variables('workspaceName')))), '2022-09-01').outputs.workspaceName.value]"
           }
         },
         "template": {
@@ -852,14 +875,20 @@
             "_generator": {
               "name": "bicep",
               "version": "0.37.4.10188",
-              "templateHash": "16602087760454950584"
+              "templateHash": "13472034856540182410"
             }
           },
           "parameters": {
-            "functionAppName": {
+            "environmentName": {
               "type": "string",
               "metadata": {
-                "description": "Function App name"
+                "description": "Container App Environment name"
+              }
+            },
+            "containerAppName": {
+              "type": "string",
+              "metadata": {
+                "description": "Container App name"
               }
             },
             "location": {
@@ -876,108 +905,213 @@
                 "description": "Tags to apply to resources"
               }
             },
+            "containerImage": {
+              "type": "string",
+              "defaultValue": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
+              "metadata": {
+                "description": "Container image"
+              }
+            },
             "serviceBusConnectionString": {
               "type": "securestring",
               "metadata": {
                 "description": "Service Bus connection string"
               }
             },
+            "openAiEndpoint": {
+              "type": "string",
+              "metadata": {
+                "description": "Azure OpenAI endpoint"
+              }
+            },
+            "openAiDeploymentName": {
+              "type": "string",
+              "metadata": {
+                "description": "Azure OpenAI deployment name"
+              }
+            },
             "storageAccountName": {
               "type": "string",
               "metadata": {
-                "description": "Storage account name for Function App"
+                "description": "Storage account name"
+              }
+            },
+            "mlWorkspaceName": {
+              "type": "string",
+              "metadata": {
+                "description": "ML Workspace name"
+              }
+            },
+            "enableManagedIdentity": {
+              "type": "bool",
+              "defaultValue": true,
+              "metadata": {
+                "description": "Enable Managed Identity"
+              }
+            },
+            "acrServer": {
+              "type": "string",
+              "defaultValue": "",
+              "metadata": {
+                "description": "Azure Container Registry server (optional - leave empty if using public images)"
+              }
+            },
+            "serviceBusNamespace": {
+              "type": "string",
+              "defaultValue": "",
+              "metadata": {
+                "description": "Service Bus namespace (FQDN or name) for the worker to use when authenticating with managed identity."
               }
             }
           },
           "resources": [
             {
-              "type": "Microsoft.Web/serverfarms",
-              "apiVersion": "2022-09-01",
-              "name": "[format('{0}-plan', parameters('functionAppName'))]",
+              "type": "Microsoft.OperationalInsights/workspaces",
+              "apiVersion": "2022-10-01",
+              "name": "[format('{0}-logs', parameters('environmentName'))]",
               "location": "[parameters('location')]",
               "tags": "[parameters('tags')]",
-              "sku": {
-                "name": "Y1",
-                "tier": "Dynamic"
-              },
-              "properties": {}
+              "properties": {
+                "sku": {
+                  "name": "PerGB2018"
+                },
+                "retentionInDays": 30
+              }
             },
             {
-              "type": "Microsoft.Web/sites",
-              "apiVersion": "2022-09-01",
-              "name": "[parameters('functionAppName')]",
+              "type": "Microsoft.App/managedEnvironments",
+              "apiVersion": "2023-05-01",
+              "name": "[parameters('environmentName')]",
               "location": "[parameters('location')]",
               "tags": "[parameters('tags')]",
-              "kind": "functionapp",
-              "identity": {
-                "type": "SystemAssigned"
-              },
               "properties": {
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', format('{0}-plan', parameters('functionAppName')))]",
-                "siteConfig": {
-                  "appSettings": [
+                "appLogsConfiguration": {
+                  "destination": "log-analytics",
+                  "logAnalyticsConfiguration": {
+                    "customerId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-logs', parameters('environmentName'))), '2022-10-01').customerId]",
+                    "sharedKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-logs', parameters('environmentName'))), '2022-10-01').primarySharedKey]"
+                  }
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-logs', parameters('environmentName')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.App/containerApps",
+              "apiVersion": "2023-05-01",
+              "name": "[parameters('containerAppName')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "identity": "[if(parameters('enableManagedIdentity'), createObject('type', 'SystemAssigned'), null())]",
+              "properties": {
+                "managedEnvironmentId": "[resourceId('Microsoft.App/managedEnvironments', parameters('environmentName'))]",
+                "configuration": {
+                  "secrets": [
                     {
-                      "name": "AzureWebJobsStorage",
-                      "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', parameters('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2021-09-01').keys[0].value)]"
-                    },
-                    {
-                      "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                      "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', parameters('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2021-09-01').keys[0].value)]"
-                    },
-                    {
-                      "name": "WEBSITE_CONTENTSHARE",
-                      "value": "[toLower(parameters('functionAppName'))]"
-                    },
-                    {
-                      "name": "FUNCTIONS_EXTENSION_VERSION",
-                      "value": "~4"
-                    },
-                    {
-                      "name": "FUNCTIONS_WORKER_RUNTIME",
-                      "value": "node"
-                    },
-                    {
-                      "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                      "value": "~20"
-                    },
-                    {
-                      "name": "ServiceBusConnection",
+                      "name": "servicebus-connection",
                       "value": "[parameters('serviceBusConnectionString')]"
                     }
                   ],
-                  "ftpsState": "Disabled",
-                  "minTlsVersion": "1.2"
+                  "registries": "[if(not(empty(parameters('acrServer'))), createArray(createObject('server', parameters('acrServer'), 'identity', 'system')), createArray())]",
+                  "activeRevisionsMode": "Single",
+                  "ingress": null
                 },
-                "httpsOnly": true
+                "template": {
+                  "containers": [
+                    {
+                      "name": "agent-worker",
+                      "image": "[parameters('containerImage')]",
+                      "resources": {
+                        "cpu": "[json('2.0')]",
+                        "memory": "4Gi"
+                      },
+                      "env": [
+                        {
+                          "name": "SERVICE_BUS_CONNECTION",
+                          "secretRef": "servicebus-connection"
+                        },
+                        {
+                          "name": "SERVICE_BUS_NAMESPACE",
+                          "value": "[parameters('serviceBusNamespace')]"
+                        },
+                        {
+                          "name": "AZURE_OPENAI_ENDPOINT",
+                          "value": "[parameters('openAiEndpoint')]"
+                        },
+                        {
+                          "name": "AZURE_OPENAI_DEPLOYMENT_NAME",
+                          "value": "[parameters('openAiDeploymentName')]"
+                        },
+                        {
+                          "name": "STORAGE_ACCOUNT_NAME",
+                          "value": "[parameters('storageAccountName')]"
+                        },
+                        {
+                          "name": "AZURE_ML_WORKSPACE_NAME",
+                          "value": "[parameters('mlWorkspaceName')]"
+                        },
+                        {
+                          "name": "NODE_ENV",
+                          "value": "production"
+                        }
+                      ]
+                    }
+                  ],
+                  "scale": {
+                    "minReplicas": 0,
+                    "maxReplicas": 5,
+                    "rules": [
+                      {
+                        "name": "queue-scaling",
+                        "custom": {
+                          "type": "azure-servicebus",
+                          "metadata": {
+                            "queueName": "casestudy-jobs",
+                            "messageCount": "1"
+                          },
+                          "auth": [
+                            {
+                              "secretRef": "servicebus-connection",
+                              "triggerParameter": "connection"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', format('{0}-plan', parameters('functionAppName')))]"
+                "[resourceId('Microsoft.App/managedEnvironments', parameters('environmentName'))]"
               ]
             }
           ],
           "outputs": {
-            "functionAppId": {
+            "containerAppId": {
               "type": "string",
-              "value": "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
+              "value": "[resourceId('Microsoft.App/containerApps', parameters('containerAppName'))]"
             },
-            "functionAppName": {
+            "containerAppName": {
               "type": "string",
-              "value": "[parameters('functionAppName')]"
-            },
-            "functionAppUrl": {
-              "type": "string",
-              "value": "[format('https://{0}', reference(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '2022-09-01').defaultHostName)]"
+              "value": "[parameters('containerAppName')]"
             },
             "principalId": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '2022-09-01', 'full').identity.principalId]"
+              "value": "[if(parameters('enableManagedIdentity'), reference(resourceId('Microsoft.App/containerApps', parameters('containerAppName')), '2023-05-01', 'full').identity.principalId, '')]"
+            },
+            "environmentId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.App/managedEnvironments', parameters('environmentName'))]"
             }
           }
         }
       },
       "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('openai{0}', uniqueString(resourceGroup().id, variables('openAiAccountName'))))]",
         "[resourceId('Microsoft.Resources/deployments', format('servicebus{0}', uniqueString(resourceGroup().id, variables('serviceBusNamespace'))))]",
-        "[resourceId('Microsoft.Resources/deployments', format('storage{0}', uniqueString(resourceGroup().id, variables('storagePrefix'))))]"
+        "[resourceId('Microsoft.Resources/deployments', format('storage{0}', uniqueString(resourceGroup().id, variables('storagePrefix'))))]",
+        "[resourceId('Microsoft.Resources/deployments', format('workspace{0}', uniqueString(resourceGroup().id, variables('workspaceName'))))]"
       ]
     },
     {
@@ -1035,6 +1169,10 @@
               {
                 "name": "SERVICE_BUS_CONNECTION__fullyQualifiedNamespace",
                 "value": "[format('{0}.servicebus.windows.net', variables('serviceBusNamespace'))]"
+              },
+              {
+                "name": "SERVICE_BUS_CONNECTION",
+                "value": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('serviceBusNamespace'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]"
               },
               {
                 "name": "SERVICE_BUS_JOB_QUEUE",
@@ -1241,13 +1379,17 @@
       "type": "string",
       "value": "[reference(resourceId('Microsoft.Resources/deployments', format('servicebus{0}', uniqueString(resourceGroup().id, variables('serviceBusNamespace')))), '2022-09-01').outputs.statusQueueName.value]"
     },
-    "functionAppName": {
+    "containerAppName": {
       "type": "string",
-      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('functionapp{0}', uniqueString(resourceGroup().id, format('{0}-func', variables('sanitizedEnv'))))), '2022-09-01').outputs.functionAppName.value]"
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('containerapp{0}', uniqueString(resourceGroup().id, variables('containerAppName')))), '2022-09-01').outputs.containerAppName.value]"
     },
-    "functionAppUrl": {
+    "containerAppId": {
       "type": "string",
-      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('functionapp{0}', uniqueString(resourceGroup().id, format('{0}-func', variables('sanitizedEnv'))))), '2022-09-01').outputs.functionAppUrl.value]"
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('containerapp{0}', uniqueString(resourceGroup().id, variables('containerAppName')))), '2022-09-01').outputs.containerAppId.value]"
+    },
+    "containerEnvironmentId": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('containerapp{0}', uniqueString(resourceGroup().id, variables('containerAppName')))), '2022-09-01').outputs.environmentId.value]"
     }
   }
 }

@@ -15,6 +15,7 @@ import path from 'path';
 import config from '../config/config.js';
 import { SimpleOrchestrator } from '../agents/simple-orchestrator.js';
 import { outputManager } from './output-manager.js';
+import { getLocalTimestampForFilename } from '../utils/local-timestamp.js';
 
 interface AgentConfig {
   name: string;
@@ -188,7 +189,8 @@ class MultiAgentSystem {
         {
           executionTime,
           agentMetrics
-        }
+        },
+        caseStudyFolder  // Pass the folder to prevent duplicate folder creation
       );
 
       // The output manager now automatically saves quick summaries in case study folders
@@ -206,13 +208,15 @@ class MultiAgentSystem {
       console.error(chalk.red('❌ Error details:'), error.message);
       
       // Still try to save error information
+      const errorFolder = this.generateCaseStudyFolder(caseStudyText);
       await outputManager.saveAnalysis(
         caseStudyText,
         `Analysis failed: ${error instanceof Error ? error.message : String(error)}`,
         {
           executionTime,
           agentMetrics: { error: true }
-        }
+        },
+        errorFolder
       );
       
       throw error;
@@ -303,7 +307,7 @@ class MultiAgentSystem {
   async saveReport(content: string, filename?: string): Promise<string> {
     // This method is kept for backwards compatibility
     // New approach: case studies are automatically saved in structured folders via outputManager.saveAnalysis
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const timestamp = getLocalTimestampForFilename();
     const outputDir = path.join(process.cwd(), 'output');
     
     // Ensure output directory exists
@@ -350,14 +354,14 @@ class MultiAgentSystem {
   }
 
   private generateCaseStudyFolder(caseStudyText: string): string {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const timestamp = getLocalTimestampForFilename();
     const title = this.extractTitle(caseStudyText);
     const sanitizedTitle = title
       .toLowerCase()
       .replace(/[^a-z0-9\s]/g, '')
       .replace(/\s+/g, '-')
       .slice(0, 50);
-    
+
     return `case-study-${timestamp}-${sanitizedTitle}`;
   }
 

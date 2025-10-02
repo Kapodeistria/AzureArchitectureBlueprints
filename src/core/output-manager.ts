@@ -92,9 +92,10 @@ export class OutputManager {
   async saveAnalysis(
     caseStudyText: string,
     analysis: string,
-    metadata: Partial<OutputMetadata> = {}
+    metadata: Partial<OutputMetadata> = {},
+    providedCaseStudyFolder?: string
   ): Promise<string> {
-    const caseStudyFolder = this.generateCaseStudyFolder(caseStudyText);
+    const caseStudyFolder = providedCaseStudyFolder || this.generateCaseStudyFolder(caseStudyText);
     await this.ensureOutputDir(caseStudyFolder);
 
     const workflowId = `workflow-${Date.now()}`;

@@ -1,6 +1,6 @@
 {
   "name": "agentic-well-architected-blueprint",
-  "version": "3.2.4",
+  "version": "7.2.1",
   "description": "AgenticWellArchitectedBlueprint - Microsoft Well-Architected Framework assessment platform with 11 specialized AI agents for comprehensive WAF compliance analysis",
   "main": "index.js",
   "scripts": {
@@ -58,13 +58,15 @@
     "test:ci": "npm run test:smoke && npm run test:critical-path",
     "test:regression": "echo 'Regression tests not yet implemented'",
     "test:integration": "echo 'Integration tests not yet implemented'",
-    "test:report": "echo 'Test reporting not yet implemented'"
+    "test:report": "echo 'Test reporting not yet implemented'",
+    "deploy:cloud": "scripts/deploy/deploy-prod.sh"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@azure/identity": "^4.12.0",
+    "@azure/service-bus": "^7.9.0",
     "@types/node": "^24.5.2",
     "axios": "^1.12.2",
     "chalk": "^5.6.2",

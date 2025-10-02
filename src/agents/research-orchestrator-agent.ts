@@ -5,9 +5,11 @@
 
 import OpenAI from 'openai';
 import config from '../config/config.js';
+import { AgentProgressReporter } from '../integrations/service-bus-progress.js';
 
 interface ResearchTask {
   id: string;
+  progressId: string;
   agentName: string;
   prompt: string;
   timeLimit: number; // in milliseconds
@@ -26,16 +28,22 @@ interface ResearchResult {
 export class ResearchOrchestratorAgent {
   private client: OpenAI;
   private researchAgents: Map<string, ResearchTask>;
+  private progressReporter?: AgentProgressReporter;
 
   constructor(client: OpenAI) {
     this.client = client;
     this.initializeResearchAgents();
   }
 
+  setProgressReporter(reporter?: AgentProgressReporter): void {
+    this.progressReporter = reporter;
+  }
+
   private initializeResearchAgents() {
     this.researchAgents = new Map([
       ['waf-infrastructure-regional', {
         id: 'waf-infra-001',
+        progressId: 'research-infrastructure',
         agentName: 'Infrastructure & Regional WAF Compliance Agent',
         prompt: this.getWAFInfrastructureResearchPrompt(),
         timeLimit: 45000, // 45 seconds
@@ -43,6 +51,7 @@ export class ResearchOrchestratorAgent {
       }],
       ['waf-ai-ml-innovation', {
         id: 'waf-ai-002',
+        progressId: 'research-ai-ml',
         agentName: 'AI/ML Well-Architected Patterns Agent', 
         prompt: this.getWAFAIMLResearchPrompt(),
         timeLimit: 45000, // 45 seconds
@@ -50,6 +59,7 @@ export class ResearchOrchestratorAgent {
       }],
       ['waf-enterprise-cases', {
         id: 'waf-ent-003',
+        progressId: 'research-enterprise',
         agentName: 'Enterprise WAF Case Studies Agent',
         prompt: this.getWAFEnterpriseResearchPrompt(),
         timeLimit: 50000, // 50 seconds
@@ -57,6 +67,7 @@ export class ResearchOrchestratorAgent {
       }],
       ['waf-compliance-sovereignty', {
         id: 'waf-comp-004',
+        progressId: 'research-compliance',
         agentName: 'Compliance & Data Sovereignty WAF Agent',
         prompt: this.getWAFComplianceResearchPrompt(),
         timeLimit: 40000, // 40 seconds
@@ -64,6 +75,7 @@ export class ResearchOrchestratorAgent {
       }],
       ['waf-industry-verticals', {
         id: 'waf-ind-005',
+        progressId: 'research-industry',
         agentName: 'Industry Vertical WAF Solutions Agent',
         prompt: this.getWAFIndustryResearchPrompt(),
         timeLimit: 40000, // 40 seconds
@@ -71,6 +83,7 @@ export class ResearchOrchestratorAgent {
       }],
       ['waf-architecture-migration', {
         id: 'waf-arch-006',
+        progressId: 'research-architecture',
         agentName: 'Architecture & Migration WAF Patterns Agent',
         prompt: this.getWAFArchitectureResearchPrompt(),
         timeLimit: 45000, // 45 seconds
@@ -117,6 +130,14 @@ export class ResearchOrchestratorAgent {
     caseStudyContext?: string
   ): Promise<ResearchResult> {
     const startTime = Date.now();
+    let fallback = false;
+
+    if (this.progressReporter) {
+      await this.progressReporter.agentStarted(task.progressId, {
+        displayName: task.agentName,
+        stage: 'research'
+      });
+    }
     
     try {
       // Create timeout promise
@@ -145,17 +166,36 @@ export class ResearchOrchestratorAgent {
       };
 
     } catch (error) {
+      fallback = true;
       const executionTime = Date.now() - startTime;
-      const isTimeout = error.message === 'Research timeout';
+      const message = error instanceof Error ? error.message : String(error);
+      const isTimeout = message === 'Research timeout';
+      
+      if (this.progressReporter) {
+        await this.progressReporter.agentFailed(task.progressId, error, {
+          displayName: task.agentName,
+          stage: 'research',
+          details: { reason: isTimeout ? 'timeout' : 'error' }
+        });
+      }
       
       return {
         agentName: task.agentName,
-        findings: isTimeout ? 'Research timed out - partial results may be available' : `Research error: ${error.message}`,
+        findings: isTimeout ? 'Research timed out - partial results may be available' : `Research error: ${message}`,
         executionTime,
         status: isTimeout ? 'timeout' : 'error',
         keyInsights: [],
         caseStudies: []
       };
+
+    } finally {
+      if (this.progressReporter) {
+        await this.progressReporter.agentCompleted(task.progressId, {
+          displayName: task.agentName,
+          stage: 'research',
+          status: fallback ? 'fallback' : 'success'
+        });
+      }
     }
   }
 

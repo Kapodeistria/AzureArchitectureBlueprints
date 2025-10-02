@@ -57,10 +57,10 @@ export class ArchitectureRefinementOrchestrator {
   private architectureAgent: ArchitectureAgent;
 
   // Refinement parameters
-  private readonly DEFAULT_TARGET_SCORE = 85; // Out of 100
-  private readonly MAX_ITERATIONS = 5;
-  private readonly CONVERGENCE_THRESHOLD = 3; // Points improvement required to continue
-  private readonly MINIMUM_IMPROVEMENT = 1; // Minimum points improvement per iteration
+  private readonly DEFAULT_TARGET_SCORE = 70; // Out of 100 (reduced to avoid excessive iterations)
+  private readonly MAX_ITERATIONS = 2; // Reduced from 5 to 2 for faster execution
+  private readonly CONVERGENCE_THRESHOLD = 5; // Increased from 3 to stop earlier
+  private readonly MINIMUM_IMPROVEMENT = 2; // Increased from 1 to avoid marginal improvements
 
   constructor(client: OpenAI) {
     this.client = client;
@@ -182,20 +182,13 @@ export class ArchitectureRefinementOrchestrator {
   }
 
   private async generateInitialArchitecture(payload: any): Promise<string> {
-    const architectureTask = {
-      id: 'initial-architecture',
-      type: 'architecture-design' as const,
-      priority: 'high' as const,
-      payload: {
-        caseStudy: payload.caseStudy,
-        requirements: payload.requirements,
-        businessContext: payload.businessContext,
-        industryType: payload.industryType
-      }
-    };
-
-    const result = await this.architectureAgent.execute(architectureTask);
-    return result.detailedArchitecture;
+    // Use the design method directly, not execute
+    const architecture = await this.architectureAgent.design(
+      payload.caseStudy,
+      payload.requirements,
+      undefined
+    );
+    return architecture;
   }
 
   private async assessArchitectureWithWAF(architecture: string, payload: any): Promise<any> {
@@ -212,7 +205,7 @@ export class ArchitectureRefinementOrchestrator {
       }
     };
 
-    return await this.wafOrchestrator.execute(wafTask);
+    return await this.wafOrchestrator.executeWAFAssessment(wafTask);
   }
 
   private async refineArchitecture(

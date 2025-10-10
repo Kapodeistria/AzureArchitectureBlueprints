@@ -1,6 +1,6 @@
 {
   "name": "agentic-well-architected-blueprint",
-  "version": "7.2.1",
+  "version": "7.3.1",
   "description": "AgenticWellArchitectedBlueprint - Microsoft Well-Architected Framework assessment platform with 11 specialized AI agents for comprehensive WAF compliance analysis",
   "main": "index.js",
   "scripts": {

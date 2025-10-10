@@ -2566,20 +2566,25 @@ Success Metrics Achieved:
                 return '📄';
             };
 
-            // Filter canonical files for display (exclude metadata but keep ASCII for DocViewer)
-            const canonicalFiles = files.filter(f =>
+            // Filter files for display (exclude metadata, ASCII, original case study)
+            const displayFiles = files.filter(f =>
                 !f.name.includes('metadata') &&
                 !f.name.includes('performance-report') &&
-                !f.name.includes('solution-') &&
-                !f.name.includes('quick-summary') &&
-                !f.name.includes('original-case-study')
+                !f.name.includes('original-case-study') &&
+                !f.name.includes('ascii-')
             );
 
-            // For grid display, exclude ASCII files
-            const displayFiles = canonicalFiles.filter(f => !f.name.includes('ascii-'));
+            // Sort files: solution first, quick-summary second, then alphabetically
+            displayFiles.sort((a, b) => {
+                if (a.name.includes('solution-')) return -1;
+                if (b.name.includes('solution-')) return 1;
+                if (a.name.includes('quick-summary')) return -1;
+                if (b.name.includes('quick-summary')) return 1;
+                return a.name.localeCompare(b.name);
+            });
 
-            // Store files globally for React modal and DocViewer (include ASCII)
-            globalDemoFiles = canonicalFiles;
+            // Store files globally
+            globalDemoFiles = displayFiles;
 
             const filesHtml = displayFiles.map((f, index) => {
                 const globalIndex = globalDemoFiles.indexOf(f);
@@ -2744,10 +2749,7 @@ Success Metrics Achieved:
                 });
             }, 100);
 
-            // Mount DocViewer after demo completes
-            console.log('[Demo] Calling mountDocViewer with', canonicalFiles.length, 'files');
-            console.log('[Demo] Files:', canonicalFiles.map(f => f.name));
-            mountDocViewer(canonicalFiles);
+            // DocViewer removed - using direct file preview instead
         }
 
         async function loadRecentOutputs() {

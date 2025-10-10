@@ -28,4 +28,4 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
-.cache/
+.cache/webapp/.env
